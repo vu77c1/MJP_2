@@ -19,7 +19,6 @@ public class MainManager {
         do {
             System.out.println("----------------MANAGEMENT----------------");
             System.out.println();
-
             System.out.println();
             System.out.println("            0. Exit");
             System.out.println("            1. Quản lý hộ dân");
@@ -107,7 +106,6 @@ public class MainManager {
 
             }
         } catch (Exception e) {
-
             e.printStackTrace();
         }
         return n;
