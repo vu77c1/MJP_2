@@ -5,7 +5,7 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Scanner;
 
-public class DBConnect {
+public class JdbcConnect {
     private static Scanner scanner = new Scanner(System.in);
     public static Connection connectDatabase() {
         final String JDBC_DRIVER = JdbcConfig.JDBC_DRIVER;
@@ -23,8 +23,7 @@ public class DBConnect {
         }
         return con;
     }
-    public static void disconnectDatabase(Connection con)
-    {
+    public static Connection disconnectDatabase(Connection con) {
         if (con != null) {
             try {
                 scanner.close();
@@ -35,5 +34,6 @@ public class DBConnect {
                 // Handle the exception as needed
             }
         }
+        return con;
     }
 }
