@@ -1,3 +1,8 @@
+import Common.JdbcConfig;
+import Model.Citizen;
+import Model.CitizenManager;
+
+import java.sql.Connection;
 import java.util.Scanner;
 
 public class MainManager {
@@ -61,6 +66,9 @@ public class MainManager {
             switch (n) {
                 case 1:
                     System.out.println("Quản lý hộ dân");
+
+                    CitizenManager citizenManager = new CitizenManager(JdbcConfig.connection);
+                    citizenManager.getAllCitizens();
                     break;
                 case 2:
                     System.out.println("Quản lý cán bộ");

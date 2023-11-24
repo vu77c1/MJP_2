@@ -1,5 +1,7 @@
 package Model;
 
+import Common.JdbcConfig;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class CitizenManager {
-    private Connection connection;
+    Connection connection = null;
+
 
     // Constructor nhận connection từ bên ngoài
     public CitizenManager(Connection connection) {
@@ -77,6 +80,5 @@ public class CitizenManager {
         }
         return citizens;
     }
-    // Các phương thức khác tương tự cho các chức năng cần thiết
-    // Ví dụ: getCitizenById, getCitizensByHouseId, vv.
+
 }
