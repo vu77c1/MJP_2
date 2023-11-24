@@ -1,16 +1,20 @@
+import Common.*;
+import Model.*;
+
+import java.sql.Connection;
 import java.util.Scanner;
 
 public class MainManager {
-    private static Scanner sc = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
     public static void main(String[] args) {
         int n;
         do {
-            n = menu(sc);
-            productManagement(n, sc);
+            n = menu(scanner);
+            productManagement(n, scanner);
 
         } while (!"0".equalsIgnoreCase(String.valueOf(n)));
 
-        sc.close();
+        scanner.close();
 
     }
     public static int menu(Scanner sc) {
@@ -54,7 +58,8 @@ public class MainManager {
         return n;
     }
 
-    public static int productManagement(int n, Scanner sc) {
+    public static int productManagement(int n, Scanner scanner) {
+
         try {
 
             switch (n) {
@@ -86,7 +91,6 @@ public class MainManager {
                 case 8:
                     System.out.println("Quản lý đối tượng ưu tiên");
 
-
                     break;
                 case 9:
                     System.out.println("Quản lý công dân");
@@ -98,17 +102,17 @@ public class MainManager {
                     break;
                 case 11:
                     System.out.println("Thống kê");
-
                     break;
+
                 case 0:
                     System.out.println("Close program.....");
+                    JdbcConnect.disconnectDatabase();
                     break;
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
         }
         return n;
-
     }
 }
