@@ -22,7 +22,7 @@ public class Processing {
         }
     }
     public static boolean isIDAlreadyExists(Connection con, String id, String tableName) {
-        String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE identity_card = ?) THEN 1 ELSE 0 END";
+        String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE id = ?) THEN 1 ELSE 0 END";
         boolean idExist = false;
 
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -40,21 +40,53 @@ public class Processing {
         return idExist;
     }
 
+    //	Nhap CCCD Va Validate
+    public static String inputIdentity(Scanner sc) {
+        String identity;
+        boolean check = true;
+        do {
+            System.out.print(" Nhập vào số CCCD: ");
+            identity = sc.nextLine().trim().replaceAll("\\s+", "");
+            if (!identity.isBlank()) {
+                if (identity.length() == 12 && Processing.isNumber(identity) && identity.charAt(0) != '-'
+                        && (!Processing.isSpecialCharacter(identity))) {
+                    check = true;
+                } else if (identity.charAt(0) == '-') {
+                    System.out.println(" \u001B[31mERROR: CCCD Không thể là số âm !!!\u001B[0m");
+                    check = false;
+                } else if (Processing.isSpecialCharacter(identity)) {
+                    System.out.println("\u001B[31m ERROR: CCCD Không thể chứa ký tự đặc biệt !!!\u001B[0m");
+                    check = false;
+                } else {
+                    System.out.println(" \u001B[31mERROR: CCCD phải bao gồm 12 số!!!\u001B[0m");
+                    check = false;
+                }
+            } else {
+                check = false;
+                System.out.println(" \u001B[31mERROR: Không được bỏ trống, vui lòng nhập lại!!!\u001B[0m");
+            }
+
+        } while (!check);
+        return identity;
+
+    }
+
+
     //	Nhap Address Va Validate
     public static String inputAddress(Scanner sc) {
         String address;
         boolean check = true;
         do {
-            System.out.print(" Input Address: ");
+            System.out.print("Nhập vào địa chỉ ");
             address = sc.nextLine().trim().replaceAll("\\s+", " ");
 
             if ((!Processing.isNumber(address)) && !Processing.isSpecialCharacter(address)) {
                 check = true;
             } else if (Processing.isNumber(address)) {
-                System.out.println(" ERROR: Address Khong Duoc Chua Toan So  !!!");
+                System.out.println(" ERROR: Địa chỉ không thể chỉ chứa số, phải bao gồm cả xã/phường, quận/huyện, tỉnh/thành phố!!!");
                 check = false;
             } else {
-                System.out.println(" ERROR: Address Name Khong Duoc Chua Ky Tu Dac Biet  !!!");
+                System.out.println(" ERROR: Địa chỉ không thể chứa ký tự đặt biệt!!!");
                 check = false;
             }
 
@@ -66,22 +98,22 @@ public class Processing {
         String fullName;
         boolean check = true;
         do {
-            System.out.print(" Input Full Name: ");
+            System.out.print(" Nhập vào họ và tên: ");
             fullName = sc.nextLine().trim().replaceAll("\\s+", " ");
             if (!fullName.isBlank()) {
 
                 if ((!Processing.isNumber(fullName)) && !Processing.isSpecialCharacter(fullName)) {
                     check = true;
                 } else if (Processing.isNumber(fullName)) {
-                    System.out.println(" ERROR: Full Name Khong Duoc Chua Toan So  !!!");
+                    System.out.println(" \u001B[31mERROR: Họ và tên không được chứa số!!!\u001B[0m");
                     check = false;
                 } else {
-                    System.out.println(" ERROR: Full Name Khong Duoc Chua Ky Tu Dac Biet  !!!");
+                    System.out.println("\u001B[31m ERROR: Họ và tên không thể chứa ký tự đặt biệt!!!\u001B[0m");
                     check = false;
                 }
             } else {
                 check = false;
-                System.out.println(" ERROR: Khong Duoc Bo Trong, Vui Long Nhap Lai!!!");
+                System.out.println(" \u001B[31mERROR: Không được bỏ trống, vui lòng nhập lại!!!\u001B[0m");
             }
 
         } while (!check);
@@ -93,7 +125,7 @@ public class Processing {
         String phone;
         boolean check = true;
         do {
-            System.out.print(" Input Phone:");
+            System.out.print("Nhập vào số điện thoại:");
             phone = sc.nextLine().trim().replaceAll("\\s+", "");
             if (!phone.isBlank()) {
                 if (phone.length() == 10 && phone.charAt(0) == '0' && Processing.isNumber(phone)
@@ -101,13 +133,13 @@ public class Processing {
                     check = true;
                 } else if (phone.charAt(0) != '0') {
                     check = false;
-                    System.out.println(" ERROR: So Dien Thoai Bat Dau Bang So 0!!!");
+                    System.out.println("\u001B[31mERROR: Số điện thaoij nên bắt đầu bằng \'0\'!!!\u001B[0m");
                 } else if (Processing.isSpecialCharacter(phone)) {
                     check = false;
-                    System.out.println(" ERROR: So Dien Thoai Chua Ky Tu Dac Biet!!!");
+                    System.out.println("\u001B[31mERROR: Số điện thoại không thể chứa các ký tự khác số!!!\u001B[0m");
                 } else {
                     check = false;
-                    System.out.println(" ERROR: So Dien Thoai Gom 10 Chu So!!!");
+                    System.out.println("\u001B[31mERROR: Số điện thoại phải bao gồm 10 số!!!");
                 }
             } else {
                 check = false;

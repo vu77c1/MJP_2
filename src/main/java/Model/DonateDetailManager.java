@@ -85,4 +85,51 @@ public class DonateDetailManager {
             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
     }
+
+    //	Xoa Thong Tin Khach Hang
+    public void deleteDonateDetail(Connection con) {
+            System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n((Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")  ");
+            waitForEnter();
+            System.out.print("Vui lòng nhập vào ID của record muốn xóa: ");
+        String identity = scanner.nextLine();// Tạm thời xóa record theo ID
+        System.out.println();
+        PreparedStatement pstmt = null;
+        String tableName = "DonateDetail";
+        try {
+//			Kiem Tra Su Ton Ton Tai Cua Khach Hang, Neu Ton Tai Thi Tien Hanh Xoa
+            if (Processing.isIDAlreadyExists(con, identity, tableName) == true){
+            String chose = null;
+                    do {
+                        System.out.print("Bạn có chắc chắn muốn xóa (Y/N)?");
+                        chose = scanner.nextLine().trim();
+                    } while (!("Y".equalsIgnoreCase(chose) || "N".equalsIgnoreCase(chose)));
+
+                    if ("Y".equalsIgnoreCase(chose)) {
+                        //Xóa
+                        String sqlDelete = "DELETE FROM DonateDetail WHERE ID=?";
+                        pstmt = con.prepareStatement(sqlDelete);
+                        pstmt.setString(1, identity);
+                        if (pstmt.executeUpdate() != 0) {
+                            System.out.println("Xóa thành công!!!");
+                        }
+
+                    } else {
+                        System.out.println(" \u001B[31mINFOR:Không có kết quả nào bị xóa!!!\u001B[0m");
+                }
+            } else {
+                System.out.println("\u001B[31mKết quả không tồn tại trong Database!!!\u001B[0m");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                if (pstmt != null)
+                    pstmt.close();
+            } catch (SQLException se2) {
+                se2.printStackTrace();
+            }
+        }
+    }
 }
