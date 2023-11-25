@@ -60,15 +60,12 @@ public class MainManager {
             } while (m == -1);
 
             n = m;
-
-
         } while (!(n >= 0 && n <= 11));
         return n;
     }
 
     public static int productManagement(int n, Scanner sc) {
         try {
-
             switch (n) {
                 case 1:
                     HouseManager houseManager = new HouseManager(DBConnect.connectDatabase());
@@ -80,23 +77,18 @@ public class MainManager {
                     break;
                 case 3:
                     System.out.println("Quản lý người đại diện");
-
                     break;
                 case 4:
                     System.out.println("Quản lý công ty ủng hộ");
-
                     break;
                 case 5:
                     System.out.println("Quản lý Ủy Ban");
                     break;
                 case 6:
                     System.out.println("Quản lý phân phối");
-
                     break;
                 case 7:
                     System.out.println("Quản lý chi tiết phân phối");
-                    handleDonateDetailManager(con);
-                    break;
                 case 8:
                     System.out.println("\t\t\tPriority Object Manager ");
                     PriorityObjectManager po = new PriorityObjectManager();
@@ -132,12 +124,10 @@ public class MainManager {
                         }
                     }
 
-
                     break;
                 case 9:
                     CitizenManager citizenManager = new CitizenManager(DBConnect.connectDatabase());
                     System.out.println("Quản lý công dân");
-                    handleCitizenManagement(citizenManager, sc);
                     break;
                 case 10:
                     System.out.println("\t\t\tCitizen Object Manager ");
@@ -171,7 +161,6 @@ public class MainManager {
                                 break;
                         }
                     }
-
                     break;
                 case 11:
                     System.out.println("Thống kê");
@@ -182,13 +171,11 @@ public class MainManager {
                     closeScanner();
                     System.exit(0);
                     break;
-
             }
         } catch (Exception e) {
             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
         }
         return n;
-
     }
     private static void handleHouseManagement(HouseManager houseManager, Scanner scanner) {
         System.out.println("Quản lý hộ dân - Chọn chức năng:");
