@@ -24,7 +24,7 @@ public class CitizenManager {
     public Citizen enterCitizenDetailsFromConsole(Scanner scanner) {
         Citizen newCitizen = new Citizen();
 
-        System.out.println("Nhập thông tin cho công dân mới:");
+        System.out.println("Enter new Citizen:");
 
         System.out.print("Tên: ");
         newCitizen.setName(scanner.nextLine());
