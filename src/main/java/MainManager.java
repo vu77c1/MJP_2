@@ -114,6 +114,7 @@ public class MainManager {
                 case 0:
                     System.out.println("Close program.....");
                     DBConnect.disconnectDatabase();
+                    System.exit(0);
                     break;
 
             }
@@ -150,7 +151,7 @@ public class MainManager {
                         System.out.print("Nhập ID hộ dân cần xóa: ");
                         int houseIdToDelete = Integer.parseInt(scanner.nextLine());
                         houseManager.deleteHouse(houseIdToDelete);
-                        System.out.println("Hộ dân có ID " + houseIdToDelete + " đã được xóa thành công.");
+                        System.out.println("\u001B[32mHộ dân có ID " + houseIdToDelete + " đã được xóa thành công.\u001B[0m");
                         break;
                     case 3:
                         // Sửa thông tin hộ dân
@@ -168,7 +169,7 @@ public class MainManager {
                         main(new String[]{});
                         break;
                     default:
-                        System.out.println("Lựa chọn không hợp lệ.");
+                        System.out.println("\u001B[31mLựa chọn không hợp lệ.\u001B[0m");
                         break;
                 }
             } catch (NumberFormatException e) {
@@ -201,7 +202,7 @@ public class MainManager {
                         System.out.print("Nhập ID công dân cần xóa: ");
                         int citizenIdToDelete = Integer.parseInt(scanner.nextLine());
                         citizenManager.deleteCitizen(citizenIdToDelete);
-                        System.out.println("Công dân có ID " + citizenIdToDelete + " đã được xóa thành công.");
+                        System.out.println("\u001B[32mCông dân có ID " + citizenIdToDelete + " đã được xóa thành công.\u001B[0m");
                         break;
                     case 3:
                         // Sửa thông tin công dân
@@ -213,7 +214,7 @@ public class MainManager {
                         main(new String[]{});
                         break;
                     default:
-                        System.out.println("Lựa chọn không hợp lệ.");
+                        System.out.println("\u001B[31mLựa chọn không hợp lệ.\u001B[0m");
                         break;
                 }
             } catch (NumberFormatException e) {

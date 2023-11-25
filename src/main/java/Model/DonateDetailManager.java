@@ -52,7 +52,7 @@ public class DonateDetailManager {
             LocalDate donateDate;
             String donateDateStr;
             do {
-                System.out.print("Nhập vào ngày nhận hỗ trợ (theo định dạng MM/dd/yyyy): ");
+                System.out.print("Nhập vào ngày nhận hỗ trợ (theo định dạng dd/MM/yyyy): ");
                 donateDateStr = sc.nextLine();
 
                 try {
