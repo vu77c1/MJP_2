@@ -9,13 +9,13 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Processing {
-    private static Scanner scanner = new Scanner(System.in);
+    private static Scanner sc = new Scanner(System.in);
     private static Connection con = DBConnect.connectDatabase();
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     public static void waitForEnter() {
         while (true) {
             System.out.println("\u001B[32mNhấn 'Enter' để quay lại menu...\u001B[0m");
-            String input = scanner.nextLine();
+            String input = sc.nextLine();
 
             if (input.isEmpty()) {
                 // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
@@ -48,7 +48,7 @@ public class Processing {
         boolean check = true;
         do {
             System.out.print(" Nhập vào số CCCD: ");
-            identity = scanner.nextLine().trim().replaceAll("\\s+", "");
+            identity = sc.nextLine().trim().replaceAll("\\s+", "");
             if (!identity.isBlank()) {
                 if (identity.length() == 12 && Processing.isNumber(identity) && identity.charAt(0) != '-'
                         && (!Processing.isSpecialCharacter(identity))) {
@@ -229,5 +229,9 @@ public class Processing {
             return true; // Return false in case of an exception
         }
     }
-
+    public static void closeScanner() {
+        if (sc != null) {
+            sc.close();
+        }
+    }
 }

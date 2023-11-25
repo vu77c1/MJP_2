@@ -1,7 +1,6 @@
 package Model;
 
 import Common.DBConnect;
-
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

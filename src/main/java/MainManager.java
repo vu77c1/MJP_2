@@ -114,6 +114,7 @@ public class MainManager {
                 case 0:
                     System.out.println("Close program.....");
                     DBConnect.disconnectDatabase();
+                    closeScanner();
                     System.exit(0);
                     break;
 
