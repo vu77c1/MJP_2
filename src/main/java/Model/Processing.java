@@ -89,7 +89,7 @@ public class Processing {
                 System.out.println(" ERROR: Địa chỉ không thể chỉ chứa số, phải bao gồm cả xã/phường, quận/huyện, tỉnh/thành phố!!!");
                 check = false;
             } else if (address.length()>255) {
-                System.out.println(" \u001B[31mERROR: Họ và tên không được quá 255 ký tự!!!\u001B[0m");
+                System.out.println(" \u001B[31mERROR: Địa chỉ không được quá 255 ký tự!!!\u001B[0m");
                 check = false;
             } else {
                 System.out.println(" ERROR: Địa chỉ không thể chứa ký tự đặt biệt!!!");
