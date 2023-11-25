@@ -48,15 +48,12 @@ public class MainManager {
             } while (m == -1);
 
             n = m;
-
-
         } while (!(n >= 0 && n <= 11));
         return n;
     }
 
     public static int productManagement(int n, Scanner sc) {
         try {
-
             switch (n) {
                 case 1:
                     System.out.println("Quản lý hộ dân");
@@ -66,49 +63,38 @@ public class MainManager {
                     break;
                 case 3:
                     System.out.println("Quản lý người đại diện");
-
                     break;
                 case 4:
                     System.out.println("Quản lý công ty ủng hộ");
-
                     break;
                 case 5:
                     System.out.println("Quản lý Ủy Ban");
                     break;
                 case 6:
                     System.out.println("Quản lý phân phối");
-
                     break;
                 case 7:
                     System.out.println("Quản lý chi tiết phân phối");
-
                     break;
                 case 8:
                     System.out.println("Quản lý đối tượng ưu tiên");
-
-
                     break;
                 case 9:
                     System.out.println("Quản lý công dân");
-
                     break;
                 case 10:
                     System.out.println("Quản lý đối tượng công dân");
-
                     break;
                 case 11:
                     System.out.println("Thống kê");
-
                     break;
                 case 0:
                     System.out.println("Close program.....");
                     break;
-
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
         return n;
-
     }
 }
