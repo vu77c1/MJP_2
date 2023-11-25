@@ -1,5 +1,7 @@
 package Model;
 
+import Common.DBConnect;
+
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
@@ -8,7 +10,8 @@ import java.util.regex.Pattern;
 
 public class Processing {
     private static Scanner scanner = new Scanner(System.in);
-    public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/uuuu").withResolverStyle(ResolverStyle.STRICT);
+    private static Connection con = DBConnect.connectDatabase();
+    public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     public static void waitForEnter() {
         while (true) {
             System.out.println("\u001B[32mNhấn 'Enter' để quay lại menu...\u001B[0m");
@@ -139,11 +142,11 @@ public class Processing {
                     System.out.println("\u001B[31mERROR: Số điện thoại không thể chứa các ký tự khác số!!!\u001B[0m");
                 } else {
                     check = false;
-                    System.out.println("\u001B[31mERROR: Số điện thoại phải bao gồm 10 số!!!");
+                    System.out.println("\u001B[31mERROR: Số điện thoại phải bao gồm 10 số!!!\u001B[0m");
                 }
             } else {
                 check = false;
-                System.out.println(" ERROR: Khong Duoc Bo Trong!!!");
+                System.out.println("\u001B[31m ERROR: Không được bỏ trống!!!\u001B[0m");
             }
         } while (!check);
         return phone;
@@ -153,6 +156,14 @@ public class Processing {
     public static boolean isNumber(String number) {
         try {
             Integer.parseInt(number);
+            return true;
+        } catch (Exception e) {
+        }
+        return false;
+    }
+    public static boolean isFloatNumber(String number) {
+        try {
+            Double.parseDouble(number);
             return true;
         } catch (Exception e) {
         }
@@ -184,6 +195,35 @@ public class Processing {
             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
         return -1; // Return an error indicator instead of throwing an exception
+    }
+    public static int inputIdentity(Scanner sc, String tableName, String columnName) {
+        int ID;
+        do {
+            System.out.print("Nhập vào ID  (Tham khảo các menu \"Quản lý\"): ");
+            ID = sc.nextInt();
+            System.out.println();
+
+            if (checkIDExistence(ID, tableName, columnName)) {
+                System.out.println("\u001B[31mID không tồn tại trong bảng " + tableName + ". Vui lòng nhập lại.\u001B[0m");
+            }
+        } while (checkIDExistence(ID, tableName, columnName));
+
+        return ID;
+    }
+
+    private static boolean checkIDExistence(int ID, String tableName, String columnName) {
+        String query = "SELECT * FROM " + tableName + " WHERE " + columnName + " = ?";
+        try (PreparedStatement preparedStatement = con.prepareStatement(query)) {
+            preparedStatement.setInt(1, ID);
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                return !resultSet.next(); // Returns true if the ID exists in the table
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+            // Handle the exception according to your needs
+            return true; // Return false in case of an exception
+        }
     }
 
 }

@@ -42,37 +42,43 @@ public class DonateDetailManager {
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
             PreparedStatement insertStatement = con.prepareStatement(insertQuery);
             System.out.print("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\"): ");
-            int representative_id = sc.nextInt();
-            System.out.print("Nhập vào ID của xã/phường được nhận hỗ trợ (Tham khảo menu \"Quản lý Ủy ban\"): ");
-            int commission_id = sc.nextInt();
-            LocalDate donateDate = null;
-            String donateDateStr = null;
-            do
-            {
+            int representativeId = Processing.inputIdentity(sc, "Representative", "id");
+            System.out.println("ID của xã/phường được nhận hỗ trợ (Tham khảo menu \"Quản lý Ủy ban\"): ");
+            int commissionId = Processing.inputIdentity(sc, "Commission", "id");
+            sc.nextLine(); // Consume the newline character
+
+            LocalDate donateDate;
+            String donateDateStr;
+            do {
                 System.out.print("Nhập vào ngày nhận hỗ trợ (theo định dạng MM/dd/yyyy): ");
                 donateDateStr = sc.nextLine();
 
-                try
-                {
+                try {
                     donateDate = LocalDate.parse(donateDateStr, dateFormat);
-                    if (donateDate.isAfter(LocalDate.now()))
-                    {
+                    if (donateDate.isAfter(LocalDate.now())) {
                         System.out.println("\u001B[31mNgày nhận hỗ trợ phải trước hơn ngày hiện tại!\n Bạn không thể du hành thời gian đúng chứ!\u001B[0m");
                         donateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
                     }
-                }
-                catch (DateTimeParseException ex)
-                {
+                } catch (DateTimeParseException ex) {
                     System.out.println("\u001B[31m Ngày tháng nhập vào \"" + donateDateStr + "\" không hợp lệ.\u001B[0m");
                     donateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
                 }
-            }
-            while (donateDate == null);
+            } while (donateDate == null);
+            double amount = 0;
+            String input;
 
-            System.out.print("Nhập vào số tiền được ủng hộ: ");
-            double amount = sc.nextDouble();
-            insertStatement.setInt(1, representative_id);
-            insertStatement.setInt(2, commission_id);
+            do {
+                System.out.print("Nhập vào số tiền được ủng hộ: ");
+                input = sc.next();
+
+                if (!isFloatNumber(input)) {
+                    System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
+                } else {
+                    amount = Double.parseDouble(input);
+                }
+            } while (!isFloatNumber(input));
+            insertStatement.setInt(1, representativeId);
+            insertStatement.setInt(2, commissionId);
             insertStatement.setDate(3, Date.valueOf(donateDate));
             insertStatement.setDouble(4, amount);
             System.out.println("\u001B[32mNhà hỗ trợ đã được thêm vào cơ sở dữ liệu.\u001B[0m");
