@@ -1,16 +1,16 @@
 import Common.DBConnect;
-import Common.JdbcConfig;
-import Model.Citizen;
-import Model.CitizenManager;
-import Model.HouseManager;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Scanner;
+import Model.*;
+
+import static Model.DonateDetailManager.*;
+import static Model.Processing.*;
 
 public class MainManager {
     private static Scanner sc = new Scanner(System.in);
+    private static Connection con = DBConnect.connectDatabase();
     public static void main(String[] args) {
         int n;
         do {
@@ -92,7 +92,7 @@ public class MainManager {
                     break;
                 case 7:
                     System.out.println("Quản lý chi tiết phân phối");
-
+                    handleDonateDetailManager(con);
                     break;
                 case 8:
                     System.out.println("Quản lý đối tượng ưu tiên");
@@ -218,5 +218,55 @@ public class MainManager {
                 System.out.println("Lỗi SQL: " + e.getMessage());
             }
         } while (choice != 0);
+    }
+    public static void handleDonateDetailManager(Connection con) {
+        int choice = -1;
+        do{
+
+            System.out.println("Quản lý danh sách chi tiết ủng hộ");
+            System.out.println("1. Hiển thị danh sách chi tiết ủng hộ");
+            System.out.println("2. Thêm thông tin chi tiết ủng hộ");
+            System.out.println("3. Sửa thông tin chi tiết ủng hộ");
+            System.out.println("4. Xóa thông tin ủng hộ");
+            System.out.println("0. Trở về menu chính");
+            System.out.println();
+            System.out.println("What do you want to choose?");
+
+
+            do {
+                try
+                {
+                    System.out.print("Nhập vào số của chương trình: (0-4): ");
+                    choice = Integer.parseInt(sc.nextLine());
+                }
+                catch (NumberFormatException input)
+                {
+                    System.out.println("\u001B[31mKý tự nhập vào không hợp lệ!\nVui lòng nhập lại (0-4)!\u001B[0m");
+                }
+            }
+            while (choice == -1);
+            switch (choice) {
+                case 0:
+                    System.out.print("Trở về màn hình chính");
+                    main(new String[]{});
+                    break;
+                case 1:
+                    printDonateDetail(con);
+                    break;
+                case 2:
+                    addDonateDetail(con);
+                    break;
+                case 3:
+                    updateDonateDetail(con);
+                    break;
+                case 4:
+                    deleteDonateDetail(con);
+                    break;
+                default:
+                    System.out.println("\u001B[31mChức năng không hợp lệ. Vui lòng chọn lại.\u001B[0m");
+                    waitForEnter();
+            }
+        }
+        while (choice >=0 && choice <=4);
     }
 }

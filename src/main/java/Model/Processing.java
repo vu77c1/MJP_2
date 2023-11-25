@@ -41,12 +41,12 @@ public class Processing {
     }
 
     //	Nhap CCCD Va Validate
-    public static String inputIdentity(Scanner sc) {
+    public static String inputIdentity() {
         String identity;
         boolean check = true;
         do {
             System.out.print(" Nhập vào số CCCD: ");
-            identity = sc.nextLine().trim().replaceAll("\\s+", "");
+            identity = scanner.nextLine().trim().replaceAll("\\s+", "");
             if (!identity.isBlank()) {
                 if (identity.length() == 12 && Processing.isNumber(identity) && identity.charAt(0) != '-'
                         && (!Processing.isSpecialCharacter(identity))) {
