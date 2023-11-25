@@ -1,14 +1,12 @@
 package Model;
 
 import Common.DBConnect;
-import Common.JdbcConfig;
 
 import java.sql.*;
 import java.util.Scanner;
 
-public class OfficerManager {
+public class OfficerManage {
     private static Scanner sc = new Scanner(System.in);
-
     private static Connection connection = DBConnect.connectDatabase();
     public static void main(String[] args) throws SQLException {
         displayMenu();
@@ -27,19 +25,19 @@ public class OfficerManager {
                     System.out.println("* Notification: Program is closed. Thank you for using our program!");
                     break;
                 case 1:
-                    OfficerManager.addNewOfficer();
+                    OfficerManage.addNewOfficer();
                     displayMenu();
                     break;
                 case 2:
-                    OfficerManager.updateOfficerTable();
+                    OfficerManage.updateOfficerTable();
                     displayMenu();
                     break;
                 case 3:
-                    OfficerManager.deleteOfficer();
+                    OfficerManage.deleteOfficer();
                     displayMenu();
                     break;
                 case 4:
-                    OfficerManager.displayOfficerTable();
+                    OfficerManage.displayOfficerTable();
                     displayMenu();
                     break;
                 default:
