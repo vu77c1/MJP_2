@@ -19,7 +19,6 @@ public class Processing {
 
             if (input.isEmpty()) {
                 // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
-                scanner.nextLine();
                 break;
             }
         }
@@ -44,7 +43,7 @@ public class Processing {
     }
 
     //	Nhap CCCD Va Validate
-    public static String inputIdentity() {
+    public static String inputIdentityCard() {
         String identity;
         boolean check = true;
         do {
@@ -213,7 +212,6 @@ public class Processing {
                 System.out.println("\u001B[31mID không tồn tại trong bảng " + tableName + ". Vui lòng nhập lại.\u001B[0m");
             }
         } while (checkIDExistence(ID, tableName, columnName));
-
         return ID;
     }
 
