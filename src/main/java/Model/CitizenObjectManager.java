@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 
 public class CitizenObjectManager {
-    //Lay tat ca thong tin PriorityObject trong databse khong truyen tham so
+    //Lay tat ca thong tin CitizenObject trong databse khong truyen tham so
     public ArrayList<CitizenObject> getCitizenObject() {
         ArrayList<CitizenObject> infoList = new ArrayList<>();
         try {
@@ -37,7 +37,7 @@ public class CitizenObjectManager {
         return infoList;
     }
 
-    //Lay tat ca thong tin PriorityObject trong databse co tham so
+    //Lay tat ca thong tin CitizenObject trong databse co tham so
     public ArrayList<CitizenObject> getCitizenObject(String sql) {
         ArrayList<CitizenObject> infoList = new ArrayList<>();
         try {
@@ -155,7 +155,7 @@ public class CitizenObjectManager {
 
     }
 
-    //hien thi danh sach PriorityObject
+    //hien thi danh sach CitizenObject
     public void displayCitizenObjects(ArrayList<CitizenObject> citizenObjects) {
         System.out.println("\t\t\tID\tObject Type");
 
@@ -163,7 +163,7 @@ public class CitizenObjectManager {
             System.out.println("\t\t\t" + citizenObject.getId() + "\t" + citizenObject.getTypeNameObject());
         }
     }
-    //Kiem tra PriorityObject co ton tai trong database khong
+    //Kiem tra CitizenObject co ton tai trong database khong
 
     public boolean isIdExists(int id) {
         boolean exists = false;
