@@ -7,16 +7,11 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class OfficerManager {
-//    public static OfficerManager getInstance() {
-//        return new OfficerManager();
-//    }
     private static Scanner sc = new Scanner(System.in);
 
     private static Connection connection = DBConnect.connectDatabase();
     public static void main(String[] args) throws SQLException {
-//        Connection connection = DBConnect.connectDatabase();
         displayMenu();
-//        Statement st = connection.createStatement();
         int choice = 0;
         do {
             try {
