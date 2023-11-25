@@ -52,7 +52,7 @@ public class MainManager {
                     System.out.print("Please choose....");
                     m = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter a valid integer.");
+                    System.out.println("\u001B[31mKý tự nhập vào không hợp lệ!\nVui lòng nhập lại (0-11)!\u001B[0m");
                 }
             } while (m == -1);
 
@@ -114,6 +114,7 @@ public class MainManager {
                     break;
                 case 0:
                     System.out.println("Close program.....");
+                    DBConnect.disconnectDatabase();
                     break;
 
             }
@@ -163,7 +164,8 @@ public class MainManager {
                         houseManager.updateHouse(houseIdToUpdate, newCommissionId, newPriorityObjectId);
                         break;
                     case 0:
-                        System.out.print("Trở về màn hình chính");
+                        System.out.println("Trở về màn hình chính");
+                        waitForEnter();
                         main(new String[]{});
                         break;
                     default:
@@ -207,7 +209,8 @@ public class MainManager {
                         citizenManager.updateCitizenFromConsoleInput(scanner);
                         break;
                     case 0:
-                        System.out.print("Trở về màn hình chính");
+                        System.out.println("Trở về màn hình chính");
+                        waitForEnter();
                         main(new String[]{});
                         break;
                     default:
@@ -249,7 +252,8 @@ public class MainManager {
             while (choice == -1);
             switch (choice) {
                 case 0:
-                    System.out.print("Trở về màn hình chính");
+                    System.out.println("Trở về màn hình chính");
+                    waitForEnter();
                     main(new String[]{});
                     break;
                 case 1:

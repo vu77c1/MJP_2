@@ -8,7 +8,7 @@ import java.util.Scanner;
 import static Model.Processing.*;
 
 public class DonateDetailManager {
-    private final static Scanner scanner = new Scanner(System.in);
+    private final static Scanner sc = new Scanner(System.in);
     public static void printDonateDetail(Connection con){
         try {
                 System.out.println("========================================================== DANH SÁCH ỦNG HỘ =========================================================");
@@ -42,15 +42,15 @@ public class DonateDetailManager {
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
             PreparedStatement insertStatement = con.prepareStatement(insertQuery);
             System.out.print("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\"): ");
-            int representative_id = scanner.nextInt();
+            int representative_id = sc.nextInt();
             System.out.print("Nhập vào ID của xã/phường được nhận hỗ trợ (Tham khảo menu \"Quản lý Ủy ban\"): ");
-            int commission_id = scanner.nextInt();
+            int commission_id = sc.nextInt();
             LocalDate donateDate = null;
             String donateDateStr = null;
             do
             {
                 System.out.print("Nhập vào ngày nhận hỗ trợ (theo định dạng MM/dd/yyyy): ");
-                donateDateStr = scanner.nextLine();
+                donateDateStr = sc.nextLine();
 
                 try
                 {
@@ -70,7 +70,7 @@ public class DonateDetailManager {
             while (donateDate == null);
 
             System.out.print("Nhập vào số tiền được ủng hộ: ");
-            double amount = scanner.nextDouble();
+            double amount = sc.nextDouble();
             insertStatement.setInt(1, representative_id);
             insertStatement.setInt(2, commission_id);
             insertStatement.setDate(3, Date.valueOf(donateDate));
@@ -80,8 +80,7 @@ public class DonateDetailManager {
         }
         catch (SQLException e)
         {
-            System.out.println(e.getMessage());
-            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
         }
     }
 
@@ -90,7 +89,7 @@ public class DonateDetailManager {
             System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n((Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")  ");
             waitForEnter();
             System.out.print("Vui lòng nhập vào ID của record muốn xóa: ");
-        String identity = scanner.nextLine();// Tạm thời xóa record theo ID
+        String identity = sc.nextLine();// Tạm thời xóa record theo ID
         System.out.println();
         PreparedStatement pstmt = null;
         String tableName = "DonateDetail";
@@ -100,7 +99,7 @@ public class DonateDetailManager {
             String chose = null;
                     do {
                         System.out.print("Bạn có chắc chắn muốn xóa (Y/N)?");
-                        chose = scanner.nextLine().trim();
+                        chose = sc.nextLine().trim();
                     } while (!("Y".equalsIgnoreCase(chose) || "N".equalsIgnoreCase(chose)));
 
                     if ("Y".equalsIgnoreCase(chose)) {
@@ -138,7 +137,7 @@ public class DonateDetailManager {
         System.out.print("Bạn sắp thao tác cập nhật một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n((Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")  ");
         waitForEnter();
         System.out.print("Vui lòng nhập vào ID của record muốn update: ");
-        String identity = scanner.nextLine();// Tạm thời xóa record theo ID
+        String identity = sc.nextLine();// Tạm thời xóa record theo ID
         System.out.println();
         PreparedStatement pstmt = null;
         String tableName = "DonateDetail";
@@ -157,7 +156,7 @@ public class DonateDetailManager {
                         "2. Ngày ủng hộ", "3. Ủy ban nhận", "4. Người đại diện");
                 System.out.println("+-------------------------------+");
                 System.out.print(" From Update Menu, Your Choice: ");
-                chose = scanner.nextLine().trim();
+                chose = sc.nextLine().trim();
                 if (!("1".equals(chose) || "2".equals(chose) || "3".equals(chose) || "4".equals(chose))) {
                     check = false;
                     System.out.println("\u001B[31mGiá trị nhập vào không đúng, vui lòng nhập lại!!!\u001B[0m");
@@ -168,7 +167,7 @@ public class DonateDetailManager {
 //			Update Số tiền
                 case "1":
                     System.out.print("Nhập vào số tiền: ");
-                    double newAmount = scanner.nextDouble();
+                    double newAmount = sc.nextDouble();
                     String sql1 = "UPDATE DonateDetail SET amount =? WHERE id =?";
 
                     try {
@@ -197,7 +196,7 @@ public class DonateDetailManager {
                     do
                     {
                         System.out.print("Nhập vào ngày nhận hỗ trợ (theo định dạng MM/dd/yyyy): ");
-                        newDonateDateStr = scanner.nextLine();
+                        newDonateDateStr = sc.nextLine();
 
                         try
                         {
@@ -236,7 +235,7 @@ public class DonateDetailManager {
 //			Update ID Ủy ban
                 case "3":
                     System.out.print("Nhập vào ID Ủy ban: ");
-                    String newCommissionId = scanner.nextLine();
+                    String newCommissionId = sc.nextLine();
                     String sql3 = "UPDATE DonateDetail SET commission_id =? WHERE id =?";
                     try {
                         pstmt = con.prepareStatement(sql3);
@@ -260,7 +259,7 @@ public class DonateDetailManager {
 //			Update ID nguoi dai dien
                 case "4":
                     System.out.print("Nhập vào ID của người đại diện: ");
-                    String newRepresentativeId = scanner.nextLine();
+                    String newRepresentativeId = sc.nextLine();
                     String sql4 = "UPDATE DonateDetail SET representative_id =? WHERE id =?";
                     try {
                         pstmt = con.prepareStatement(sql4);
