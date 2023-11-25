@@ -1,20 +1,25 @@
-import Common.*;
-import Model.*;
+import Common.DBConnect;
+import Common.JdbcConfig;
+import Model.Citizen;
+import Model.CitizenManager;
+import Model.HouseManager;
 
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.List;
 import java.util.Scanner;
 
 public class MainManager {
-    private static final Scanner scanner = new Scanner(System.in);
+    private static Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
         int n;
         do {
-            n = menu(scanner);
-            productManagement(n, scanner);
+            n = menu(sc);
+            productManagement(n, sc);
 
         } while (!"0".equalsIgnoreCase(String.valueOf(n)));
 
-        scanner.close();
+        sc.close();
 
     }
     public static int menu(Scanner sc) {
@@ -58,14 +63,15 @@ public class MainManager {
         return n;
     }
 
-    public static int productManagement(int n, Scanner scanner) {
-
+    public static int productManagement(int n, Scanner sc) {
         try {
 
             switch (n) {
                 case 1:
+                    HouseManager houseManager = new HouseManager(DBConnect.connectDatabase());
                     System.out.println("Quản lý hộ dân");
-                    break;
+                    handleHouseManagement(houseManager, sc);
+                   break;
                 case 2:
                     System.out.println("Quản lý cán bộ");
                     break;
@@ -91,10 +97,12 @@ public class MainManager {
                 case 8:
                     System.out.println("Quản lý đối tượng ưu tiên");
 
+
                     break;
                 case 9:
+                    CitizenManager citizenManager = new CitizenManager(DBConnect.connectDatabase());
                     System.out.println("Quản lý công dân");
-
+                    handleCitizenManagement(citizenManager, sc);
                     break;
                 case 10:
                     System.out.println("Quản lý đối tượng công dân");
@@ -102,17 +110,113 @@ public class MainManager {
                     break;
                 case 11:
                     System.out.println("Thống kê");
-                    break;
 
+                    break;
                 case 0:
                     System.out.println("Close program.....");
-                    JdbcConnect.disconnectDatabase();
                     break;
 
             }
         } catch (Exception e) {
-            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
+            e.printStackTrace();
         }
         return n;
+
+    }
+    private static void handleHouseManagement(HouseManager houseManager, Scanner scanner) {
+        System.out.println("Quản lý hộ dân - Chọn chức năng:");
+        System.out.println("1. Thêm hộ dân");
+        System.out.println("2. Xóa hộ dân");
+        System.out.println("3. Sửa thông tin hộ dân");
+        System.out.println("0. Quay lại menu chính");
+
+        int choice = -1;
+
+        do {
+            try {
+                System.out.print("Vui lòng chọn: ");
+                choice = Integer.parseInt(scanner.nextLine());
+                switch (choice) {
+                    case 1:
+                        // Thêm hộ dân
+                        System.out.print("Nhập commission ID: ");
+                        int commissionId = Integer.parseInt(scanner.nextLine());
+                        System.out.print("Nhập priority object ID: ");
+                        int priorityObjectId = Integer.parseInt(scanner.nextLine());
+                        houseManager.addHouse(commissionId, priorityObjectId);
+                        break;
+                    case 2:
+                        // Xóa hộ dân
+                        System.out.print("Nhập ID hộ dân cần xóa: ");
+                        int houseIdToDelete = Integer.parseInt(scanner.nextLine());
+                        houseManager.deleteHouse(houseIdToDelete);
+                        System.out.println("Hộ dân có ID " + houseIdToDelete + " đã được xóa thành công.");
+                        break;
+                    case 3:
+                        // Sửa thông tin hộ dân
+                        System.out.print("Nhập ID hộ dân cần sửa: ");
+                        int houseIdToUpdate = Integer.parseInt(scanner.nextLine());
+                        System.out.print("Nhập commission ID mới: ");
+                        int newCommissionId = Integer.parseInt(scanner.nextLine());
+                        System.out.print("Nhập priority object ID mới: ");
+                        int newPriorityObjectId = Integer.parseInt(scanner.nextLine());
+                        houseManager.updateHouse(houseIdToUpdate, newCommissionId, newPriorityObjectId);
+                        break;
+                    case 0:
+                        // Quay lại menu chính
+                        break;
+                    default:
+                        System.out.println("Lựa chọn không hợp lệ.");
+                        break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Vui lòng nhập số.");
+            } catch (SQLException e) {
+                System.out.println("Lỗi SQL: " + e.getMessage());
+            }
+        } while (choice != 0);
+    }
+    private static void handleCitizenManagement(CitizenManager citizenManager, Scanner scanner) {
+        System.out.println("Quản lý công dân - Chọn chức năng:");
+        System.out.println("1. Thêm công dân");
+        System.out.println("2. Xóa công dân");
+        System.out.println("3. Sửa thông tin công dân");
+        System.out.println("0. Quay lại menu chính");
+
+        int choice = -1;
+
+        do {
+            try {
+                System.out.print("Vui lòng chọn: ");
+                choice = Integer.parseInt(scanner.nextLine());
+                switch (choice) {
+                    case 1:
+                        // Thêm công dân
+                        citizenManager.addCitizenFromConsoleInput(scanner);
+                        break;
+                    case 2:
+                        // Xóa công dân
+                        System.out.print("Nhập ID công dân cần xóa: ");
+                        int citizenIdToDelete = Integer.parseInt(scanner.nextLine());
+                        citizenManager.deleteCitizen(citizenIdToDelete);
+                        System.out.println("Công dân có ID " + citizenIdToDelete + " đã được xóa thành công.");
+                        break;
+                    case 3:
+                        // Sửa thông tin công dân
+                        citizenManager.updateCitizenFromConsoleInput(scanner);
+                        break;
+                    case 0:
+                        // Quay lại menu chính
+                        break;
+                    default:
+                        System.out.println("Lựa chọn không hợp lệ.");
+                        break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Vui lòng nhập số.");
+            } catch (SQLException e) {
+                System.out.println("Lỗi SQL: " + e.getMessage());
+            }
+        } while (choice != 0);
     }
 }
