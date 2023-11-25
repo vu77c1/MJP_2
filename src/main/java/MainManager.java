@@ -118,7 +118,7 @@ public class MainManager {
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
         }
         return n;
 
@@ -163,7 +163,8 @@ public class MainManager {
                         houseManager.updateHouse(houseIdToUpdate, newCommissionId, newPriorityObjectId);
                         break;
                     case 0:
-                        // Quay lại menu chính
+                        System.out.print("Trở về màn hình chính");
+                        main(new String[]{});
                         break;
                     default:
                         System.out.println("Lựa chọn không hợp lệ.");
@@ -172,7 +173,7 @@ public class MainManager {
             } catch (NumberFormatException e) {
                 System.out.println("Vui lòng nhập số.");
             } catch (SQLException e) {
-                System.out.println("Lỗi SQL: " + e.getMessage());
+                System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
             }
         } while (choice != 0);
     }
@@ -206,7 +207,8 @@ public class MainManager {
                         citizenManager.updateCitizenFromConsoleInput(scanner);
                         break;
                     case 0:
-                        // Quay lại menu chính
+                        System.out.print("Trở về màn hình chính");
+                        main(new String[]{});
                         break;
                     default:
                         System.out.println("Lựa chọn không hợp lệ.");
@@ -215,7 +217,7 @@ public class MainManager {
             } catch (NumberFormatException e) {
                 System.out.println("Vui lòng nhập số.");
             } catch (SQLException e) {
-                System.out.println("Lỗi SQL: " + e.getMessage());
+                System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
             }
         } while (choice != 0);
     }
