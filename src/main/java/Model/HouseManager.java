@@ -1,5 +1,7 @@
 package Model;
 import Common.DBConnect;
+import org.w3c.dom.ls.LSOutput;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -73,6 +75,4 @@ public class HouseManager {
             }
         }
     }
-
-
 }
