@@ -24,12 +24,12 @@ public class Processing {
             }
         }
     }
-    public static boolean isIDAlreadyExists(Connection con, String id, String tableName) {
+    public static boolean isIDAlreadyExists(Connection con, int id, String tableName) {
         String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE id = ?) THEN 1 ELSE 0 END";
         boolean idExist = false;
 
         try (PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setString(1, id);
+            stmt.setInt(1, id);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     idExist = rs.getInt(1) == 1;
@@ -202,7 +202,7 @@ public class Processing {
         }
         return -1; // Return an error indicator instead of throwing an exception
     }
-    public static int inputIdentity(Scanner sc, String tableName, String columnName) {
+    public static int inputID(Scanner sc, String tableName, String columnName) {
         int ID;
         do {
             System.out.print("Nhập vào ID  (Tham khảo các menu \"Quản lý\"): ");
