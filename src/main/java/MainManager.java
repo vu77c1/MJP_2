@@ -24,7 +24,6 @@ public class MainManager {
     }
     public static int menu(Scanner sc) {
         int n;
-
         do {
             System.out.println("----------------MANAGEMENT----------------");
             System.out.println();
@@ -227,7 +226,7 @@ public class MainManager {
     public static void handleDonateDetailManager(Connection con) {
         int choice = -1;
         do{
-
+            System.out.println();
             System.out.println("Quản lý danh sách chi tiết ủng hộ");
             System.out.println("1. Hiển thị danh sách chi tiết ủng hộ");
             System.out.println("2. Thêm thông tin chi tiết ủng hộ");

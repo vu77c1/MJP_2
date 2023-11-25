@@ -11,26 +11,27 @@ public class DonateDetailManager {
     private final static Scanner sc = new Scanner(System.in);
     public static void printDonateDetail(Connection con){
         try {
-                System.out.println("========================================================== DANH SÁCH ỦNG HỘ =========================================================");
-                System.out.println("._______.__________________________.____________________._________________._________________._________________._____________________.");
-                System.out.println("│   ID  │          Số tiền         │    Ngày ủng hộ     │   Xã/Phường     │  Người đại diện │   Tên Công ty   │   Cán bộ tiếp nhận  │");
-                System.out.println("│_______│__________________________│____________________│_________________│_________________│_________________│_____________________│");
-                Statement statement = con.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT DonateDetail.id, amount, donate_date, precint_name, representative_name, company_name, name FROM DonateDetail Join dbo.Commission C on DonateDetail.commission_id = C.id JOIN dbo.Representative R on R.id = DonateDetail.representative_id join dbo.Company C2 on C2.id = R.company_id join dbo.Officer O on O.id = C.officer_id");
-                while (resultSet.next())
-                {
-                    String ID = resultSet.getString("DonateDetail.id");
-                    double amount = resultSet.getDouble("amount");
-                    LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
-                    String precint_name = resultSet.getString("precint_name");
-                    String representative_name = resultSet.getString("representative_name");
-                    String company_name = resultSet.getString("company_name");
-                    String name = resultSet.getString("name");
-                    System.out.printf("│ %-5S │ %-12s │ %-24s │ %-18s │ %-15s │ %-15s │ %-15s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
-                    System.out.println("│_______│______________│__________________________│____________________│_________________│_________________│_________________│_____________│");
-                }
-                System.out.println("========================================================= DANH SÁCH KẾT THÚC ========================================================");
-                waitForEnter();
+            System.out.println();
+            System.out.println("========================================================== DANH SÁCH ỦNG HỘ =========================================================");
+            System.out.println("._______.__________________________.____________________._________________._________________._________________._____________________.");
+            System.out.println("│   ID  │          Số tiền         │    Ngày ủng hộ     │   Xã/Phường     │  Người đại diện │   Tên Công ty   │   Cán bộ tiếp nhận  │");
+            System.out.println("│_______│__________________________│____________________│_________________│_________________│_________________│_____________________│");
+            Statement statement = con.createStatement();
+            ResultSet resultSet = statement.executeQuery("SELECT DonateDetail.id, amount, donate_date, precint_name, representative_name, company_name, name FROM DonateDetail Join dbo.Commission C on DonateDetail.commission_id = C.id JOIN dbo.Representative R on R.id = DonateDetail.representative_id join dbo.Company C2 on C2.id = R.company_id join dbo.Officer O on O.id = C.officer_id");
+            while (resultSet.next())
+            {
+                String ID = resultSet.getString("DonateDetail.id");
+                double amount = resultSet.getDouble("amount");
+                LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
+                String precint_name = resultSet.getString("precint_name");
+                String representative_name = resultSet.getString("representative_name");
+                String company_name = resultSet.getString("company_name");
+                String name = resultSet.getString("name");
+                System.out.printf("│ %-5S │ %-12s │ %-24s │ %-18s │ %-15s │ %-15s │ %-15s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
+                System.out.println("│_______│______________│__________________________│____________________│_________________│_________________│_________________│_____________│");
+            }
+            System.out.println("========================================================= DANH SÁCH KẾT THÚC ========================================================");
+            waitForEnter();
         }catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
@@ -38,6 +39,7 @@ public class DonateDetailManager {
     }
     public static void addDonateDetail(Connection con){
         try{
+            System.out.println();
             System.out.println("=== Thêm thông tin nhà ủng hộ ===");
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
             PreparedStatement insertStatement = con.prepareStatement(insertQuery);
@@ -92,15 +94,16 @@ public class DonateDetailManager {
 
     //	Xoa Thong Tin Khach Hang
     public static void deleteDonateDetail(Connection con) {
-            System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n((Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")  ");
-            waitForEnter();
-            System.out.print("Vui lòng nhập vào ID của record muốn xóa: ");
+        System.out.println();
+        System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")  ");
+        sc.nextLine();
+        System.out.print("Vui lòng nhập vào ID của record muốn xóa: ");
         String identity = sc.nextLine();// Tạm thời xóa record theo ID
         System.out.println();
         PreparedStatement pstmt = null;
         String tableName = "DonateDetail";
         try {
-//			Kiem Tra Su Ton Ton Tai Cua Khach Hang, Neu Ton Tai Thi Tien Hanh Xoa
+//			Kiem Tra Su Ton Ton Tai Cua record, Neu Ton Tai Thi Tien Hanh Xoa
             if (Processing.isIDAlreadyExists(con, identity, tableName)){
             String chose = null;
                     do {
@@ -140,7 +143,8 @@ public class DonateDetailManager {
 
     //	Chuc Nang Cap Nhat Thong Tin Khach Hang
     public static void updateDonateDetail(Connection con) {
-        System.out.print("Bạn sắp thao tác cập nhật một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n((Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")  ");
+        System.out.println();
+        System.out.print("Bạn sắp thao tác cập nhật một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")  ");
         waitForEnter();
         System.out.print("Vui lòng nhập vào ID của record muốn update: ");
         String identity = sc.nextLine();// Tạm thời xóa record theo ID
@@ -148,7 +152,7 @@ public class DonateDetailManager {
         PreparedStatement pstmt = null;
         String tableName = "DonateDetail";
 
-//		Kiem Tra CMND Da Co Trong Bang Khang Hang Hay Chua? Neu Co Thi Tien Hanh Update
+//		Kiem Tra id Da Co Trong Bang Khang Hang Hay Chua? Neu Co Thi Tien Hanh Update
         if (Processing.isIDAlreadyExists(con, identity, tableName )) {
             String chose =null;
             boolean check;
@@ -201,7 +205,7 @@ public class DonateDetailManager {
                     String newDonateDateStr = null;
                     do
                     {
-                        System.out.print("Nhập vào ngày nhận hỗ trợ (theo định dạng MM/dd/yyyy): ");
+                        System.out.print("Nhập vào ngày nhận hỗ trợ (theo định dạng dd/MM/yyyy): ");
                         newDonateDateStr = sc.nextLine();
 
                         try
