@@ -1,4 +1,5 @@
 import Common.InputValidator;
+import Model.CitizenObjectManager;
 import Model.PriorityObjectManager;
 
 import java.util.Scanner;
@@ -131,7 +132,37 @@ public class MainManager {
 
                     break;
                 case 10:
-                    System.out.println("Quản lý đối tượng công dân");
+                    System.out.println("\t\t\tCitizen Object Manager ");
+                    CitizenObjectManager co = new CitizenObjectManager();
+                    System.out.println("\t\t\t0. Exit");
+                    System.out.println("\t\t\t1. Add");
+                    System.out.println("\t\t\t2. Update");
+                    System.out.println("\t\t\t3. Delete");
+                    System.out.println("\t\t\t4. List Citizen Object");
+                    int num = -1;
+                    while (num != 0) {
+                        num = InputValidator.validateIntInput("\t\t\tEnter your choice 1-4 (0 to exit):  ");
+                        switch (num) {
+                            case 1:
+                                co.addCitizenObject();
+                                break;
+                            case 2:
+                                co.updateCitizenObject();
+                                break;
+                            case 3:
+                                co.deletePriorityObject();
+                                break;
+                            case 4:
+                                co.displayCitizenObjects(co.getCitizenObject());
+                                break;
+                            case 0:
+                                System.out.println("\t\t\tExiting Citizen Object Management...");
+                                break;
+                            default:
+                                System.out.println("\t\t\tInvalid choice. Please enter a valid option.");
+                                break;
+                        }
+                    }
 
                     break;
                 case 11:
