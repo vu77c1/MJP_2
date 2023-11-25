@@ -25,10 +25,10 @@ public class DistributionManager {
 
     public static void printDistribution(Connection con){
         try {
-            System.out.println("************************************ DANH SÁCH PHÂN PHỐI ************************************");
-            System.out.println("._______._____________________.____________________._________________._________________._________________._____________________.");
-            System.out.println("│   ID  │     ID Xã/Phường   │    ID Chủ Hộ       │ Số tiền được nhận  │     Ngày nhận   │ ");
-            System.out.println("│_______│____________________│____________________│____________________│_________________│  ");
+            System.out.println("\t\t\t************************************ DANH SÁCH PHÂN PHỐI *********************************");
+            System.out.println("\t\t\t._______._____________________.____________________._________________._________________.__");
+            System.out.println("\t\t\t│   ID  │     ID Xã/Phường   │    ID Chủ Hộ       │ Số tiền được nhận  │     Ngày nhận   │ ");
+            System.out.println("\t\t\t│_______│____________________│____________________│____________________│_________________│  ");
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT Distribution.id, commission_id, household_id, amount_received, date_received  FROM Distribution Join dbo.Commission C on C.id= Distribution.commission_id");
             while (resultSet.next())
@@ -39,10 +39,11 @@ public class DistributionManager {
                 double amount_received = resultSet.getFloat("amount_received");
                 LocalDate date_received = resultSet.getDate("date_received").toLocalDate();
 
-                System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │%-16s │ \n", ID, commission_id,household_id, amount_received,dateFormat.format(date_received));
-                System.out.println("│_______│____________________│____________________│____________________│_________________│");
+                System.out.printf("\t\t\t│ %-5S │ %-18s │ %-18s │ %-18s │%-16s │ \n", ID, commission_id,household_id, amount_received,dateFormat.format(date_received));
+                System.out.println("\t\t\t│_______│____________________│____________________│____________________│_________________│");
             }
-            System.out.println("************************************ DANH SÁCH KẾT THÚC ************************************");
+            System.out.println();
+            System.out.println("\t\t\t************************************ DANH SÁCH KẾT THÚC **********************************");
             waitForEnter();
         }catch (SQLException e) {
 
@@ -109,7 +110,7 @@ public class DistributionManager {
         return infoList;
     }
     //Enter data
-    public Distribution inputPriorityObject() {
+    public Distribution inputDistribution() {
         Integer comid = InputValidator.validateIntInput("\t\t\tEnter New Commission ID:  ");
         Integer houseid=InputValidator.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
         Double amount=InputValidator.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
@@ -127,7 +128,7 @@ public class DistributionManager {
 
 
         try {
-            Distribution di = inputPriorityObject();
+            Distribution di = inputDistribution();
             JDBCQuery.openConnection();
             String sql = "insert into Distribution (commission_id, household_id, amount_received, date_received) values (?,?,?,?)";
 
@@ -147,11 +148,11 @@ public class DistributionManager {
 
     }
     //hàm cập nhật lại thông tin
-    public void updatePriorityObject() {
+    public void updateDistribution() {
         int id;
         id = InputValidator.validateIntInput("\t\t\tEnter ID to update: ");
         if (isIdExists(id)) {
-            displayPriorityObjects(getDistribution("select * from Distribution where id=" + id));
+            displayDistribution(getDistribution("select * from Distribution where id=" + id));
 
 
             Integer comid = InputValidator.validateIntInput("\t\t\tEnter New Commission ID:  ");
@@ -216,7 +217,7 @@ public class DistributionManager {
 
 
     //hiển thị danh sách Phân phối
-    public void displayPriorityObjects(ArrayList<Distribution> distributions) {
+    public void displayDistribution(ArrayList<Distribution> distributions) {
         System.out.println("\t\t\tID\t|\tCommissionID|\tHouseHoldID\t|\tAmountReceived\t|\tDateReceived");
 
         for (Distribution di : distributions) {

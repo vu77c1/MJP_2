@@ -129,20 +129,20 @@ public class MainManager {
         int choice = -1;
         do{
 
-            System.out.println("Quản lý danh sách phân phối");
-            System.out.println("1. Hiển thị danh sách phân phối");
-            System.out.println("2. Thêm thông tin phân phối");
-            System.out.println("3. Sửa thông tin phân phối");
-            System.out.println("4. Xóa thông tin phân phối");
-            System.out.println("0. Trở về menu chính");
+            System.out.println("\t\t\tQuản lý danh sách phân phối");
+            System.out.println("\t\t\t1. Hiển thị danh sách phân phối");
+            System.out.println("\t\t\t2. Thêm thông tin phân phối");
+            System.out.println("\t\t\t3. Sửa thông tin phân phối");
+            System.out.println("\t\t\t4. Xóa thông tin phân phối");
+            System.out.println("\t\t\t0. Trở về menu chính");
             System.out.println();
-            System.out.println("What do you want to choose?");
+            System.out.println("\t\t\tWhat do you want to choose?");
 
 
             do {
                 try
                 {
-                    System.out.print("Nhập vào số của chương trình: (0-4): ");
+                    System.out.print("\t\t\tNhập vào số của chương trình: (0-4): ");
                     choice = Integer.parseInt(sc.nextLine());
                 }
                 catch (NumberFormatException input)
@@ -153,7 +153,7 @@ public class MainManager {
             while (choice == -1);
             switch (choice) {
                 case 0:
-                    System.out.println("Trở về màn hình chính");
+                    System.out.println("\t\t\tTrở về màn hình chính");
                     waitForEnter();
                     main(new String[]{});
                     break;
@@ -165,7 +165,7 @@ public class MainManager {
                     distributionManager.addDistribution();
                     break;
                 case 3:
-                    distributionManager.updatePriorityObject();
+                    distributionManager.updateDistribution();
                     break;
                 case 4:
                     distributionManager.deleteDistribution();
