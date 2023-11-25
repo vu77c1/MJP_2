@@ -116,7 +116,6 @@ public class Processing {
                 }else if (fullName.length()>255) {
                     System.out.println(" \u001B[31mERROR: Họ và tên không được quá 255 ký tự!!!\u001B[0m");
                     check = false;
-                }
             }else {
                     System.out.println("\u001B[31m ERROR: Họ và tên không thể chứa ký tự đặt biệt!!!\u001B[0m");
                     check = false;
