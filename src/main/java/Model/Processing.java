@@ -88,6 +88,9 @@ public class Processing {
             } else if (Processing.isNumber(address)) {
                 System.out.println(" ERROR: Địa chỉ không thể chỉ chứa số, phải bao gồm cả xã/phường, quận/huyện, tỉnh/thành phố!!!");
                 check = false;
+            } else if (address.length()>255) {
+                System.out.println(" \u001B[31mERROR: Họ và tên không được quá 255 ký tự!!!\u001B[0m");
+                check = false;
             } else {
                 System.out.println(" ERROR: Địa chỉ không thể chứa ký tự đặt biệt!!!");
                 check = false;
@@ -110,7 +113,11 @@ public class Processing {
                 } else if (Processing.isNumber(fullName)) {
                     System.out.println(" \u001B[31mERROR: Họ và tên không được chứa số!!!\u001B[0m");
                     check = false;
-                } else {
+                }else if (fullName.length()>255) {
+                    System.out.println(" \u001B[31mERROR: Họ và tên không được quá 255 ký tự!!!\u001B[0m");
+                    check = false;
+                }
+            }else {
                     System.out.println("\u001B[31m ERROR: Họ và tên không thể chứa ký tự đặt biệt!!!\u001B[0m");
                     check = false;
                 }
@@ -136,7 +143,7 @@ public class Processing {
                     check = true;
                 } else if (phone.charAt(0) != '0') {
                     check = false;
-                    System.out.println("\u001B[31mERROR: Số điện thaoij nên bắt đầu bằng \'0\'!!!\u001B[0m");
+                    System.out.println("\u001B[31mERROR: Số điện thoại nên bắt đầu bằng \'0\'!!!\u001B[0m");
                 } else if (Processing.isSpecialCharacter(phone)) {
                     check = false;
                     System.out.println("\u001B[31mERROR: Số điện thoại không thể chứa các ký tự khác số!!!\u001B[0m");
