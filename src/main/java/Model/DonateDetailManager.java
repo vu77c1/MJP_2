@@ -1,5 +1,7 @@
 package Model;
 
+import Common.InputValidator;
+
 import java.sql.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
@@ -42,11 +44,11 @@ public class DonateDetailManager {
             System.out.println();
             System.out.println("=== Thêm thông tin nhà ủng hộ ===");
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
-            System.out.println("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\")");
+            System.out.print("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\")");
             int representativeId = Processing.inputID(sc, "Representative", "id");
             System.out.println("ID của xã/phường được nhận hỗ trợ (Tham khảo menu \"Quản lý Ủy ban\")");
             int commissionId = Processing.inputID(sc, "Commission", "id");
-            sc.nextLine(); // Consume the newline character
+            //sc.nextLine(); // Consume the newline character
             LocalDate donateDate;
             String donateDateStr;
             do {
@@ -165,7 +167,6 @@ public class DonateDetailManager {
                         "2. Ngày ủng hộ", "3. Ủy ban nhận", "4. Người đại diện", "5. Tất cả");
                 System.out.println("+-------------------------------+");
                 System.out.print(" From Update Menu, Your Choice: ");
-                //sc.nextLine();
                 chose = sc.nextLine().trim();
                 if (!("1".equals(chose) || "2".equals(chose) || "3".equals(chose) || "4".equals(chose)|| "5".equals(chose))) {
                     check = false;
@@ -176,8 +177,7 @@ public class DonateDetailManager {
             switch (chose) {
 //			Update Số tiền
                 case "1":
-                    System.out.print("Nhập vào số tiền: ");
-                    double newAmount = sc.nextDouble();
+                    double newAmount = InputValidator.validateDoubleInput("Nhập vào số tiền: ");
                     String sql1 = "UPDATE DonateDetail SET amount =? WHERE id =?";
 
                     try {

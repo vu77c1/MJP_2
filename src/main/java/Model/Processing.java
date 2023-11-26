@@ -171,7 +171,8 @@ public class Processing {
         try {
             Double.parseDouble(number);
             return true;
-        } catch (Exception e) {
+        } catch (NumberFormatException ex) {
+            //System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
         }
         return false;
     }
