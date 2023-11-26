@@ -283,14 +283,14 @@ public class MainManager {
         int choice = -1;
         do{
             System.out.println();
-            System.out.println("Quản lý danh sách chi tiết ủng hộ");
-            System.out.println("1. Hiển thị danh sách chi tiết ủng hộ");
-            System.out.println("2. Thêm thông tin chi tiết ủng hộ");
-            System.out.println("3. Sửa thông tin chi tiết ủng hộ");
-            System.out.println("4. Xóa thông tin ủng hộ");
-            System.out.println("0. Trở về menu chính");
+            System.out.println("\t\tQuản lý danh sách chi tiết ủng hộ");
+            System.out.println("\t\t\t1. Hiển thị danh sách chi tiết ủng hộ");
+            System.out.println("\t\t\t2. Thêm thông tin chi tiết ủng hộ");
+            System.out.println("\t\t\t3. Sửa thông tin chi tiết ủng hộ");
+            System.out.println("\t\t\t4. Xóa thông tin ủng hộ");
+            System.out.println("\t\t\t0. Trở về menu chính");
             System.out.println();
-            System.out.println("What do you want to choose?");
+            System.out.println("\t\tWhat do you want to choose?");
 
 
             do {
