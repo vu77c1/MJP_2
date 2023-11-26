@@ -9,7 +9,7 @@ import static Model.Processing.*;
 public class MainManager {
 
 
-    private  static Connection con=JDBCQuery.connectDatabase();
+    private  static Connection con=DBConnect.connectDatabase();
     private static final Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
         int n;
@@ -22,6 +22,7 @@ public class MainManager {
         sc.close();
 
     }
+
     public static int menu(Scanner sc) {
         int n;
 

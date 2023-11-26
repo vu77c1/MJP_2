@@ -6,22 +6,6 @@ public class JDBCQuery {
     public JDBCQuery() {
 
     }
-    public static Connection connectDatabase() {
-        final String JDBC_DRIVER = JdbcConfig.JDBC_DRIVER;
-        final String DB_URL = JdbcConfig.JDBC_URL;
-        final String USERNAME = JdbcConfig.USERNAME;
-        final String PASSWORD = JdbcConfig.PASSWORD;
-        Connection con = null;
-        // Load the JDBC driver
-        try {
-            Class.forName(JDBC_DRIVER);
-            con = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-            System.out.println("\u001B[32mDatabase Connected\u001B[0m");
-        } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
-        }
-        return con;
-    }
 
     public static void openConnection() {
         try {
@@ -35,7 +19,7 @@ public class JDBCQuery {
         }
     }
 
-    // Hàm để đóng kết nối
+    // Hàm để đóng kết nốid
     public static void closeConnection() {
         if (JdbcConfig.connection != null) {
             try {
@@ -80,4 +64,3 @@ public class JDBCQuery {
     }
 
 }
-
