@@ -89,6 +89,8 @@ public class MainManager {
                     break;
                 case 7:
                     System.out.println("Quản lý chi tiết phân phối");
+                    handleDonateDetailManager(con);
+                    break;
                 case 8:
                     System.out.println("\t\t\tPriority Object Manager ");
                     PriorityObjectManager po = new PriorityObjectManager();
