@@ -88,19 +88,23 @@ public class HouseManager {
         ResultSet rs = null;
         try {
             st = connection.createStatement();
-            String sql = "SELECT * FROM House";
+            String sql = "SELECT H.id, CONCAT(C.precint_name, ', ', C.city_name, ', ', C.province_name) AS commission_info, P.object_type " +
+                    "FROM House H " +
+                    "INNER JOIN Commission C ON H.commission_id = C.id " +
+                    "INNER JOIN PriorityObject P ON H.priority_object_id = P.id";
             rs = st.executeQuery(sql);
 
             System.out.println("=================================== House Table ====================================");
-            System.out.println(String.format("| %-5s | %-15s | %-20s |", "ID", "Commission ID", "Priority Object ID"));
-            System.out.println(String.format("| %-5s | %-15s | %-20s |", "-----", "---------------", "-----------------"));
+            System.out.println(String.format("| %-5s | %-35s | %-20s |", "ID", "Commission Information", "Priority Object Type"));
+            System.out.println(String.format("| %-5s | %-35s | %-20s |", "-----", "-----------------------------------", "---------------------"));
             while (rs.next()) {
-                System.out.println(String.format("| %-5s | %-15s | %-20s |",
-                        rs.getInt("id"), rs.getInt("commission_id"), rs.getInt("priority_object_id")));
-                System.out.println(String.format("| %-5s | %-15s | %-20s |", "-----", "---------------", "-----------------"));
+                System.out.println(String.format("| %-5s | %-35s | %-20s |",
+                        rs.getInt("id"), rs.getString("commission_info"), rs.getString("object_type")));
+                System.out.println(String.format("| %-5s | %-35s | %-20s |", "-----", "-----------------------------------", "---------------------"));
             }
             System.out.println();
         } finally {
+            // Đóng ResultSet và Statement sau khi sử dụng xong
             if (rs != null) {
                 rs.close();
             }
@@ -109,6 +113,7 @@ public class HouseManager {
             }
         }
     }
+
     public static void handleHouseManagement(HouseManager houseManager, Scanner scanner) {
         int choice;
 
