@@ -195,6 +195,7 @@ public class OfficerManage {
 
         System.out.println("Enter the id you want to edit:");
         int id = sc.nextInt();
+        pstm.setInt(2, id);
 
         int check = pstm.executeUpdate();
         if (check > 0) {
@@ -223,6 +224,7 @@ public class OfficerManage {
 
         System.out.println("Enter the id you want to edit:");
         int id = sc.nextInt();
+        pstm.setInt(2, id);
 
         int check = pstm.executeUpdate();
         if (check > 0) {
@@ -272,7 +274,7 @@ public class OfficerManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Update success");
+            System.out.println("* Notification: Delete success");
         } else {
             System.out.println("* Warning: Delete fail. The ID you entered is invalid.");
         }

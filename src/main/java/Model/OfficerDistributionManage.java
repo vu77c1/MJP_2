@@ -270,7 +270,7 @@ public class OfficerDistributionManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Update success");
+            System.out.println("* Notification: Delete success");
         } else {
             System.out.println("* Warning: Delete fail. The ID you entered is invalid.");
         }
