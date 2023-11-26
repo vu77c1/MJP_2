@@ -5,7 +5,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
-public class InputValidator {
+public class InputValidator1 {
     private static Scanner scanner = new Scanner(System.in);
 
     public static Date validateDateInput(String prompt) {

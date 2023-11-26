@@ -2,8 +2,8 @@ package Common;
 
 import java.sql.*;
 
-public class JDBCQuery {
-    public JDBCQuery() {
+public class JDBCQuery1 {
+    public JDBCQuery1() {
 
     }
 

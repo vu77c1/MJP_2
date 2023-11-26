@@ -1,17 +1,15 @@
 package Model;
 
-import Common.InputValidator;
-import Common.JDBCQuery;
+import Common.InputValidator1;
+import Common.JDBCQuery1;
 
 import java.sql.*;
 import java.text.SimpleDateFormat;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.ArrayList;
-import java.util.List;
 import java.util.Scanner;
 
 
@@ -55,9 +53,9 @@ public class DistributionManager {
     public ArrayList<Distribution> getDistribution() {
         ArrayList<Distribution> infoList = new ArrayList<>();
         try {
-            JDBCQuery.openConnection();
+            JDBCQuery1.openConnection();
             String sql = "select  * from Distribution";
-            ResultSet rs = JDBCQuery.executeSelectQuery(sql);
+            ResultSet rs = JDBCQuery1.executeSelectQuery(sql);
             if (rs != null) {
                 try {
                     while (rs.next()) {
@@ -75,7 +73,7 @@ public class DistributionManager {
             ex2.printStackTrace();
 
         } finally {
-            JDBCQuery.closeConnection();
+            JDBCQuery1.closeConnection();
 
         }
         return infoList;
@@ -85,8 +83,8 @@ public class DistributionManager {
     public ArrayList<Distribution> getDistribution(String sql) {
         ArrayList<Distribution> infoList = new ArrayList<>();
         try {
-            JDBCQuery.openConnection();
-            ResultSet rs = JDBCQuery.executeSelectQuery(sql);
+            JDBCQuery1.openConnection();
+            ResultSet rs = JDBCQuery1.executeSelectQuery(sql);
             if (rs != null) {
                 try {
                     while (rs.next()) {
@@ -104,17 +102,17 @@ public class DistributionManager {
             ex2.printStackTrace();
 
         } finally {
-            JDBCQuery.closeConnection();
+            JDBCQuery1.closeConnection();
 
         }
         return infoList;
     }
     //Enter data
     public Distribution inputDistribution() {
-        Integer comid = InputValidator.validateIntInput("\t\t\tEnter New Commission ID:  ");
-        Integer houseid=InputValidator.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
-        Double amount=InputValidator.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
-        java.util.Date datereceived=InputValidator.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
+        Integer comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
+        Integer houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+        Double amount= InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
+        java.util.Date datereceived= InputValidator1.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
         Distribution di = new Distribution();
         di.setCommissionId(comid);
         di.setHouseholdID(houseid);
@@ -129,11 +127,11 @@ public class DistributionManager {
 
         try {
             Distribution di = inputDistribution();
-            JDBCQuery.openConnection();
+            JDBCQuery1.openConnection();
             String sql = "insert into Distribution (commission_id, household_id, amount_received, date_received) values (?,?,?,?)";
 
             Object[] prams = {di.getCommissionId(), di.getHouseholdID(),di.getAmountReceived(),di.getDateReceived()};
-            int rs = JDBCQuery.executeUpdateQuery(sql, prams);
+            int rs = JDBCQuery1.executeUpdateQuery(sql, prams);
             if (rs > 0) {
                 System.out.println("\t\t\tAdd success!!");
             } else {
@@ -143,7 +141,7 @@ public class DistributionManager {
         } catch (Exception ex) {
             ex.printStackTrace();
         } finally {
-            JDBCQuery.closeConnection();
+            JDBCQuery1.closeConnection();
         }
 
     }
@@ -152,26 +150,26 @@ public class DistributionManager {
         int flag=0;
         do {
             int id;
-            id = InputValidator.validateIntInput("\t\t\tEnter ID to update: ");
+            id = InputValidator1.validateIntInput("\t\t\tEnter ID to update: ");
 
             if (isIdExists(id)) {
                 displayDistribution(getDistribution("select * from Distribution where id=" + id));
 
 
-                Integer comid = InputValidator.validateIntInput("\t\t\tEnter New Commission ID:  ");
-                Integer houseid=InputValidator.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
-                Double amount=InputValidator.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
-                java.util.Date datereceived=InputValidator.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
+                Integer comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
+                Integer houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+                Double amount= InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
+                java.util.Date datereceived= InputValidator1.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
 
 
                 try {
 
-                    JDBCQuery.openConnection();
+                    JDBCQuery1.openConnection();
 
                     String sql = "UPDATE Distribution SET commission_id = ?, household_id = ?,amount_received = ?,date_received = ? WHERE id =?;";
                     Object[] prams = {comid, houseid, amount, datereceived,id};
 
-                    int rowsAffected = JDBCQuery.executeUpdateQuery(sql, prams);
+                    int rowsAffected = JDBCQuery1.executeUpdateQuery(sql, prams);
 
                     if (rowsAffected > 0) {
                         System.out.println("\t\t\tUpdate success!!");
@@ -182,7 +180,7 @@ public class DistributionManager {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 } finally {
-                    JDBCQuery.closeConnection();
+                    JDBCQuery1.closeConnection();
                 }
 
             } else {
@@ -200,14 +198,14 @@ public class DistributionManager {
         int flag=0;
         do {
             int id;
-            id = InputValidator.validateIntInput("\t\t\tEnter ID to delete: ");
+            id = InputValidator1.validateIntInput("\t\t\tEnter ID to delete: ");
             if (isIdExists(id)) {
                 try {
-                    JDBCQuery.openConnection();
+                    JDBCQuery1.openConnection();
 
                     String sql = "DELETE FROM Distribution WHERE id = ?";
                     Object[] params = {id};
-                    int rowsAffected = JDBCQuery.executeUpdateQuery(sql, params);
+                    int rowsAffected = JDBCQuery1.executeUpdateQuery(sql, params);
 
                     if (rowsAffected > 0) {
                         System.out.println("\t\t\tDelete success!!");
@@ -218,7 +216,7 @@ public class DistributionManager {
                 } catch (Exception ex) {
                     ex.printStackTrace();
                 } finally {
-                    JDBCQuery.closeConnection();
+                    JDBCQuery1.closeConnection();
                 }
 
             } else {
@@ -249,12 +247,12 @@ public class DistributionManager {
     public boolean isIdExists(int id) {
         boolean exists = false;
         try {
-            JDBCQuery.openConnection();
+            JDBCQuery1.openConnection();
 
             String sql = "SELECT COUNT(*) FROM Distribution WHERE id = ?";
             Object[] params = {id};
 
-            ResultSet rs = JDBCQuery.executeSelectQuery(sql, params);
+            ResultSet rs = JDBCQuery1.executeSelectQuery(sql, params);
 
             if (rs.next()) {
                 int count = rs.getInt(1);
@@ -263,7 +261,7 @@ public class DistributionManager {
         } catch (SQLException ex) {
             ex.printStackTrace();
         } finally {
-            JDBCQuery.closeConnection();
+            JDBCQuery1.closeConnection();
         }
         return exists;
     }
