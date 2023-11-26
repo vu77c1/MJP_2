@@ -17,13 +17,13 @@ public class OfficerManage {
                 System.out.println("Enter your choice...");
                 choice = sc.nextInt();
             } catch (Exception e) {
-                System.out.println(e.toString());
-                System.out.println("* Warning: Input is incorrect!");
+                System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
+                System.out.println("\u001B[31m* Warning: Input is incorrect!\u001B[0m");
             }
             switch (choice) {
                 case 0:
                     connection.close();
-                    System.out.println("* Notification: Program is closed. Thank you for using our program!");
+                    System.out.println("\u001B[36m* Notification: Program is closed. Thank you for using our program!\u001B[0m");
                     break;
                 case 1:
                     OfficerManage.addNewOfficer();
@@ -42,7 +42,7 @@ public class OfficerManage {
                     displayMenu();
                     break;
                 default:
-                    System.out.println("* Warning: Input is invalid. Please try again!");
+                    System.out.println("\u001B[31m* Warning: Input is invalid. Please try again!\u001B[0m");
                     break;
             }
         } while (choice != 0);
@@ -82,7 +82,7 @@ public class OfficerManage {
             name = sc.nextLine();
             check1 = validateStringLength(name, maxLengthName);
             if (check1 == false) {
-                System.out.println("* Warning: You have entered more than 50 characters. Please try again!");
+                System.out.println("\u001B[31m* Warning: You have entered more than 50 characters. Please try again!\u001B[0m");
             }
         } while (check1 == false);
 
@@ -94,7 +94,7 @@ public class OfficerManage {
             phoneNumber = sc.next();
             check2 = validateStringLength(phoneNumber, maxLengthPhoneNumber);
             if (check2 == false) {
-                System.out.println("* Warning: You have entered more than 11 characters. Please try again!");
+                System.out.println("\u001B[31m* Warning: You have entered more than 11 characters. Please try again!\u001B[0m");
             }
         } while (check2 == false);
 
@@ -107,7 +107,7 @@ public class OfficerManage {
             address = sc.nextLine();
             check3 = validateStringLength(address, maxLengthAddress);
             if (check3 == false) {
-                System.out.println("* Warning: You have entered more than 255 characters. Please try again!");
+                System.out.println("\u001B[31m* Warning: You have entered more than 255 characters. Please try again!\u001B[0m");
             }
         } while (check3 == false);
 
@@ -115,10 +115,10 @@ public class OfficerManage {
         String sql = "INSERT INTO [dbo].[Officer] VALUES ('" + name + "', '" + phoneNumber + "', '" + address + "');";
         int check = st.executeUpdate(sql);
         if (check > 0) {
-            System.out.println("* Notification: Insert success");
+            System.out.println("\u001B[32m* Notification: Insert success.\u001B[0m");
             System.out.println();
         } else {
-            System.out.println("* Warning: Insert fail.");
+            System.out.println("\u001B[31m* Warning: Insert fail.\u001B[0m");
         }
     }
 
@@ -136,7 +136,7 @@ public class OfficerManage {
             selectUpdate = sc.nextInt();
             switch (selectUpdate) {
                 case 0:
-                    System.out.println("* Notification: Update program is closed");
+                    System.out.println("\u001B[32m* Notification: Update program is closed\u001B[0m");
                     break;
                 case 1:
                     updateOfficerName();
@@ -151,7 +151,7 @@ public class OfficerManage {
                     displayUpdateMenu();
                     break;
                 default:
-                    System.out.println("* Warning: Input is invalid. Please try again!");
+                    System.out.println("\u001B[31m* Warning: Input is invalid. Please try again!\u001B[0m");
                     break;
             }
         } while (selectUpdate != 0);
@@ -188,7 +188,7 @@ public class OfficerManage {
             newName = sc.nextLine();
             check1 = validateStringLength(newName, maxLength);
             if (check1 == false) {
-                System.out.println("* Warning: You have entered more than 50 characters. Please try again!");
+                System.out.println("\u001B[31m* Warning: You have entered more than 50 characters. Please try again!\u001B[0m");
             }
         } while (check1 == false);
         pstm.setString(1, newName);
@@ -199,9 +199,9 @@ public class OfficerManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Update success");
+            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
         } else {
-            System.out.println("* Warning: Update fail. The ID you entered is invalid.");
+            System.out.println("\u001B[31m* Warning: Update fail. The ID you entered is invalid.\u001B[0m");
         }
     }
 
@@ -217,7 +217,7 @@ public class OfficerManage {
             newPhoneNumber = sc.next();
             check1 = validateStringLength(newPhoneNumber, maxLength);
             if (check1 == false) {
-                System.out.println("* Warning: You have entered more than 11 characters. Please try again!");
+                System.out.println("\u001B[31m* Warning: You have entered more than 11 characters. Please try again!\u001B[0m");
             }
         } while (check1 == false);
         pstm.setString(1, newPhoneNumber);
@@ -228,9 +228,9 @@ public class OfficerManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Update success");
+            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
         } else {
-            System.out.println("* Warning: Update fail. The ID you entered is invalid.");
+            System.out.println("\u001B[31m* Warning: Update fail. The ID you entered is invalid.\u001B[0m");
         }
     }
 
@@ -247,7 +247,7 @@ public class OfficerManage {
             newAddress = sc.nextLine();
             check1 = validateStringLength(newAddress,maxLength);
             if (check1 == false) {
-                System.out.println("* Warning: You have entered more than 255 characters. Please try again!");
+                System.out.println("\u001B[31m* Warning: You have entered more than 255 characters. Please try again!\u001B[0m");
             }
         } while (check1 == false);
         pstm.setString(1, newAddress);
@@ -258,9 +258,9 @@ public class OfficerManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Update success");
+            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
         } else {
-            System.out.println("* Warning: Update fail. The ID you entered is invalid.");
+            System.out.println("\u001B[31m* Warning: Update fail. The ID you entered is invalid.\u001B[0m");
         }
     }
 
@@ -274,9 +274,9 @@ public class OfficerManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Delete success");
+            System.out.println("\u001B[32m* Notification: Delete success\u001B[0m");
         } else {
-            System.out.println("* Warning: Delete fail. The ID you entered is invalid.");
+            System.out.println("\u001B[31m* Warning: Delete fail. The ID you entered is invalid.\u001B[0m");
         }
     }
 
@@ -285,9 +285,9 @@ public class OfficerManage {
         Statement st = connection.createStatement();
         String sql = "select * from Officer";
         ResultSet rs = st.executeQuery(sql);
-        System.out.println("=====================================Officer Table======================================");
+        System.out.println("\u001B[33m=====================================Officer Table======================================");
         System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "ID", "Name", "Phone number", "Address"));
-        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "-----", "--------------------", "---------------",
+        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |\u001B[0m", "-----", "--------------------", "---------------",
                     "-----------------------------------"));
         while (rs.next()) {
             System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", rs.getInt(1), rs.getString(2),

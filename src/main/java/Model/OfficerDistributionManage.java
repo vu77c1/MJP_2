@@ -22,13 +22,13 @@ public class OfficerDistributionManage {
                 System.out.println("Enter your choice...");
                 choice = sc.nextInt();
             } catch (Exception e) {
-                System.out.println(e.toString());
-                System.out.println("* Warning: Input is incorrect!");
+                System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
+                System.out.println("\u001B[31m* Warning: Input is incorrect!\u001B[0m");
             }
             switch (choice) {
                 case 0:
                     connection.close();
-                    System.out.println("* Notification: Program is closed. Thank you for using our program!");
+                    System.out.println("\u001B[36m* Notification: Program is closed. Thank you for using our program!\u001B[0m");
                     break;
                 case 1:
                     OfficerDistributionManage.addNewData();
@@ -47,7 +47,7 @@ public class OfficerDistributionManage {
                     displayMenu();
                     break;
                 default:
-                    System.out.println("* Warning: Input is invalid. Please try again!");
+                    System.out.println("\u001B[31m* Warning: Input is invalid. Please try again!\u001B[0m");
                     break;
             }
         } while (choice != 0);
@@ -86,7 +86,7 @@ public class OfficerDistributionManage {
             // call method checkOfficerIdExistence:
             check1 = checkOfficerIdExistence(officerId);
             if (check1 == false) {
-                System.out.println("* Warning: ID does not exist in the Officer table!");
+                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
             }
         } while (check1 == false);
 
@@ -99,7 +99,7 @@ public class OfficerDistributionManage {
             // call method checkDistributionIdExistence
             check2 = checkDistributionIdExistence(distributionId);
             if (check2 == false) {
-                System.out.println("* Warning: ID does not exist in the Officer Distribution table!");
+                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
             }
         } while (check2 == false);
 
@@ -111,7 +111,7 @@ public class OfficerDistributionManage {
             date = (Date) dateFormat.parse(dateDistribution);
         } catch (ParseException e) {
             System.out.println(e.toString());
-            System.out.println("* Warning: Entered is incorrect format!");
+            System.out.println("\u001B[31m* Warning: Entered is incorrect format!\u001B[0m");
         }
 
         // add address distribution
@@ -124,7 +124,7 @@ public class OfficerDistributionManage {
             addressDistribution = sc.nextLine();
             check3 = validateStringLength(addressDistribution, maxLengthAddress);
             if (check3 == false) {
-                System.out.println("* Warning: You have entered more than 255 characters. Please try again!");
+                System.out.println("\u001B[31m* Warning: You have entered more than 255 characters. Please try again!\u001B[0m");
             }
         } while (check3 == false);
 
@@ -134,10 +134,10 @@ public class OfficerDistributionManage {
                 "VALUES ("+ officerId +", "+ distributionId +", '"+ dateDistribution +"', '"+ addressDistribution +"');";
         int check = st.executeUpdate(sql);
         if (check > 0) {
-            System.out.println("* Notification: Insert success");
+            System.out.println("\u001B[32m* Notification: Insert success\u001B[0m");
             System.out.println();
         } else {
-            System.out.println("* Warning: Insert fail.");
+            System.out.println("\u001B[31m* Warning: Insert fail.\u001B[0m");
         }
     }
 
@@ -193,7 +193,7 @@ public class OfficerDistributionManage {
             selectUpdate = sc.nextInt();
             switch (selectUpdate) {
                 case 0:
-                    System.out.println("* Notification: Update program is closed");
+                    System.out.println("\u001B[32m* Notification: Update program is closed\u001B[0m");
                     break;
                 case 1:
                     updateDateDistribution();
@@ -204,7 +204,7 @@ public class OfficerDistributionManage {
                     displayUpdateMenu();
                     break;
                 default:
-                    System.out.println("* Warning: Input is invalid. Please try again!");
+                    System.out.println("\u001B[31m* Warning: Input is invalid. Please try again!\u001B[0m");
                     break;
             }
         } while (selectUpdate !=0);
@@ -222,7 +222,7 @@ public class OfficerDistributionManage {
             date = (Date) dateFormat.parse(newDateDistribution);
         } catch (ParseException e) {
             System.out.println(e.toString());
-            System.out.println("* Warning: Entered is incorrect format!");
+            System.out.println("\u001B[31m* Warning: Entered is incorrect format!\u001B[0m");
         }
         pstm.setString(1, newDateDistribution);
 
@@ -232,9 +232,9 @@ public class OfficerDistributionManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Update success");
+            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
         } else {
-            System.out.println("* Warning: Update fail. The ID you entered is invalid.");
+            System.out.println("\u001B[31m* Warning: Update fail. The ID you entered is invalid.\u001B[0m");
         }
     }
 
@@ -254,9 +254,9 @@ public class OfficerDistributionManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Update success");
+            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
         } else {
-            System.out.println("* Warning: Update fail. The ID you entered is invalid.");
+            System.out.println("\u001B[31m* Warning: Update fail. The ID you entered is invalid.\u001B[0m");
         }
     }
 
@@ -270,9 +270,9 @@ public class OfficerDistributionManage {
 
         int check = pstm.executeUpdate();
         if (check > 0) {
-            System.out.println("* Notification: Delete success");
+            System.out.println("\u001B[32m* Notification: Delete success\u001B[0m");
         } else {
-            System.out.println("* Warning: Delete fail. The ID you entered is invalid.");
+            System.out.println("\u001B[31m* Warning: Delete fail. The ID you entered is invalid.\u001B[0m");
         }
     }
 
@@ -281,10 +281,10 @@ public class OfficerDistributionManage {
         Statement st = connection.createStatement();
         String sql = "select * from OfficerDistribution";
         ResultSet rs = st.executeQuery(sql);
-        System.out.println("=================================== Officer Distribution Table ====================================");
+        System.out.println("\u001B[33m=================================== Officer Distribution Table ====================================");
         System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", "ID", "Officer ID","Distribution ID",
                     "Date Distribution", "Address Distribution"));
-        System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", "-----", "----------", "---------------",
+        System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |\u001B[0m", "-----", "----------", "---------------",
                     "-----------------", "-----------------------------------"));
         while (rs.next()) {
             System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", rs.getInt(1), rs.getInt(2),
