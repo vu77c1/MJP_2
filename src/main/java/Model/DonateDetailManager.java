@@ -17,10 +17,10 @@ public class DonateDetailManager {
             System.out.println("│   ID  │          Số tiền         │    Ngày ủng hộ     │   Xã/Phường     │  Người đại diện │   Tên Công ty   │   Cán bộ tiếp nhận  │");
             System.out.println("│_______│__________________________│____________________│_________________│_________________│_________________│_____________________│");
             Statement statement = con.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT DonateDetail.id, amount, donate_date, precint_name, representative_name, company_name, name FROM DonateDetail Join dbo.Commission C on DonateDetail.commission_id = C.id JOIN dbo.Representative R on R.id = DonateDetail.representative_id join dbo.Company C2 on C2.id = R.company_id join dbo.Officer O on O.id = C.officer_id");
+            ResultSet resultSet = statement.executeQuery("SELECT dbo.DonateDetail.id, amount, donate_date, precint_name, representative_name, company_name, name FROM DonateDetail left Join dbo.Commission C on DonateDetail.commission_id = C.id left JOIN dbo.Representative R on R.id = DonateDetail.representative_id left join dbo.Company C2 on C2.id = R.company_id left join dbo.Officer O on O.id = C.officer_id");
             while (resultSet.next())
             {
-                String ID = resultSet.getString("DonateDetail.id");
+                String ID = resultSet.getString("id");
                 double amount = resultSet.getDouble("amount");
                 LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
                 String precint_name = resultSet.getString("precint_name");
@@ -42,13 +42,11 @@ public class DonateDetailManager {
             System.out.println();
             System.out.println("=== Thêm thông tin nhà ủng hộ ===");
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
-            PreparedStatement insertStatement = con.prepareStatement(insertQuery);
-            System.out.print("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\"): ");
+            System.out.println("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\")");
             int representativeId = Processing.inputID(sc, "Representative", "id");
-            System.out.println("ID của xã/phường được nhận hỗ trợ (Tham khảo menu \"Quản lý Ủy ban\"): ");
+            System.out.println("ID của xã/phường được nhận hỗ trợ (Tham khảo menu \"Quản lý Ủy ban\")");
             int commissionId = Processing.inputID(sc, "Commission", "id");
             sc.nextLine(); // Consume the newline character
-
             LocalDate donateDate;
             String donateDateStr;
             do {
@@ -79,10 +77,13 @@ public class DonateDetailManager {
                     amount = Double.parseDouble(input);
                 }
             } while (!isFloatNumber(input));
+            PreparedStatement insertStatement = con.prepareStatement(insertQuery);
             insertStatement.setInt(1, representativeId);
             insertStatement.setInt(2, commissionId);
             insertStatement.setDate(3, Date.valueOf(donateDate));
             insertStatement.setDouble(4, amount);
+            // Execute the query
+            insertStatement.executeUpdate();
             System.out.println("\u001B[32mNhà hỗ trợ đã được thêm vào cơ sở dữ liệu.\u001B[0m");
             waitForEnter();
         }
@@ -164,7 +165,7 @@ public class DonateDetailManager {
                         "2. Ngày ủng hộ", "3. Ủy ban nhận", "4. Người đại diện", "5. Tất cả");
                 System.out.println("+-------------------------------+");
                 System.out.print(" From Update Menu, Your Choice: ");
-                sc.nextLine();
+                //sc.nextLine();
                 chose = sc.nextLine().trim();
                 if (!("1".equals(chose) || "2".equals(chose) || "3".equals(chose) || "4".equals(chose)|| "5".equals(chose))) {
                     check = false;

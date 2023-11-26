@@ -206,7 +206,7 @@ public class Processing {
         int ID;
         do {
             ID = InputValidator.validateIntInput("Nhập vào ID  (Tham khảo các menu \"Quản lý\"): ");
-            System.out.println();
+            //System.out.println();
 
             if (checkIDExistence(ID, tableName, columnName)) {
                 System.out.println("\u001B[31mID không tồn tại trong bảng " + tableName + ". Vui lòng nhập lại.\u001B[0m");
