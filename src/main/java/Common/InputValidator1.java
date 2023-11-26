@@ -16,7 +16,7 @@ public class InputValidator1 {
             try {
                 System.out.print(prompt);
                 String dateString = scanner.nextLine().trim();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/uuuu");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
                 dateFormat.setLenient(false);
                 date = dateFormat.parse(dateString);
                 isValid = true;

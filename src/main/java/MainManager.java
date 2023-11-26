@@ -9,7 +9,7 @@ import static Model.Processing.*;
 public class MainManager {
 
 
-    private  static Connection con=DBConnect.connectDatabase();
+    private  static Connection con=JDBCQuery1.connectDatabase();
     private static final Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
         int n;
@@ -31,17 +31,17 @@ public class MainManager {
             System.out.println();
             System.out.println();
             System.out.println("            0. Exit");
-            System.out.println("            1. Quản lý hộ dân");
-            System.out.println("            2. Quản lý cán bộ");
-            System.out.println("            3. Quản lý người đại diện");
-            System.out.println("            4. Quản lý công ty ủng hộ");
-            System.out.println("            5. Quản lý Ủy Ban");
-            System.out.println("            6. Quản lý phân phối");
-            System.out.println("            7. Quản lý chi tiết phân phối");
-            System.out.println("            8. Quản lý đối tượng ưu tiên");
-            System.out.println("            9. Quản lý công dân");
-            System.out.println("            10. Quản lý đối tượng công dân");
-            System.out.println("            11. Thống kê");
+            System.out.println("            1. Manage HoseHold");
+            System.out.println("            2. Manage Officer");
+            System.out.println("            3. Manage Representative");
+            System.out.println("            4. Company management is donate");
+            System.out.println("            5. Commission Management");
+            System.out.println("            6. Distribution management");
+            System.out.println("            7. Manage distribution details");
+            System.out.println("            8. Manage priority objects");
+            System.out.println("            9. Citizen management");
+            System.out.println("            10. Managing citizen objects");
+            System.out.println("            11. Statistical");
             System.out.println();
             System.out.println("            What do you want to choose?");
 
@@ -70,43 +70,43 @@ public class MainManager {
 
             switch (n) {
                 case 1:
-                    System.out.println("Quản lý hộ dân");
+                    System.out.println("Manage HoseHold");
                     break;
                 case 2:
-                    System.out.println("Quản lý cán bộ");
+                    System.out.println("Manage Officer");
                     break;
                 case 3:
-                    System.out.println("Quản lý người đại diện");
+                    System.out.println("Manage Representative");
 
                     break;
                 case 4:
-                    System.out.println("Quản lý công ty ủng hộ");
+                    System.out.println("Company management is donate");
 
                     break;
                 case 5:
-                    System.out.println("Quản lý Ủy Ban");
+                    System.out.println("Commission Management");
                     break;
                 case 6:
                     handleDistributionManager();
                     break;
                 case 7:
-                    System.out.println("Quản lý chi tiết phân phối");
+                    System.out.println("Manage distribution details");
 
                     break;
                 case 8:
-                    System.out.println("Quản lý đối tượng ưu tiên");
+                    System.out.println("Manage priority objects");
 
                     break;
                 case 9:
-                    System.out.println("Quản lý công dân");
+                    System.out.println("Citizen management");
 
                     break;
                 case 10:
-                    System.out.println("Quản lý đối tượng công dân");
+                    System.out.println("Managing citizen objects");
 
                     break;
                 case 11:
-                    System.out.println("Thống kê");
+                    System.out.println("Statistical");
                     break;
 
                 case 0:
@@ -116,7 +116,7 @@ public class MainManager {
 
             }
         } catch (Exception e) {
-            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
+            System.out.println("\u001B[31mThere was an error during connection Database: " + e.getMessage() + ".\u001B[0m");
         }
         return n;
     }
@@ -130,12 +130,12 @@ public class MainManager {
         int choice = -1;
         do{
 
-            System.out.println("\t\t\tQuản lý danh sách phân phối");
-            System.out.println("\t\t\t1. Hiển thị danh sách phân phối");
-            System.out.println("\t\t\t2. Thêm thông tin phân phối");
-            System.out.println("\t\t\t3. Sửa thông tin phân phối");
-            System.out.println("\t\t\t4. Xóa thông tin phân phối");
-            System.out.println("\t\t\t0. Trở về menu chính");
+            System.out.println("\t\t\tManage distribution lists");
+            System.out.println("\t\t\t1. Show distribution list");
+            System.out.println("\t\t\t2. Add distribution information");
+            System.out.println("\t\t\t3. Edit distribution information");
+            System.out.println("\t\t\t4. Delete distribution information");
+            System.out.println("\t\t\t0. Return to menu main");
             System.out.println();
             System.out.println("\t\t\tWhat do you want to choose?");
 
@@ -143,18 +143,18 @@ public class MainManager {
             do {
                 try
                 {
-                    System.out.print("\t\t\tNhập vào số của chương trình: (0-4): ");
+                    System.out.print("\t\t\tEnter the program number: (0-4): ");
                     choice = Integer.parseInt(sc.nextLine());
                 }
                 catch (NumberFormatException input)
                 {
-                    System.out.println("\u001B[31mKý tự nhập vào không hợp lệ!\nVui lòng nhập lại (0-4)!\u001B[0m");
+                    System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-4)!\u001B[0m");
                 }
             }
             while (choice == -1);
             switch (choice) {
                 case 0:
-                    System.out.println("\t\t\tTrở về màn hình chính");
+                    System.out.println("\t\t\tReturn to the main screen");
                     waitForEnter();
                     main(new String[]{});
                     break;
@@ -172,7 +172,7 @@ public class MainManager {
                     distributionManager.deleteDistribution();
                     break;
                 default:
-                    System.out.println("\u001B[31mChức năng không hợp lệ. Vui lòng chọn lại.\u001B[0m");
+                    System.out.println("\u001B[31mInvalid function. Please re-enter.\u001B[0m");
                     waitForEnter();
             }
         }

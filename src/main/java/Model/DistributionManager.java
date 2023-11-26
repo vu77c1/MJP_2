@@ -16,16 +16,16 @@ import java.util.Scanner;
 import static Model.Processing.*;
 
 public class DistributionManager {
-    public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MM/dd/uuuu").withResolverStyle(ResolverStyle.STRICT);
+    public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT);
     public static SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
     private   static Scanner sc=new Scanner(System.in);
 
 
     public static void printDistribution(Connection con){
         try {
-            System.out.println("\t\t\t************************************ DANH SÁCH PHÂN PHỐI *********************************");
+            System.out.println("\t\t\t************************************ DISTRIBUTION LIST *********************************");
             System.out.println("\t\t\t._______._____________________.____________________._________________._________________.__");
-            System.out.println("\t\t\t│   ID  │     ID Xã/Phường   │    ID Chủ Hộ       │ Số tiền được nhận  │     Ngày nhận   │ ");
+            System.out.println("\t\t\t│   ID  │     ID Commission  │    ID Household    │ Amount received    │  date_received  │ ");
             System.out.println("\t\t\t│_______│____________________│____________________│____________________│_________________│  ");
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT Distribution.id, commission_id, household_id, amount_received, date_received  FROM Distribution Join dbo.Commission C on C.id= Distribution.commission_id");
@@ -41,7 +41,7 @@ public class DistributionManager {
                 System.out.println("\t\t\t│_______│____________________│____________________│____________________│_________________│");
             }
             System.out.println();
-            System.out.println("\t\t\t************************************ DANH SÁCH KẾT THÚC **********************************");
+            System.out.println("\t\t\t************************************ LIST END **********************************");
             waitForEnter();
         }catch (SQLException e) {
 
