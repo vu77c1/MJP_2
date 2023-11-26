@@ -115,9 +115,18 @@ public class OfficerDistributionManage {
         }
 
         // add address distribution
-        sc.nextLine();
-        System.out.println("Enter address distribution");
-        String addressDistribution = sc.nextLine();
+        int maxLengthAddress = 255;
+        boolean check3 = false;
+        String addressDistribution = "";
+        do {
+            sc.nextLine();
+            System.out.println("Enter address distribution");
+            addressDistribution = sc.nextLine();
+            check3 = validateStringLength(addressDistribution, maxLengthAddress);
+            if (check3 == false) {
+                System.out.println("* Warning: You have entered more than 255 characters. Please try again!");
+            }
+        } while (check3 == false);
 
         // create sql stament and execute
         Statement st = connection.createStatement();
@@ -130,6 +139,11 @@ public class OfficerDistributionManage {
         } else {
             System.out.println("* Warning: Insert fail.");
         }
+    }
+
+    // create Validate for String:
+    private static boolean validateStringLength(String input, int maxLength) {
+        return input.length() <= maxLength;
     }
 
     // check existence of Officer id

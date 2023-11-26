@@ -3,6 +3,7 @@ package Model;
 import Common.DBConnect;
 
 import java.sql.*;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class OfficerManage {
@@ -72,14 +73,43 @@ public class OfficerManage {
     // create method 1: Add new Officer
     public static void addNewOfficer() throws SQLException {
         Statement st = connection.createStatement();
-        sc.nextLine();
-        System.out.println("Input name:");
-        String name = sc.nextLine();
-        System.out.println("Input phone number:");
-        String phoneNumber = sc.next();
-        sc.nextLine();
-        System.out.println("Input address:");
-        String address = sc.nextLine();
+        int maxLengthName = 50;
+        String name = "";
+        boolean check1 = false;
+        do {
+            sc.nextLine();
+            System.out.println("Input name:");
+            name = sc.nextLine();
+            check1 = validateStringLength(name, maxLengthName);
+            if (check1 == false) {
+                System.out.println("* Warning: You have entered more than 50 characters. Please try again!");
+            }
+        } while (check1 == false);
+
+        int maxLengthPhoneNumber = 11;
+        String phoneNumber = "";
+        boolean check2 = false;
+        do {
+            System.out.println("Input phone number:");
+            phoneNumber = sc.next();
+            check2 = validateStringLength(phoneNumber, maxLengthPhoneNumber);
+            if (check2 == false) {
+                System.out.println("* Warning: You have entered more than 11 characters. Please try again!");
+            }
+        } while (check2 == false);
+
+        int maxLengthAddress = 255;
+        String address = "";
+        boolean check3 = false;
+        do {
+            sc.nextLine();
+            System.out.println("Input address:");
+            address = sc.nextLine();
+            check3 = validateStringLength(address, maxLengthAddress);
+            if (check3 == false) {
+                System.out.println("* Warning: You have entered more than 255 characters. Please try again!");
+            }
+        } while (check3 == false);
 
         // create sql statement and execute
         String sql = "INSERT INTO [dbo].[Officer] VALUES ('" + name + "', '" + phoneNumber + "', '" + address + "');";
@@ -90,6 +120,11 @@ public class OfficerManage {
         } else {
             System.out.println("* Warning: Insert fail.");
         }
+    }
+
+    // create Validate for String:
+    private static boolean validateStringLength(String input, int maxLength) {
+        return input.length() <= maxLength;
     }
 
     // create method 2: Update Officer table
@@ -122,18 +157,44 @@ public class OfficerManage {
         } while (selectUpdate != 0);
     }
 
+    private static boolean checkOfficerIdExistence(int id) throws SQLException {
+        // get the ID value in the Officer table
+        ArrayList<Integer> s1 = new ArrayList<>();
+        String sql1 = "SELECT * FROM Officer";
+        PreparedStatement pstm = connection.prepareStatement(sql1);
+        ResultSet rs1 = pstm.executeQuery();
+        while (rs1.next()) {
+            s1.add(0, rs1.getInt(1));
+        }
+        int count = 0;
+        for (int i = 0; i < s1.size(); i++) {
+            if (id == s1.get(i)) {
+                count++;
+            }
+        }
+        return count > 0;
+    }
+
     // create method 2.1:
     public static void updateOfficerName() throws SQLException {
         String sql = "UPDATE Officer SET name = ?  WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
-        sc.nextLine();
-        System.out.println("Enter new name:");
-        String newName = sc.nextLine();
+        int maxLength = 50;
+        boolean check1 = false;
+        String newName = "";
+        do {
+            sc.nextLine();
+            System.out.println("Enter new name:");
+            newName = sc.nextLine();
+            check1 = validateStringLength(newName, maxLength);
+            if (check1 == false) {
+                System.out.println("* Warning: You have entered more than 50 characters. Please try again!");
+            }
+        } while (check1 == false);
         pstm.setString(1, newName);
 
         System.out.println("Enter the id you want to edit:");
         int id = sc.nextInt();
-        pstm.setInt(2, id);
 
         int check = pstm.executeUpdate();
         if (check > 0) {
@@ -147,13 +208,21 @@ public class OfficerManage {
     public static void updateOfficerPhoneNumber() throws SQLException {
         String sql = "UPDATE Officer SET phone_number = ?  WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
-        System.out.println("Enter new phone number:");
-        String newPhoneNumber = sc.next();
+        int maxLength = 11;
+        boolean check1 = false;
+        String newPhoneNumber = "";
+        do {
+            System.out.println("Enter new phone number:");
+            newPhoneNumber = sc.next();
+            check1 = validateStringLength(newPhoneNumber, maxLength);
+            if (check1 == false) {
+                System.out.println("* Warning: You have entered more than 11 characters. Please try again!");
+            }
+        } while (check1 == false);
         pstm.setString(1, newPhoneNumber);
 
         System.out.println("Enter the id you want to edit:");
         int id = sc.nextInt();
-        pstm.setInt(2, id);
 
         int check = pstm.executeUpdate();
         if (check > 0) {
@@ -167,9 +236,18 @@ public class OfficerManage {
     public static void updateOfficerAddress() throws SQLException {
         String sql = "UPDATE Officer SET address = ?  WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
-        sc.nextLine();
-        System.out.println("Enter new address:");
-        String newAddress = sc.nextLine();
+        int maxLength = 255;
+        boolean check1 = false;
+        String newAddress = "";
+        do {
+            sc.nextLine();
+            System.out.println("Enter new address:");
+            newAddress = sc.nextLine();
+            check1 = validateStringLength(newAddress,maxLength);
+            if (check1 == false) {
+                System.out.println("* Warning: You have entered more than 255 characters. Please try again!");
+            }
+        } while (check1 == false);
         pstm.setString(1, newAddress);
 
         System.out.println("Enter the id you want to edit:");
