@@ -216,6 +216,7 @@ public class DistributionManager {
     }
 
 
+
     //hiển thị danh sách Phân phối
     public void displayDistribution(ArrayList<Distribution> distributions) {
         System.out.println("\t\t\tID\t|\tCommissionID|\tHouseHoldID\t|\tAmountReceived\t|\tDateReceived");

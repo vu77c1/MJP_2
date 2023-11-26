@@ -22,6 +22,7 @@ public class MainManager {
         sc.close();
 
     }
+
     public static int menu(Scanner sc) {
         int n;
 
