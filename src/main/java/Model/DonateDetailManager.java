@@ -14,25 +14,26 @@ public class DonateDetailManager {
     public static void printDonateDetail(Connection con){
         try {
             System.out.println();
-            System.out.println("========================================================== DANH SÁCH ỦNG HỘ =========================================================");
-            System.out.println("._______.__________________________.____________________._________________._________________._________________._____________________.");
-            System.out.println("│   ID  │          Số tiền         │    Ngày ủng hộ     │   Xã/Phường     │  Người đại diện │   Tên Công ty   │   Cán bộ tiếp nhận  │");
-            System.out.println("│_______│__________________________│____________________│_________________│_________________│_________________│_____________________│");
+            System.out.println("============================================================= DANH SÁCH ỦNG HỘ ============================================================");
+            System.out.println("._______.____________________.____________________.____________________.____________________.______________________.______________________.");
+            System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │   Người đại diện   │      Tên Công ty     │   Cán bộ tiếp nhận   │");
+            System.out.print("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT dbo.DonateDetail.id, amount, donate_date, precint_name, representative_name, company_name, name FROM DonateDetail left Join dbo.Commission C on DonateDetail.commission_id = C.id left JOIN dbo.Representative R on R.id = DonateDetail.representative_id left join dbo.Company C2 on C2.id = R.company_id left join dbo.Officer O on O.id = C.officer_id");
             while (resultSet.next())
             {
                 String ID = resultSet.getString("id");
                 double amount = resultSet.getDouble("amount");
+                String amountStr = String.format("%.0f", amount);
                 LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
                 String precint_name = resultSet.getString("precint_name");
                 String representative_name = resultSet.getString("representative_name");
                 String company_name = resultSet.getString("company_name");
                 String name = resultSet.getString("name");
-                System.out.printf("│ %-5S │ %-12s │ %-24s │ %-18s │ %-15s │ %-15s │ %-15s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
-                System.out.println("│_______│______________│__________________________│____________________│_________________│_________________│_________________│_____________│");
+                System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amountStr, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
+                System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
             }
-            System.out.println("========================================================= DANH SÁCH KẾT THÚC ========================================================");
+            System.out.println("============================================================ DANH SÁCH KẾT THÚC ===========================================================");
             waitForEnter();
         }catch (SQLException e) {
             System.out.println(e.getMessage());
