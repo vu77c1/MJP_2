@@ -1,6 +1,7 @@
 package Model;
 
 import Common.DBConnect;
+import Common.InputValidator;
 
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
@@ -204,8 +205,7 @@ public class Processing {
     public static int inputID(Scanner sc, String tableName, String columnName) {
         int ID;
         do {
-            System.out.print("Nhập vào ID  (Tham khảo các menu \"Quản lý\"): ");
-            ID = sc.nextInt();
+            ID = InputValidator.validateIntInput("Nhập vào ID  (Tham khảo các menu \"Quản lý\"): ");
             System.out.println();
 
             if (checkIDExistence(ID, tableName, columnName)) {
