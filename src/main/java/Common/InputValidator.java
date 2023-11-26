@@ -16,12 +16,12 @@ public class InputValidator {
             try {
                 System.out.print(prompt);
                 String dateString = scanner.nextLine().trim();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/uuuu");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
                 dateFormat.setLenient(false);
                 date = dateFormat.parse(dateString);
                 isValid = true;
             } catch (ParseException ex) {
-                System.out.println("\u001B[31m\t\t\tError: Please enter a valid date in the format 'dd/MM/yyyy'.\u001B[0m");
+                System.out.println("\t\t\tError: Please enter a valid date in the format 'yyyy/MM-/dd'.");
             }
         } while (!isValid);
 
@@ -39,13 +39,13 @@ public class InputValidator {
             if (!userInput.isEmpty()) {
                 isValid = true;
             } else {
-                System.out.println("\u001B[31mError: Input cannot be empty.\u001B[0m");
+                System.out.println("Error: Input cannot be empty.");
             }
         } while (!isValid);
 
         return userInput;
     }
-//kiem tra input dau vao PriorityObject
+    //kiem tra input dau vao PriorityObject
     public static String validateStringPriorityObject(String prompt) {
         String userInput = "";
         boolean isValid = false;
@@ -59,39 +59,13 @@ public class InputValidator {
                     if (!containsSpecialCharacter(userInput)) {
                         isValid = true;
                     } else {
-                        System.out.println("\u001B[31m\t\t\tThe string does not contain any special characters.\u001B[0m");
+                        System.out.println("\t\t\tThe string does not contain any special characters.");
                     }
                 } else {
-                    System.out.println("\u001B[31m\t\t\tDo not exceed 255 characters\u001B[0m");
+                    System.out.println("\t\t\tDo not exceed 255 characters");
                 }
             } else {
-                System.out.println("\u001B[31m\t\t\tError: Input cannot be empty.\u001B[0m");
-            }
-
-        } while (!isValid);
-
-        return userInput;
-    }
-    public static String validateStringCitizenObject(String prompt) {
-        String userInput = "";
-        boolean isValid = false;
-
-        do {
-            System.out.print(prompt);
-            userInput = scanner.nextLine().trim();
-            if (!userInput.isEmpty()) {
-                if (userInput.length() <= 255) {
-
-                    if (!containsSpecialCharacter(userInput)) {
-                        isValid = true;
-                    } else {
-                        System.out.println("\u001B[31m\t\t\tThe string does not contain any special characters.\u001B[0m");
-                    }
-                } else {
-                    System.out.println("\u001B[31m\t\t\tDo not exceed 255 characters\u001B[0m");
-                }
-            } else {
-                System.out.println("\u001B[31m\t\t\tError: Input cannot be empty.\u001B[0m");
+                System.out.println("\t\t\tError: Input cannot be empty.");
             }
 
         } while (!isValid);
@@ -115,7 +89,7 @@ public class InputValidator {
                 userInput = Double.parseDouble(scanner.nextLine());
                 isValid = true;
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mError: Please enter a valid double.\u001B[0m");
+                System.out.println("Error: Please enter a valid double.");
             }
         } while (!isValid);
 
@@ -132,7 +106,7 @@ public class InputValidator {
                 userInput = Integer.parseInt(scanner.nextLine());
                 isValid = true;
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
+                System.out.println("Error: Please enter a valid integer.");
             }
         } while (!isValid);
 
@@ -140,9 +114,7 @@ public class InputValidator {
     }
 
     public static void closeScanner() {
-        if (scanner != null) {
-            scanner.close();
-        }
+        scanner.close();
     }
 
 }
