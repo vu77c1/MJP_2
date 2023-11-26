@@ -37,7 +37,14 @@ public class CitizenManager {
     public static boolean isValidName(String name) {
         return name.matches("[a-zA-Z\\s]+") && name.length() > 0 && name.length() <= 255;
     }
-
+    private boolean isValidDateFormat(String dobString) {
+        try {
+            java.sql.Date.valueOf(dobString);
+            return true;
+        } catch (IllegalArgumentException e) {
+            return false;
+        }
+    }
     public static boolean isValidPhoneNumber(String phoneNumber) {
         return phoneNumber.matches("\\d{10}");
     }
@@ -95,13 +102,22 @@ public class CitizenManager {
         newCitizen.setIdentityCard(cmnd);
 
         System.out.print("Date of birth (yyyy-MM-dd): ");
-        String dobString = scanner.nextLine();
-        try {
-            Date dob = java.sql.Date.valueOf(dobString);
-            newCitizen.setDateOfBirth(dob);
-        } catch (IllegalArgumentException e) {
-            System.out.println("Invalid date format. Use format yyyy-MM-dd.");
-        }
+        String dobString;
+        do {
+            System.out.print("Date of birth (yyyy-MM-dd): ");
+            dobString = scanner.nextLine();
+
+            if (isValidDateFormat(dobString)) {
+                try {
+                    Date dob = java.sql.Date.valueOf(dobString);
+                    newCitizen.setDateOfBirth(dob);
+                } catch (IllegalArgumentException e) {
+                    System.out.println("Invalid date format. Use format yyyy-MM-dd.");
+                }
+            } else {
+                System.out.println("Invalid date format. Please use format yyyy-MM-dd.");
+            }
+        } while (!isValidDateFormat(dobString));
 
         // Yêu cầu người dùng nhập các thông tin khác cho công dân
         String phoneNumber;
@@ -311,38 +327,59 @@ public class CitizenManager {
         }
         return citizens;
     }
-    public void displayCitizenTable() throws SQLException {
+    public void displayCitizenTable() {
         Statement st = null;
         ResultSet rs = null;
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
         try {
             st = connection.createStatement();
             String sql = "SELECT * FROM Citizen";
             rs = st.executeQuery(sql);
 
             System.out.println("=================================== Citizen Table ====================================");
-            System.out.println(String.format("| %-5s | %-30s | %-15s | %-12s | %-25s | %-7s | %-15s | %-12s | %-18s |",
-                    "ID", "Name", "Identity Card", "Date of Birth", "Phone Number", "Address", "House ID", "Is Household Lord", "Sex"));
-            System.out.println(String.format("| %-5s | %-30s | %-15s | %-12s | %-25s | %-7s | %-15s | %-12s | %-18s |",
-                    "-----", "------------------------------", "---------------", "------------", "-------------------------", "-------", "---------------", "-----------------", "-----------------"));
+            System.out.println("| ID    | Name                           | Identity Card   | Date of Birth | Phone Number         | Address                | House ID        | Is Household Lord | Gender |");
+            System.out.println("| ----- | ------------------------------ | --------------- | --------------| --------------------- | ---------------------- | --------------- | ----------------- | ------ |");
+
             while (rs.next()) {
-                System.out.println(String.format("| %-5s | %-30s | %-15s | %-12s | %-25s | %-7s | %-15s | %-12s | %-18s |",
-                        rs.getInt("id"), rs.getString("name"), rs.getString("identity_card"),
-                        dateFormat.format(rs.getDate("date_of_birth")), rs.getString("phone_number"),
-                        rs.getString("address"), rs.getInt("house_id"), rs.getBoolean("is_household_lord"),
-                        rs.getBoolean("sex")));
-                System.out.println(String.format("| %-5s | %-30s | %-15s | %-12s | %-25s | %-7s | %-15s | %-12s | %-18s |",
-                        "-----", "------------------------------", "---------------", "------------", "-------------------------", "-------", "---------------", "-----------------", "-----------------"));
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                String identityCard = rs.getString("identity_card");
+                String phoneNumber = rs.getString("phone_number");
+                String address = rs.getString("address");
+                int houseId = rs.getInt("house_id");
+                boolean isHouseholdLord = rs.getBoolean("is_household_lord");
+                boolean gender = rs.getBoolean("sex");
+
+                // Định dạng lại ngày tháng từ kiểu Date sang chuỗi theo định dạng dd/MM/yyyy
+                String dateOfBirthString = "";
+                Date dateOfBirth = rs.getDate("date_of_birth");
+                if (dateOfBirth != null) {
+                    dateOfBirthString = dateFormat.format(dateOfBirth);
+                }
+
+                System.out.println(String.format("| %-5s | %-30s | %-15s | %-13s | %-21s | %-24s | %-15s | %-17s | %-6s |",
+                        id, name, identityCard, dateOfBirthString, phoneNumber, address, houseId, isHouseholdLord, gender ? "Male" : "Female"));
+                System.out.println("| ----- | ------------------------------ | --------------- | --------------| --------------------- | ---------------------- | --------------- | ----------------- | ------ |");
             }
-            System.out.println();
+        } catch (SQLException e) {
+            System.out.println("SQL Error: " + e.getMessage());
         } finally {
-            if (rs != null) {
-                rs.close();
-            }
-            if (st != null) {
-                st.close();
+            // Đóng ResultSet và Statement sau khi sử dụng xong
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (st != null) {
+                    st.close();
+                }
+            } catch (SQLException e) {
+                System.out.println("Error closing resources: " + e.getMessage());
             }
         }
     }
+
+
     public static void handleCitizenManagement(CitizenManager citizenManager, Scanner scanner) {
         int choice = -1;
 
