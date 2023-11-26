@@ -189,6 +189,7 @@ public class DistributionManager {
                 System.out.println("\t\t\t ID does not exist. Please enter ID again!");
 
             }
+
         }while (flag==0);
 
 
