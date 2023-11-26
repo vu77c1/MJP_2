@@ -149,69 +149,83 @@ public class DistributionManager {
     }
     //hàm cập nhật lại thông tin
     public void updateDistribution() {
-        int id;
-        id = InputValidator.validateIntInput("\t\t\tEnter ID to update: ");
-        if (isIdExists(id)) {
-            displayDistribution(getDistribution("select * from Distribution where id=" + id));
+        int flag=0;
+        do {
+            int id;
+            id = InputValidator.validateIntInput("\t\t\tEnter ID to update: ");
+
+            if (isIdExists(id)) {
+                displayDistribution(getDistribution("select * from Distribution where id=" + id));
 
 
-            Integer comid = InputValidator.validateIntInput("\t\t\tEnter New Commission ID:  ");
-            Integer houseid=InputValidator.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
-            Double amount=InputValidator.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
-            java.util.Date datereceived=InputValidator.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
+                Integer comid = InputValidator.validateIntInput("\t\t\tEnter New Commission ID:  ");
+                Integer houseid=InputValidator.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+                Double amount=InputValidator.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
+                java.util.Date datereceived=InputValidator.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
 
 
-            try {
+                try {
 
-                JDBCQuery.openConnection();
+                    JDBCQuery.openConnection();
 
-                String sql = "UPDATE Distribution SET commission_id = ?, household_id = ?,amount_received = ?,date_received = ? WHERE id =?;";
-                Object[] prams = {comid, houseid, amount, datereceived,id};
+                    String sql = "UPDATE Distribution SET commission_id = ?, household_id = ?,amount_received = ?,date_received = ? WHERE id =?;";
+                    Object[] prams = {comid, houseid, amount, datereceived,id};
 
-                int rowsAffected = JDBCQuery.executeUpdateQuery(sql, prams);
+                    int rowsAffected = JDBCQuery.executeUpdateQuery(sql, prams);
 
-                if (rowsAffected > 0) {
-                    System.out.println("\t\t\tUpdate success!!");
-                } else {
-                    System.out.println("\t\t\tUpdate failed. No Distribution found with the specified ID.");
+                    if (rowsAffected > 0) {
+                        System.out.println("\t\t\tUpdate success!!");
+                        flag=1;
+                    } else {
+                        System.out.println("\t\t\tUpdate failed. No Distribution found with the specified ID.");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    JDBCQuery.closeConnection();
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                JDBCQuery.closeConnection();
-            }
 
-        } else {
-            System.out.println("\t\t\tUpdate failed. The list of Distribution is empty.");
-        }
+            } else {
+                System.out.println("\t\t\t ID does not exist. Please enter ID again!");
+
+            }
+        }while (flag==0);
+
+
     }
 
     //hàm xóa phân phối theo id
     public void deleteDistribution() {
-        int id;
-        id = InputValidator.validateIntInput("\t\t\tEnter ID to delete: ");
-        if (isIdExists(id)) {
-            try {
-                JDBCQuery.openConnection();
+        int flag=0;
+        do {
+            int id;
+            id = InputValidator.validateIntInput("\t\t\tEnter ID to delete: ");
+            if (isIdExists(id)) {
+                try {
+                    JDBCQuery.openConnection();
 
-                String sql = "DELETE FROM Distribution WHERE id = ?";
-                Object[] params = {id};
-                int rowsAffected = JDBCQuery.executeUpdateQuery(sql, params);
+                    String sql = "DELETE FROM Distribution WHERE id = ?";
+                    Object[] params = {id};
+                    int rowsAffected = JDBCQuery.executeUpdateQuery(sql, params);
 
-                if (rowsAffected > 0) {
-                    System.out.println("\t\t\tDelete success!!");
-                } else {
-                    System.out.println("\t\t\tDelete failed. No Distribution found with the specified ID.");
+                    if (rowsAffected > 0) {
+                        System.out.println("\t\t\tDelete success!!");
+                    } else {
+                        System.out.println("\t\t\tDelete failed. No Distribution found with the specified ID.");
+                    }
+                    flag=1;
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    JDBCQuery.closeConnection();
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                JDBCQuery.closeConnection();
-            }
 
-        } else {
-            System.out.println("\t\t\tDelete failed. The list of Distribution is empty.");
-        }
+            } else {
+                System.out.println("\t\t\tID does not exist. Please enter ID again!");
+            }
+        }while(flag==0);
+
+
 
     }
 
@@ -251,6 +265,8 @@ public class DistributionManager {
         }
         return exists;
     }
+
+
 
 }
 
