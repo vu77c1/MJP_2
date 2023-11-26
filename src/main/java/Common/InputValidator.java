@@ -115,7 +115,7 @@ public class InputValidator {
                 userInput = Double.parseDouble(scanner.nextLine());
                 isValid = true;
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mError: Please enter a valid double.\u001B[0m");
+                System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
             }
         } while (!isValid);
 
