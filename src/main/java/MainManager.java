@@ -1,5 +1,4 @@
 import Common.DBConnect;
-import Common.JdbcConfig;
 import Model.*;
 
 import static Model.DonateDetailManager.*;
@@ -7,29 +6,26 @@ import static Model.DistributionManager.*;
 import static Model.Processing.*;
 import Common.InputValidator;
 import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.List;
 import java.util.Scanner;
 
 public class MainManager {
-    private static Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
     public static void main(String[] args) {
         int n;
-        do {
-            n = menu(sc);
-            productManagement(n, sc);
-
-        } while (!"0".equalsIgnoreCase(String.valueOf(n)));
-
-        sc.close();
-
+        try{
+            do {
+                n = menu(sc);
+                productManagement(n, sc);
+            } while (!"0".equalsIgnoreCase(String.valueOf(n)));
+        }catch (Exception e){
+            System.out.println("\t\t\t Có lỗi " + e.getMessage());
+        }
     }
     public static int menu(Scanner sc) {
         int n;
-
         do {
+            // Print the menu only once
             System.out.println("----------------MANAGEMENT----------------");
-            System.out.println();
             System.out.println();
             System.out.println("            0. Exit");
             System.out.println("            1. Quản lý hộ dân");
@@ -46,47 +42,42 @@ public class MainManager {
             System.out.println();
             System.out.println("            What do you want to choose?");
 
-
             int m = -1;
-
             do {
                 try {
-                    System.out.print("\t\t\tPlease choose....");
+                    System.out.print("Please choose....");
                     m = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException e) {
-                    System.out.println("\t\t\t\u001B[31mInvalid input. Please enter a valid integer.\u001B[0m");
+                    System.out.println("\u001B[31mKý tự nhập vào không hợp lệ!\nVui lòng nhập lại (0-11)!\u001B[0m");
                 }
             } while (m == -1);
-
             n = m;
-
-
         } while (!(n >= 0 && n <= 11));
         return n;
     }
 
+
     public static int productManagement(int n, Scanner sc) {
         try {
-
             switch (n) {
                 case 1:
                     HouseManager houseManager = new HouseManager(DBConnect.connectDatabase());
-                    System.out.println("Quản lý hộ dân");
+                    System.out.println("\t\tQuản lý hộ dân");
                     houseManager.handleHouseManagement(houseManager, sc);
                    break;
                 case 2:
-                    System.out.println("Quản lý cán bộ");
+                    System.out.println("\t\tQuản lý cán bộ");
                     break;
                 case 3:
-                    System.out.println("Quản lý người đại diện");
+                    System.out.println("\t\tQuản lý người đại diện");
 
                     break;
                 case 4:
-                    System.out.println("Quản lý công ty ủng hộ");
+                    System.out.println("\t\tQuản lý công ty ủng hộ");
 
                     break;
                 case 5:
-                    System.out.println("Quản lý Ủy Ban");
+                    System.out.println("\t\tQuản lý Ủy Ban");
                     break;
 
                 case 6:
@@ -119,7 +110,6 @@ public class MainManager {
                                 po.deletePriorityObject();
                                 break;
                             case 4:
-
                                 po.displayPriorityObjects(po.getPriorityObject());
                                 break;
                             case 0:
@@ -130,12 +120,7 @@ public class MainManager {
                                 break;
                         }
                     }
-
-
                     break;
-
-
-
                 case 9:
                     CitizenManager citizenManager = new CitizenManager(DBConnect.connectDatabase());
                     System.out.println("Quản lý công dân");
@@ -181,11 +166,12 @@ public class MainManager {
                     break;
                 case 0:
                     System.out.println("Close program.....");
+                    DBConnect.disconnectDatabase();
                     break;
 
             }
         } catch (Exception e) {
-            e.printStackTrace();
+            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
         }
         return n;
 
@@ -220,7 +206,7 @@ public class MainManager {
                 case 0:
                     System.out.println("\t\t\tTrở về màn hình chính");
                     waitForEnter();
-                    main(new String[]{});
+                    MainManager.main(new String[]{});
                     break;
                 case 1:
                     printDonateDetail(con);

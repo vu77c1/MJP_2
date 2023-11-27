@@ -6,6 +6,7 @@ import Common.InputValidator;
 import java.sql.*;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
@@ -15,14 +16,20 @@ public class Processing {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     public static void waitForEnter() {
         while (true) {
-            System.out.println("\t\t\t\u001B[32mNhấn Enter để tiếp tục...\u001B[0m");
-            String input = sc.nextLine();
-            if (input.isEmpty()) {
-                // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
-                break;
+            try {
+                System.out.println("\t\t\t\u001B[32mNhấn Enter để tiếp tục...\u001B[0m");
+                String input = sc.nextLine();
+                if (input.isEmpty()) {
+                    // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
+                    break;
+                }
+            } catch (NoSuchElementException e) {
+                // Handle the exception (e.g., print an error message)
+                System.out.println("Error reading input: " + e.getMessage());
             }
         }
     }
+
     public static boolean isIDAlreadyExists(Connection con, int id, String tableName) {
         String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE id = ?) THEN 1 ELSE 0 END";
         boolean idExist = false;

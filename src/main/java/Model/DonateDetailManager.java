@@ -38,14 +38,13 @@ public class DonateDetailManager {
                 while (resultSet.next())
                 {
                     String ID = resultSet.getString("id");
-                    double amount = resultSet.getDouble("amount");
-                    String amountStr = String.format("%.0f", amount);
+                    String amount = String.format("%.0f", resultSet.getDouble("amount"));
                     LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
                     String precint_name = resultSet.getString("precint_name");
                     String representative_name = resultSet.getString("representative_name");
                     String company_name = resultSet.getString("company_name");
                     String name = resultSet.getString("name");
-                    System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amountStr, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
+                    System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
                     System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
                 }
                 System.out.println("============================================================ DANH SÁCH KẾT THÚC ===========================================================");
@@ -85,14 +84,13 @@ public class DonateDetailManager {
                         System.out.println("._______.____________________.____________________.____________________.____________________.______________________.______________________.");
                         System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │   Người đại diện   │      Tên Công ty     │   Cán bộ tiếp nhận   │");
                         System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
-                        double amount = resultSet.getDouble("amount");
-                        String amountStr = String.format("%.0f", amount);
+                        String amount = String.format("%.0f", resultSet.getDouble("amount"));
                         LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
                         String precint_name = resultSet.getString("precint_name");
                         String representative_name = resultSet.getString("representative_name");
                         String company_name = resultSet.getString("company_name");
                         String name = resultSet.getString("name");
-                        System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amountStr, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
+                        System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
                         System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
                     }
                     System.out.println("============================================================ DANH SÁCH KẾT THÚC ===========================================================");
@@ -166,7 +164,7 @@ public class DonateDetailManager {
     //	Xoa Thong Tin Khach Hang
     public static void deleteDonateDetail(Connection con) {
         System.out.println();
-        System.out.print("\t\t\t\u001B[31mBạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")\n (Nhấn Enter để tiếp tục)\u001B[0m  ");
+        System.out.print("\t\t\t\u001B[31mBạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\n\t\t\tVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n\t\t\t(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")\n \t\t\t(Nhấn Enter để tiếp tục)\u001B[0m  ");
         sc.nextLine();
         printDonateDetail(con);
         System.out.print("\t\t\tVui lòng nhập vào ID của record muốn xóa: ");
@@ -190,10 +188,9 @@ public class DonateDetailManager {
                         pstmt = con.prepareStatement(sqlDelete);
                         pstmt.setInt(1, identity);
                         if (pstmt.executeUpdate() != 0) {
-                            System.out.println("\u001B[32mXóa thành công!!!\u001B[0m");
+                            System.out.println("\t\t\t\u001B[32mXóa thành công!!!\u001B[0m");
                             waitForEnter();
                         }
-
                     } else {
                         System.out.println(" \t\t\t\u001B[31mINFOR:Không có kết quả nào bị xóa!!!\u001B[0m");
                         waitForEnter();
@@ -271,7 +268,7 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.println("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
+                            System.out.print("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
                             String c = sc.nextLine();
 
                             if ("Y".equalsIgnoreCase(c)) {
@@ -328,7 +325,7 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.println("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
+                            System.out.print("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
                             String c = sc.nextLine();
 
                             if ("Y".equalsIgnoreCase(c)) {
@@ -364,7 +361,7 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.println("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
+                            System.out.print("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
                             String c = sc.nextLine();
 
                             if ("Y".equalsIgnoreCase(c)) {
@@ -400,7 +397,7 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.println("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
+                            System.out.print("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
                             String c = sc.nextLine();
 
                             if ("Y".equalsIgnoreCase(c)) {
@@ -467,7 +464,7 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.println("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
+                            System.out.print("\t\t\tBạn có muốn tiếp tục sửa không (Y/N)?");
                             String c = sc.nextLine();
 
                             if ("Y".equalsIgnoreCase(c)) {
