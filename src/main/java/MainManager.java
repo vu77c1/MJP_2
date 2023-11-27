@@ -167,6 +167,9 @@ public class MainManager {
                     break;
                 case 11:
                     System.out.println("Thống kê");
+                    PriorityObjectManager priorityObjectManager=new PriorityObjectManager();
+                    priorityObjectManager.printSearchByPriorityObject();
+
                     break;
                 case 0:
                     System.out.println("Close program.....");
