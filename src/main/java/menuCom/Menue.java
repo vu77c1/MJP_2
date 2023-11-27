@@ -14,13 +14,16 @@ import dao.CommissionDao;
 
 public class Menue {
 		 Scanner scanner = new Scanner(System.in);
-
+		 public static boolean checkSpecialCharacter(String str) {
+				  // Kiểm tra xem chuỗi có chứa ký tự đặc biệt hay không
+				  return str.matches(".*[^a-zA-Z0-9].*");
+		 }
 		 public void checkString(String s) {
 				  int numberLeng;
 				  do {
 						   s = s.trim();
 						   numberLeng = s.length();
-						   if (numberLeng >= 255) {
+						   if (numberLeng >= 255||checkSpecialCharacter(s)) {
 								    System.err.println("The name is too long\n ");
 								    System.out.println("Input again: ");
 								    s = scanner.nextLine();
