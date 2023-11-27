@@ -484,7 +484,7 @@ public class DonateDetailManager {
             waitForEnter();
         }
     }
-    public static void statsTop5Amount(Connection con) {
+    public static void statsTop3Amount(Connection con) {
         try {
             if (countRecords(con, "DonateDetail") > 0) {
                 System.out.println("\t\t\t - Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n");
@@ -521,7 +521,6 @@ public class DonateDetailManager {
     public static void statsTop5Officer(Connection con) {
         try {
             if (countRecords(con, "DonateDetail") > 0) {
-                System.out.println("\t\t\t - Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n");
                 System.out.println();
                 System.out.println("================================= DANH SÁCH ỦNG HỘ =================================");
                 System.out.println("._______.________________________.________________________.________________________.");
@@ -529,23 +528,23 @@ public class DonateDetailManager {
                 System.out.println("│_______│________________________│________________________│________________________│");
                 Statement statement = con.createStatement();
                 ResultSet resultSet = statement.executeQuery("""
-                        SELECT TOP 5
-                            Officer.id,
-                            Officer.name,
-                            Commission.precint_name,
-                            COUNT(OfficerDistribution.officer_id) as Stats
-                        FROM
-                            Officer
-                                LEFT JOIN
-                            dbo.Commission ON Officer.id = Commission.officer_id
-                                LEFT JOIN
-                            dbo.Distribution ON Commission.id = Distribution.commission_id
-                                LEFT JOIN
-                            dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
-                        GROUP BY
-                            Officer.id, Officer.name, Commission.precint_name
-                        ORDER BY
-                            Stats DESC;
+                       SELECT DISTINCT TOP 5
+                           Officer.id,
+                           Officer.name,
+                           Commission.precint_name,
+                           COUNT(OfficerDistribution.officer_id) as Stats
+                       FROM
+                           Officer
+                               LEFT JOIN
+                           dbo.Commission ON Officer.id = Commission.officer_id
+                               LEFT JOIN
+                           dbo.Distribution ON Commission.id = Distribution.commission_id
+                               LEFT JOIN
+                           dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
+                       GROUP BY
+                           Officer.id, Officer.name, Commission.precint_name
+                       ORDER BY
+                           Stats DESC;
                         """);
                 int i = 1;
                 while (resultSet.next()) {
@@ -570,26 +569,25 @@ public class DonateDetailManager {
 
     public static void statsSumAmountOfficer(Connection con){
         String selectQuery = """
-                SELECT
-                                           Officer.id,
-                                           Officer.name,
-                                           Commission.precint_name,
-                                           SUM(Distribution.amount_received) as Stats
-                                       FROM
-                                           Officer
-                                               LEFT JOIN
-                                           dbo.Commission ON Officer.id = Commission.officer_id
-                                               LEFT JOIN
-                                           dbo.Distribution ON Commission.id = Distribution.commission_id
-                                               LEFT JOIN
-                                           dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
-                                        WHERE Officer.id = ?
-                                       GROUP BY
-                                           Officer.id, Officer.name, Commission.precint_name
-                                       ORDER BY
-                                           Stats DESC""";
+               SELECT DISTINCT
+                   Officer.id,
+                   Officer.name,
+                   Commission.precint_name,
+                   SUM(Distribution.amount_received) as Stats
+               FROM
+                   Officer
+                       LEFT JOIN
+                   dbo.Commission ON Officer.id = Commission.officer_id
+                       LEFT JOIN
+                   dbo.Distribution ON Commission.id = Distribution.commission_id
+                       LEFT JOIN
+                   dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
+               WHERE Officer.id = ?
+               GROUP BY
+                   Officer.id, Officer.name, Commission.precint_name
+               ORDER BY
+                   Stats DESC""";
         try (PreparedStatement selectStatement = con.prepareStatement(selectQuery)){
-            System.out.println("\t\t\t - Liệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n");
             System.out.println();
             OfficerManager.displayOfficerTable();
             waitForEnter();

@@ -17,7 +17,7 @@ public class Processing {
     public static void waitForEnter() {
         while (true) {
             try {
-                System.out.println("\t\t\t\u001B[32mNhấn Enter để tiếp tục...\u001B[0m");
+                System.out.print("\t\t\t\u001B[32mNhấn Enter để tiếp tục...\u001B[0m");
                 String input = sc.nextLine();
                 if (input.isEmpty()) {
                     // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
@@ -25,7 +25,7 @@ public class Processing {
                 }
             } catch (NoSuchElementException e) {
                 // Handle the exception (e.g., print an error message)
-                System.out.println("Error reading input: " + e.getMessage());
+                System.out.print("Error reading input: " + e.getMessage());
             }
         }
     }

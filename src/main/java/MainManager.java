@@ -174,7 +174,6 @@ public class MainManager {
             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
         }
         return n;
-
     }
     public static void handleDonateDetailManager(Connection con) {
         int choice = -1;
@@ -297,7 +296,7 @@ public class MainManager {
             do {
                 try
                 {
-                    System.out.print("\t\t\tEnter the program number: (0-8): ");
+                    System.out.print("\t\tEnter the program number: (0-8): ");
                     choice = Integer.parseInt(sc.nextLine());
                 }
                 catch (NumberFormatException input)
@@ -320,9 +319,11 @@ public class MainManager {
                 case 6:
                     break;
                 case 7:
+                    System.out.println("\t\t\tHiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất");
                     statsTop5Officer(con);
                     break;
                 case 8:
+                    System.out.println("\t\t\tLiệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n");
                     statsSumAmountOfficer(con);
                     break;
                 case 0:
