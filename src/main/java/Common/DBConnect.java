@@ -17,7 +17,8 @@ public class DBConnect {
         try {
             Class.forName(JDBC_DRIVER);
             con = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-            System.out.println("\u001B[32mDatabase Connected\u001B[0m");
+//            System.out.println("\u001B[32mDatabase Connected\u001B[0m");
+             System.out.println();
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
         }
