@@ -15,7 +15,7 @@ public class Processing {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     public static void waitForEnter() {
         while (true) {
-            System.out.println("\u001B[32mNhấn 'Enter' để tiếp tục...\u001B[0m");
+            System.out.println("\u001B[32mNhấn Enter để tiếp tục...\u001B[0m");
             String input = sc.nextLine();
 
             if (input.isEmpty()) {
