@@ -117,7 +117,7 @@ public class CompanyManager {
     }
 
     // Phương thức lấy danh sách tất cả các Company từ cơ sở dữ liệu
-    public List<Company> getAllRepresentative() throws SQLException {
+    public List<Company> getAllCompany() throws SQLException {
         List<Company> companies = new ArrayList<>();
         String query = "SELECT * FROM Company";
         try (PreparedStatement statement = connection.prepareStatement(query);
@@ -132,4 +132,6 @@ public class CompanyManager {
         }
         return companies;
     }
+
+//    public boolean checkCompany () throws
 }
