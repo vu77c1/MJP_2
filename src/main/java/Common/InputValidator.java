@@ -21,7 +21,7 @@ public class InputValidator {
                 date = dateFormat.parse(dateString);
                 isValid = true;
             } catch (ParseException ex) {
-                System.out.println("\u001B[31m\t\t\tError: Please enter a valid date in the format 'dd/MM/yyyy'.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31m\t\t\tError: Please enter a valid date in the format 'dd/MM/yyyy'.\u001B[0m");
             }
         } while (!isValid);
 
@@ -39,7 +39,7 @@ public class InputValidator {
             if (!userInput.isEmpty()) {
                 isValid = true;
             } else {
-                System.out.println("\u001B[31mError: Input cannot be empty.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31mError: Input cannot be empty.\u001B[0m");
             }
         } while (!isValid);
 
@@ -59,13 +59,13 @@ public class InputValidator {
                     if (!containsSpecialCharacter(userInput)) {
                         isValid = true;
                     } else {
-                        System.out.println("\u001B[31m\t\t\tThe string does not contain any special characters.\u001B[0m");
+                        System.out.println("\t\t\t\u001B[31m\t\t\tThe string does not contain any special characters.\u001B[0m");
                     }
                 } else {
-                    System.out.println("\u001B[31m\t\t\tDo not exceed 255 characters\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31m\t\t\tDo not exceed 255 characters\u001B[0m");
                 }
             } else {
-                System.out.println("\u001B[31m\t\t\tError: Input cannot be empty.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31m\t\t\tError: Input cannot be empty.\u001B[0m");
             }
 
         } while (!isValid);
@@ -117,10 +117,10 @@ public class InputValidator {
                     isValid = true;
                 }else {
                     isValid = false;
-                    System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
                 }
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
             }
         } while (!isValid);
 
@@ -139,10 +139,10 @@ public class InputValidator {
                     isValid = true;
                 }else {
                     isValid = false;
-                    System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
                 }
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
             }
         } while (!isValid);
 
