@@ -75,13 +75,13 @@ public class MainManager {
                 case 3:
                     RepresentativeManager representativeManager =new RepresentativeManager(DBConnect.connectDatabase());
                     System.out.println("Quản lý người đại diện");
-                    handleRepresentative(representativeManager,sc);
+                    representativeManager.handleRepresentative(representativeManager,sc);
 
                     break;
                 case 4:
                     CompanyManager companyManager = new CompanyManager(DBConnect.connectDatabase());
                     System.out.println("Quản lý đơn vị ủng hộ");
-                    handleCompany(companyManager,sc);
+                    companyManager.handleCompany(companyManager,sc);
                     break;
                 case 5:
                     System.out.println("Quản lý Ủy Ban");
@@ -123,92 +123,5 @@ public class MainManager {
 
     }
 
-    private static void handleRepresentative(RepresentativeManager representativeManager, Scanner scanner) {
-        System.out.println("Quản lý người đại diện - Chọn chức năng:");
-        System.out.println("1. Thêm người đại diện");
-        System.out.println("2. Xóa người đại diện");
-        System.out.println("3. Sửa thông tin người đại diện");
-        System.out.println("0. Quay lại menu chính");
-
-        int choice = -1;
-
-        do {
-            try {
-                System.out.print("Vui lòng chọn: ");
-                choice = Integer.parseInt(scanner.nextLine());
-                switch (choice) {
-                    case 1:
-                        // Thêm người đại diện
-                        representativeManager.addRepresentativeInput(scanner);
-                        break;
-                    case 2:
-                        // Xóa người đại diện
-                        System.out.print("Nhập ID người đại diện cần xóa: ");
-                        int representativeIdToDelete = Integer.parseInt(scanner.nextLine());
-                        representativeManager.deleteRepresentative(representativeIdToDelete);
-                        System.out.println("Người đại diện có ID " + representativeIdToDelete + " đã được xóa thành công.");
-                        break;
-                    case 3:
-                        // Sửa thông tin người đại diện
-                        representativeManager.updateRepresentativeFromConsoleInput(scanner);
-                        break;
-                    case 0:
-                        // Quay lại menu chính
-                        break;
-                    default:
-                        System.out.println("Lựa chọn không hợp lệ.");
-                        break;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Vui lòng nhập số.");
-            } catch (SQLException e) {
-                System.out.println("Lỗi SQL: " + e.getMessage());
-            }
-        } while (choice != 0);
-    }
-
-    private static void handleCompany(CompanyManager companyManager, Scanner scanner) {
-        System.out.println("Quản lý đơn vị ủng hộ - Chọn chức năng:");
-        System.out.println("1. Thêm đơn vị ủng hộ");
-        System.out.println("2. Xóa đơn vị ủng hộ");
-        System.out.println("3. Sửa thông tin đơn vị ủng hộ");
-        System.out.println("0. Quay lại menu chính");
-
-        int choice = -1;
-
-        do {
-            try {
-                System.out.print("Vui lòng chọn: ");
-                choice = Integer.parseInt(scanner.nextLine());
-                switch (choice) {
-                    case 1:
-                        // Thêm đơn vị ủng hộ
-                        companyManager.addCompanyInput(scanner);
-                        break;
-                    case 2:
-                        // Xóa đơn vị ủng hộ
-                        System.out.print("Nhập ID đơn vị ủng hộ cần xóa: ");
-                        int representativeIdToDelete = Integer.parseInt(scanner.nextLine());
-                        companyManager.deleteCompany(representativeIdToDelete);
-                        System.out.println("Đơn vị ủng hộ có ID " + representativeIdToDelete + " đã được xóa thành công.");
-                        break;
-                    case 3:
-                        // Sửa đơn vị ủng hộ
-                        companyManager.updateCompanyFromConsoleInput(scanner);
-                        break;
-                    case 0:
-                        // Quay lại menu chính
-                        break;
-                    default:
-                        System.out.println("Lựa chọn không hợp lệ.");
-                        break;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Vui lòng nhập số.");
-            } catch (SQLException e) {
-                System.out.println("Lỗi SQL: " + e.getMessage());
-            }
-        } while (choice != 0);
-    }
 
 }
