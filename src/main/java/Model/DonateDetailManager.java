@@ -20,20 +20,21 @@ public class DonateDetailManager {
                 System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │   Người đại diện   │      Tên Công ty     │   Cán bộ tiếp nhận   │");
                 System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
                 Statement statement = con.createStatement();
-                ResultSet resultSet = statement.executeQuery("SELECT\n" +
-                        "    dbo.DonateDetail.id,\n" +
-                        "    amount,\n" +
-                        "    donate_date,\n" +
-                        "    C.precint_name,\n" +
-                        "    representative_name,\n" +
-                        "    company_name,\n" +
-                        "    O.name\n" +
-                        "FROM\n" +
-                        "    DonateDetail\n" +
-                        "        LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id\n" +
-                        "        LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id\n" +
-                        "        LEFT JOIN dbo.Company C2 ON C2.id = R.company_id\n" +
-                        "        LEFT JOIN dbo.Officer O ON O.id = C.officer_id");
+                ResultSet resultSet = statement.executeQuery("""
+                        SELECT
+                            dbo.DonateDetail.id,
+                            amount,
+                            donate_date,
+                            C.precint_name,
+                            representative_name,
+                            company_name,
+                            O.name
+                        FROM
+                            DonateDetail
+                                LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id
+                                LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
+                                LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
+                                LEFT JOIN dbo.Officer O ON O.id = C.officer_id""");
                 while (resultSet.next())
                 {
                     String ID = resultSet.getString("id");
@@ -58,20 +59,21 @@ public class DonateDetailManager {
         }
     }
     public static void printDonateDetailByID(Connection con, int ID){
-        String selectQuery = "SELECT\n" +
-                "    dbo.DonateDetail.id,\n" +
-                "    amount,\n" +
-                "    donate_date,\n" +
-                "    C.precint_name,\n" +
-                "    representative_name,\n" +
-                "    company_name,\n" +
-                "    O.name\n" +
-                "FROM\n" +
-                "    DonateDetail\n" +
-                "        LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id\n" +
-                "        LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id\n" +
-                "        LEFT JOIN dbo.Company C2 ON C2.id = R.company_id\n" +
-                "        LEFT JOIN dbo.Officer O ON O.id = C.officer_id WHERE DonateDetail.id = ?";
+        String selectQuery = """
+                SELECT
+                    dbo.DonateDetail.id,
+                    amount,
+                    donate_date,
+                    C.precint_name,
+                    representative_name,
+                    company_name,
+                    O.name
+                FROM
+                    DonateDetail
+                        LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id
+                        LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
+                        LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
+                        LEFT JOIN dbo.Officer O ON O.id = C.officer_id WHERE DonateDetail.id = ?""";
         try (PreparedStatement selectStatement = con.prepareStatement(selectQuery)){
             selectStatement.setInt(1, ID);
             try (ResultSet resultSet = selectStatement.executeQuery()) {
@@ -107,6 +109,8 @@ public class DonateDetailManager {
         try{
             System.out.println();
             System.out.println("=== Thêm thông tin nhà ủng hộ ===");
+            System.out.print("Bạn sắp thao tác thêm một record cho 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")\n (Nhấn Enter để tiếp tục)  ");
+            sc.nextLine();
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
             System.out.print("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\")");
             int representativeId = Processing.inputID(sc, "Representative", "id");
@@ -162,7 +166,7 @@ public class DonateDetailManager {
     //	Xoa Thong Tin Khach Hang
     public static void deleteDonateDetail(Connection con) {
         System.out.println();
-        System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")\n (Nhấn \'Enter\' để tiếp tục)  ");
+        System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")\n (Nhấn Enter để tiếp tục)  ");
         sc.nextLine();
         System.out.print("Vui lòng nhập vào ID của record muốn xóa: ");
         int identity = inputID(sc, "DonateDetail", "id");// Tạm thời xóa record theo ID
@@ -173,7 +177,7 @@ public class DonateDetailManager {
         try {
 //			Kiem Tra Su Ton Ton Tai Cua record, Neu Ton Tai Thi Tien Hanh Xoa
             if (Processing.isIDAlreadyExists(con, identity, tableName)){
-            String chose = null;
+            String chose;
                     do {
                         System.out.print("Bạn có chắc chắn muốn xóa (Y/N)?");
                         chose = sc.nextLine().trim();
@@ -212,7 +216,7 @@ public class DonateDetailManager {
     //	Chuc Nang Cap Nhat Thong Tin Khach Hang
     public static void updateDonateDetail(Connection con) {
         System.out.println();
-        System.out.print("Bạn sắp thao tác cập nhật một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong cơ sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")\n (Nhấn \'Enter\' để tiếp tục) ");
+        System.out.print("Bạn sắp thao tác cập nhật một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong cơ sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")\n (Nhấn Enter để tiếp tục) ");
         sc.nextLine();
         System.out.println("Vui lòng nhập vào ID của record muốn update: ");
         int identity = inputID(sc, "DonateDetail", "id");// Tạm thời xóa record theo ID
@@ -221,7 +225,7 @@ public class DonateDetailManager {
         PreparedStatement pstmt = null;
 //		Kiem Tra id Da Co Trong Bang Khang Hang Hay Chua? Neu Co Thi Tien Hanh Update
         if (Processing.isIDAlreadyExists(con, identity, "DonateDetail" )) {
-            String chose =null;
+            String chose;
             boolean check;
 //			Hien Thi Menu Update
             do {
@@ -255,7 +259,6 @@ public class DonateDetailManager {
                         pstmt.setInt(2, identity);
                         pstmt.executeUpdate();
                         System.out.println(" \u001B[32mCập nhật số tiền thành công!!!\u001B[0m");
-                        waitForEnter();
                     } catch (Exception e) {
                         System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
                     } finally {
@@ -265,13 +268,26 @@ public class DonateDetailManager {
                         } catch (SQLException se2) {
                             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
+                        do {
+                            System.out.println("Bạn có muốn tiếp tục sửa không (Y/N)?");
+                            String c = sc.nextLine();
+
+                            if ("Y".equalsIgnoreCase(c)) {
+                                updateDonateDetail(con);
+                            } else if ("N".equalsIgnoreCase(c)) {
+                                break;
+                            } else {
+                                System.out.println("\u001B[31mLựa chọn nhập vào không đúng, vui lòng nhập lại!!!\u001B[0m");
+                            }
+                        } while (true);
+                        waitForEnter();
                     }
                     break;
 //			Update ngày ủng hộ
                 case "2":
                     String sql2 = "UPDATE DonateDetail SET donate_date =? WHERE id =?";
-                    LocalDate newDonateDate = null;
-                    String newDonateDateStr = null;
+                    LocalDate newDonateDate;
+                    String newDonateDateStr;
                     do
                     {
                         System.out.print("Nhập vào ngày nhận hỗ trợ (theo định dạng dd/MM/yyyy): ");
@@ -306,9 +322,22 @@ public class DonateDetailManager {
                         try {
                             if (pstmt != null)
                                 pstmt.close();
-                        } catch (SQLException e) {
-                            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
+                        } catch (SQLException se2) {
+                            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
+                        do {
+                            System.out.println("Bạn có muốn tiếp tục sửa không (Y/N)?");
+                            String c = sc.nextLine();
+
+                            if ("Y".equalsIgnoreCase(c)) {
+                                updateDonateDetail(con);
+                            } else if ("N".equalsIgnoreCase(c)) {
+                                break;
+                            } else {
+                                System.out.println("\u001B[31mLựa chọn nhập vào không đúng, vui lòng nhập lại!!!\u001B[0m");
+                            }
+                        } while (true);
+                        waitForEnter();
                     }
                     break;
 //			Update ID Ủy ban
@@ -329,12 +358,24 @@ public class DonateDetailManager {
                         try {
                             if (pstmt != null)
                                 pstmt.close();
-                        } catch (SQLException e) {
-                            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
+                        } catch (SQLException se2) {
+                            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
+                        do {
+                            System.out.println("Bạn có muốn tiếp tục sửa không (Y/N)?");
+                            String c = sc.nextLine();
+
+                            if ("Y".equalsIgnoreCase(c)) {
+                                updateDonateDetail(con);
+                            } else if ("N".equalsIgnoreCase(c)) {
+                                break;
+                            } else {
+                                System.out.println("\u001B[31mLựa chọn nhập vào không đúng, vui lòng nhập lại!!!\u001B[0m");
+                            }
+                        } while (true);
+                        waitForEnter();
                     }
                     break;
-
 //			Update ID nguoi dai dien
                 case "4":
                     System.out.println("Nhập vào ID của người đại diện: ");
@@ -353,9 +394,22 @@ public class DonateDetailManager {
                         try {
                             if (pstmt != null)
                                 pstmt.close();
-                        } catch (SQLException e) {
-                            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
+                        } catch (SQLException se2) {
+                            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
+                        do {
+                            System.out.println("Bạn có muốn tiếp tục sửa không (Y/N)?");
+                            String c = sc.nextLine();
+
+                            if ("Y".equalsIgnoreCase(c)) {
+                                updateDonateDetail(con);
+                            } else if ("N".equalsIgnoreCase(c)) {
+                                break;
+                            } else {
+                                System.out.println("\u001B[31mLựa chọn nhập vào không đúng, vui lòng nhập lại!!!\u001B[0m");
+                            }
+                        } while (true);
+                        waitForEnter();
                     }
                     break;
                 //Update toàn bộ theo ID
@@ -381,7 +435,6 @@ public class DonateDetailManager {
                         catch (DateTimeParseException ex)
                         {
                             System.out.println("\u001B[31m Ngày tháng nhập vào \"" + newDonateDateAllStr + "\" không hợp lệ.\u001B[0m");
-                            newDonateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
                         }
                     }
                     while (newDonateDateAll == null);
@@ -406,9 +459,22 @@ public class DonateDetailManager {
                         try {
                             if (pstmt != null)
                                 pstmt.close();
-                        } catch (SQLException e) {
-                            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
+                        } catch (SQLException se2) {
+                            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + se2.getMessage() + ".\u001B[0m");
                         }
+                        do {
+                            System.out.println("Bạn có muốn tiếp tục sửa không (Y/N)?");
+                            String c = sc.nextLine();
+
+                            if ("Y".equalsIgnoreCase(c)) {
+                                updateDonateDetail(con);
+                            } else if ("N".equalsIgnoreCase(c)) {
+                                break;
+                            } else {
+                                System.out.println("\u001B[31mLựa chọn nhập vào không đúng, vui lòng nhập lại!!!\u001B[0m");
+                            }
+                        } while (true);
+                        waitForEnter();
                     }
                     break;
             }
