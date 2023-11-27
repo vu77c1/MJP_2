@@ -391,7 +391,7 @@ public class CitizenManager {
                 System.out.println("\t\t\t2. Delete");
                 System.out.println("\t\t\t3. Update");
                 System.out.println("\t\t\t4. Display");
-                System.out.print("Please choose: ");
+                System.out.print("\t\t\tPlease choose: ");
                 choice = Integer.parseInt(scanner.nextLine());
 
                 switch (choice) {
