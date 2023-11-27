@@ -162,7 +162,7 @@ public class DonateDetailManager {
     //	Xoa Thong Tin Khach Hang
     public static void deleteDonateDetail(Connection con) {
         System.out.println();
-        System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")  ");
+        System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")\n (Nhấn \'Enter\' để tiếp tục)  ");
         sc.nextLine();
         System.out.print("Vui lòng nhập vào ID của record muốn xóa: ");
         int identity = inputID(sc, "DonateDetail", "id");// Tạm thời xóa record theo ID
@@ -212,9 +212,9 @@ public class DonateDetailManager {
     //	Chuc Nang Cap Nhat Thong Tin Khach Hang
     public static void updateDonateDetail(Connection con) {
         System.out.println();
-        System.out.print("Bạn sắp thao tác cập nhật một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong cơ sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")  ");
+        System.out.print("Bạn sắp thao tác cập nhật một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong cơ sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")\n (Nhấn \'Enter\' để tiếp tục) ");
         sc.nextLine();
-        System.out.print("Vui lòng nhập vào ID của record muốn update: ");
+        System.out.println("Vui lòng nhập vào ID của record muốn update: ");
         int identity = inputID(sc, "DonateDetail", "id");// Tạm thời xóa record theo ID
         printDonateDetailByID(con, identity);
         System.out.println();
@@ -229,12 +229,12 @@ public class DonateDetailManager {
                 System.out.println("+-------------------------------+");
                 System.out.println("|   Bạn muốn update mục nào?    |");
                 System.out.println("+-------------------------------+");
-                System.out.printf("| %-30s|\n| %-30s| \n| %-30s| \n| %-30s| \n| %-30s| \n", "1. Số tiền",
-                        "2. Ngày ủng hộ", "3. Ủy ban nhận", "4. Người đại diện", "5. Tất cả");
+                System.out.printf("| %-30s|\n| %-30s| \n| %-30s| \n| %-30s| \n| %-30s| \n| %-30s| \n", "1. Số tiền",
+                        "2. Ngày ủng hộ", "3. Ủy ban nhận", "4. Người đại diện", "5. Tất cả", "0. Trở về menu Quản lý");
                 System.out.println("+-------------------------------+");
                 System.out.print(" From Update Menu, Your Choice: ");
                 chose = sc.nextLine().trim();
-                if (!("1".equals(chose) || "2".equals(chose) || "3".equals(chose) || "4".equals(chose)|| "5".equals(chose))) {
+                if (!("0".equals(chose) ||"1".equals(chose) || "2".equals(chose) || "3".equals(chose) || "4".equals(chose)|| "5".equals(chose))) {
                     check = false;
                     System.out.println("\u001B[31mGiá trị nhập vào không đúng, vui lòng nhập lại!!!\u001B[0m");
                 }
@@ -242,6 +242,9 @@ public class DonateDetailManager {
 
             switch (chose) {
 //			Update Số tiền
+                case "0":
+
+                    break;
                 case "1":
                     double newAmount = InputValidator.validateDoubleInput("Nhập vào số tiền: ");
                     String sql1 = "UPDATE DonateDetail SET amount =? WHERE id =?";
