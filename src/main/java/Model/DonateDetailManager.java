@@ -176,7 +176,7 @@ public class DonateDetailManager {
         PreparedStatement pstmt = null;
         String tableName = "DonateDetail";
         try {
-//			Kiem Tra Su Ton Ton Tai Cua record, Neu Ton Tai Thi Tien Hanh Xoa
+//			Kiem Tra Su Ton Tai Cua record, Neu Ton Tai Thi Tien Hanh Xoa
             if (Processing.isIDAlreadyExists(con, identity, tableName)){
             String chose;
                     do {

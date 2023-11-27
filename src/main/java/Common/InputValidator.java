@@ -113,7 +113,12 @@ public class InputValidator {
             try {
                 System.out.print(prompt);
                 userInput = Double.parseDouble(scanner.nextLine());
-                isValid = true;
+                if (userInput > 0 ){
+                    isValid = true;
+                }else {
+                    isValid = false;
+                    System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
+                }
             } catch (NumberFormatException ex) {
                 System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
             }
