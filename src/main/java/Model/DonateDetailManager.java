@@ -112,7 +112,7 @@ public class DonateDetailManager {
             System.out.print("Bạn sắp thao tác thêm một record cho 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")\n (Nhấn Enter để tiếp tục)  ");
             sc.nextLine();
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
-            System.out.print("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\")");
+            System.out.println("ID của người ủng hộ đại diện (cá nhân hoặc đại diện công ty) (Tham khảo menu \"Quản lý người đại diện\")");
             int representativeId = Processing.inputID(sc, "Representative", "id");
             System.out.println("ID của xã/phường được nhận hỗ trợ (Tham khảo menu \"Quản lý Ủy ban\")");
             int commissionId = Processing.inputID(sc, "Commission", "id");
@@ -342,7 +342,7 @@ public class DonateDetailManager {
                     break;
 //			Update ID Ủy ban
                 case "3":
-                    System.out.print("Nhập vào ID Ủy ban: ");
+                    System.out.println("Nhập vào ID Ủy ban: ");
                     int newCommissionId = inputID(sc, "Commission", "id");
                     String sql3 = "UPDATE DonateDetail SET commission_id =? WHERE id =?";
                     try {
@@ -416,6 +416,7 @@ public class DonateDetailManager {
                 case "5":
                     System.out.print("Nhập vào số tiền: ");
                     double newAmountAll = sc.nextDouble();
+                    sc.nextLine(); // Consume the newline character
                     LocalDate newDonateDateAll = null;
                     String newDonateDateAllStr;
                     do
@@ -438,7 +439,7 @@ public class DonateDetailManager {
                         }
                     }
                     while (newDonateDateAll == null);
-                    System.out.print("Nhập vào ID Ủy ban: ");
+                    System.out.println("Nhập vào ID Ủy ban: ");
                     int newCommissionIdAll = inputID(sc,"Commission", "id");
                     System.out.println("Nhập vào ID của người đại diện: ");
                     int newRepresentativeIdAll = inputID(sc,"Representative", "id");
@@ -450,6 +451,7 @@ public class DonateDetailManager {
                         pstmt.setDate(2, Date.valueOf(newDonateDateAll));
                         pstmt.setInt(3, newCommissionIdAll);
                         pstmt.setInt(4, newRepresentativeIdAll);
+                        pstmt.setInt(5, identity);
                         pstmt.executeUpdate();
                         System.out.println("\u001B[32mCập nhật theo ID " + identity + " thành công!!!\u001B[0m");
                         waitForEnter();
