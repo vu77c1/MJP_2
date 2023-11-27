@@ -130,7 +130,11 @@ public class InputValidator1 {
             try {
                 System.out.print(prompt);
                 userInput = Integer.parseInt(scanner.nextLine());
-                isValid = true;
+                if
+                (userInput>0){ isValid =true; }
+                else
+                { System.out.println("\t\t\tPlease enter again"); }
+
             } catch (NumberFormatException ex) {
                 System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
             }

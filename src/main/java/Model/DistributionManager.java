@@ -21,38 +21,36 @@ public class DistributionManager {
     private   static Scanner sc=new Scanner(System.in);
 
 
-    public static void printDistribution(Connection con) {
+
+    public static void printDistribution(Connection con){
         try {
-            System.out.println("\t\t\t************************************ DISTRIBUTION LIST *********************************");
-            System.out.println("\t\t\t._______.____________________________________.____________________._________________._________________.__");
-            System.out.println("\t\t\t│   ID  │          Commission Information      │    ID Household    │ Amount received │  date_received  │ ");
-            System.out.println("\t\t\t│_______│______________________________________│____________________│_________________│_________________│  ");
-
+            System.out.println("\t\t\t********************************************* DISTRIBUTION LIST *****************************************");
+            System.out.println("\t\t\t._______.______________________________________.____________________._________________._________________.__");
+            System.out.println("\t\t\t│   ID  │         ID Commission            │    ID Household    │ Amount received    │  date_received  │ ");
+            System.out.println("\t\t\t│_______│__________________________________│____________________│____________________│_________________│  ");
             Statement statement = con.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT D.id, CONCAT(C.precint_name, ', ', C.province_name, ', ', C.city_name) AS commission_info, D.household_id, D.amount_received, D.date_received " +
-                    "FROM Distribution D " +
-                    "JOIN Commission C ON C.id = D.commission_id");
-
-            while (resultSet.next()) {
+            ResultSet resultSet = statement.executeQuery("SELECT Distribution.id,commission_id, precint_name, city_name,province_name, household_id, amount_received, date_received  FROM Distribution Join dbo.Commission C on C.id= Distribution.commission_id");
+            while (resultSet.next())
+            {
                 String ID = resultSet.getString("id");
-                String commissionInfo = resultSet.getString("commission_info");
+                String commission_id = resultSet.getString("commission_id");
+                String precint_name = resultSet.getString("precint_name");
+                String city_name = resultSet.getString("city_name");
+                String province_name = resultSet.getString("province_name");
                 String household_id = resultSet.getString("household_id");
                 double amount_received = resultSet.getFloat("amount_received");
                 LocalDate date_received = resultSet.getDate("date_received").toLocalDate();
-
-                System.out.printf("\t\t\t│ %-5S │ %-38s │ %-18s │ %-15.2f │%-16s │ \n", ID, commissionInfo, household_id, amount_received, dateFormat.format(date_received));
-                System.out.println("\t\t\t│_______│______________________________________│____________________│_________________│_________________│");
+                System.out.printf("\t\t\t│ %-5S │ %-32s │ %-18s │ %-18s │%-16s │ \n", ID,precint_name+"- "+city_name+"- "+province_name, household_id, amount_received,dateFormat.format(date_received));
+                System.out.println("\t\t\t│_______│__________________________________│____________________│____________________│_________________│");
             }
-
             System.out.println();
-            System.out.println("\t\t\t************************************ LIST END **********************************");
+            System.out.println("\t\t\t******************************************** LIST END ********************************************************");
             waitForEnter();
-        } catch (SQLException e) {
+        }catch (SQLException e) {
             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
             System.out.println(e.getMessage());
         }
     }
-
     //Lay tat ca thong tin Distribution trong databse khong truyen tham so
     public ArrayList<Distribution> getDistribution() {
         ArrayList<Distribution> infoList = new ArrayList<>();
