@@ -54,7 +54,7 @@ public class MainManager {
                     System.out.print("\t\t\tPlease choose....");
                     m = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter a valid integer.");
+                    System.out.println("\t\t\t\u001B[31mInvalid input. Please enter a valid integer.\u001B[0m");
                 }
             } while (m == -1);
 
@@ -93,7 +93,7 @@ public class MainManager {
                     handleDistributionManager();
                     break;
                 case 7:
-                    System.out.println("Quản lý chi tiết phân phối");
+                    System.out.println("\t\tQuản lý chi tiết phân phối");
                     handleDonateDetailManager(con);
                     break;
                 case 8:
@@ -207,18 +207,18 @@ public class MainManager {
             do {
                 try
                 {
-                    System.out.print("Nhập vào số của chương trình: (0-4): ");
+                    System.out.print("\t\t\tNhập vào số của chương trình: (0-4): ");
                     choice = Integer.parseInt(sc.nextLine());
                 }
                 catch (NumberFormatException input)
                 {
-                    System.out.println("\u001B[31mKý tự nhập vào không hợp lệ!\nVui lòng nhập lại (0-4)!\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mKý tự nhập vào không hợp lệ!\n\t\t\tVui lòng nhập lại (0-4)!\u001B[0m");
                 }
             }
             while (choice == -1);
             switch (choice) {
                 case 0:
-                    System.out.println("Trở về màn hình chính");
+                    System.out.println("\t\t\tTrở về màn hình chính");
                     waitForEnter();
                     main(new String[]{});
                     break;
@@ -235,7 +235,7 @@ public class MainManager {
                     deleteDonateDetail(con);
                     break;
                 default:
-                    System.out.println("\u001B[31mChức năng không hợp lệ. Vui lòng chọn lại.\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mChức năng không hợp lệ. Vui lòng chọn lại.\u001B[0m");
                     waitForEnter();
             }
         }

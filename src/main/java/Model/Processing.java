@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
 
 public class Processing {
     private static Scanner sc = new Scanner(System.in);
-    private static Connection con = DBConnect.connectDatabase();
+    public static Connection con = DBConnect.connectDatabase();
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     public static void waitForEnter() {
         while (true) {

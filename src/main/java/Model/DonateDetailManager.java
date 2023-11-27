@@ -235,7 +235,7 @@ public class DonateDetailManager {
                 System.out.println("\t\t\t+-------------------------------+");
                 System.out.println("\t\t\t|   Bạn muốn update mục nào?    |");
                 System.out.println("\t\t\t+-------------------------------+");
-                System.out.printf("\t\t\t| %-30s|\n| %-30s| \n| %-30s| \n| %-30s| \n| %-30s| \n| %-30s| \n", "1. Số tiền",
+                System.out.printf("\t\t\t| %-30s|\n\t\t\t| %-30s| \n\t\t\t| %-30s| \n\t\t\t| %-30s| \n\t\t\t| %-30s| \n\t\t\t| %-30s| \n", "1. Số tiền",
                         "2. Ngày ủng hộ", "3. Ủy ban nhận", "4. Người đại diện", "5. Tất cả", "0. Trở về menu Quản lý");
                 System.out.println("\t\t\t+-------------------------------+");
                 System.out.print("\t\t\tFrom Update Menu, Your Choice: ");
