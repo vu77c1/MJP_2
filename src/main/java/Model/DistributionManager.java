@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-import static Model.Processing.*;
+import static Model.Processing1.*;
 
 public class DistributionManager {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT);
@@ -23,25 +23,28 @@ public class DistributionManager {
 
     public static void printDistribution(Connection con){
         try {
-            System.out.println("\t\t\t************************************ DISTRIBUTION LIST *********************************");
-            System.out.println("\t\t\t._______._____________________.____________________._________________._________________.__");
-            System.out.println("\t\t\t│   ID  │     ID Commission  │    ID Household    │ Amount received    │  date_received  │ ");
-            System.out.println("\t\t\t│_______│____________________│____________________│____________________│_________________│  ");
+            System.out.println("\t\t\t********************************************* DISTRIBUTION LIST *****************************************");
+            System.out.println("\t\t\t._______.______________________________________.____________________._________________._________________.__");
+            System.out.println("\t\t\t│   ID  │            Commission            │    ID Household    │ Amount received    │  date_received  │ ");
+            System.out.println("\t\t\t│_______│__________________________________│____________________│____________________│_________________│  ");
             Statement statement = con.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT Distribution.id, commission_id, household_id, amount_received, date_received  FROM Distribution Join dbo.Commission C on C.id= Distribution.commission_id");
+            ResultSet resultSet = statement.executeQuery("SELECT Distribution.id,commission_id, precint_name, city_name,province_name, household_id, amount_received, date_received  FROM Distribution Join dbo.Commission C on C.id= Distribution.commission_id");
             while (resultSet.next())
             {
                 String ID = resultSet.getString("id");
                 String commission_id = resultSet.getString("commission_id");
+                String precint_name = resultSet.getString("precint_name");
+                String city_name = resultSet.getString("city_name");
+                String province_name = resultSet.getString("province_name");
                 String household_id = resultSet.getString("household_id");
                 double amount_received = resultSet.getFloat("amount_received");
                 LocalDate date_received = resultSet.getDate("date_received").toLocalDate();
 
-                System.out.printf("\t\t\t│ %-5S │ %-18s │ %-18s │ %-18s │%-16s │ \n", ID, commission_id,household_id, amount_received,dateFormat.format(date_received));
-                System.out.println("\t\t\t│_______│____________________│____________________│____________________│_________________│");
+                System.out.printf("\t\t\t│ %-5S │ %-32s │ %-18s │ %-18s │%-16s │ \n", ID,precint_name+"- "+city_name+"- "+province_name, household_id, amount_received,dateFormat.format(date_received));
+                System.out.println("\t\t\t│_______│__________________________________│____________________│____________________│_________________│");
             }
             System.out.println();
-            System.out.println("\t\t\t************************************ LIST END **********************************");
+            System.out.println("\t\t\t******************************************** LIST END ********************************************************");
             waitForEnter();
         }catch (SQLException e) {
 
@@ -80,7 +83,7 @@ public class DistributionManager {
     }
 
     //Lay tat ca thong tin Distribution trong database co tham so
-    public ArrayList<Distribution> getDistribution(String sql) {
+    public static ArrayList<Distribution> getDistribution(String sql) {
         ArrayList<Distribution> infoList = new ArrayList<>();
         try {
             JDBCQuery1.openConnection();
@@ -266,8 +269,19 @@ public class DistributionManager {
         return exists;
     }
 
+    public static void displayDistribution1(ArrayList<Distribution> distributions) {
+        System.out.println("\t\t\tID\t|\tCommissionID|\tHouseHoldID\t|\tAmountReceived\t|\tDateReceived");
+
+        for (Distribution di : distributions) {
+            System.out.println("\t\t\t" + di.getId() + "\t|\t\t" + di.getCommissionId() +"\t\t|\t\t"+
+                    di.getHouseholdID() +"\t\t|\t\t"+ di.getAmountReceived()+"\t|\t" + di.getDateReceived());
+        }
+    }
+
+
+
+
+
 
 
 }
-
-

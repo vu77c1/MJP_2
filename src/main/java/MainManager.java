@@ -5,7 +5,7 @@ import java.util.Scanner;
 import Common.*;
 import Model.*;
 import static Model.DistributionManager.*;
-import static Model.Processing.*;
+import static Model.Processing1.*;
 public class MainManager {
 
 
@@ -34,7 +34,7 @@ public class MainManager {
             System.out.println("            1. Manage HoseHold");
             System.out.println("            2. Manage Officer");
             System.out.println("            3. Manage Representative");
-            System.out.println("            4. Company management is donate");
+            System.out.println("            4. Manage Donate");
             System.out.println("            5. Commission Management");
             System.out.println("            6. Distribution management");
             System.out.println("            7. Manage distribution details");
@@ -80,7 +80,7 @@ public class MainManager {
 
                     break;
                 case 4:
-                    System.out.println("Company management is donate");
+                    handleDonate();
 
                     break;
                 case 5:
@@ -178,4 +178,55 @@ public class MainManager {
         }
         while (choice >=0 && choice <=4);
     }
+
+
+    public static void handleDonate() {
+        DonateManage donateManage= new DonateManage();;
+        int choice = -1;
+        do{
+
+            System.out.println("\t\t\tManage distribution lists");
+            System.out.println("\t\t\t1. Show top 3 donate");
+            System.out.println("\t\t\t2. List individual supporters");
+
+            System.out.println("\t\t\t0. Return to menu main");
+            System.out.println();
+            System.out.println("\t\t\tWhat do you want to choose?");
+
+
+            do {
+                try
+                {
+                    System.out.print("\t\t\tEnter the program number: (0-4): ");
+                    choice = Integer.parseInt(sc.nextLine());
+                }
+                catch (NumberFormatException input)
+                {
+                    System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-4)!\u001B[0m");
+                }
+            }
+            while (choice == -1);
+            switch (choice) {
+                case 0:
+                    System.out.println("\t\t\tReturn to the main screen");
+                    waitForEnter();
+                    main(new String[]{});
+                    break;
+                case 1:
+                    donateManage.TopVlaue(con);
+                    break;
+                case 2:
+
+                    donateManage.printDistribution(con);
+
+                    break;
+
+                default:
+                    System.out.println("\u001B[31mInvalid function. Please re-enter.\u001B[0m");
+                    waitForEnter();
+            }
+        }
+        while (choice >=0 && choice <=4);
+    }
+
 }
