@@ -484,4 +484,143 @@ public class DonateDetailManager {
             waitForEnter();
         }
     }
+    public static void statsTop5Amount(Connection con) {
+        try {
+            if (countRecords(con, "DonateDetail") > 0) {
+                System.out.println("\t\t\t - Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n");
+                System.out.println();
+                System.out.println("================================= DANH SÁCH ỦNG HỘ =================================");
+                System.out.println("._______.________________________.________________________.________________________.");
+                System.out.println("│  STT  │       Tên Công ty      │     Người đại diện     │      Tổng số tiền      │");
+                System.out.println("│_______│________________________│________________________│________________________│");
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.executeQuery("""
+                        SELECT TOP 3 Company.company_name, Representative.representative_name, SUM(amount) AS Stats FROM DonateDetail
+                            LEFT JOIN dbo.Representative ON DonateDetail.representative_id = Representative.id
+                            LEFT JOIN dbo.Company on Representative.company_id = Company.id
+                            GROUP BY Company.company_name, Representative.representative_name ORDER BY Stats DESC""");
+                int i = 1;
+                while (resultSet.next()) {
+                    String companyName = resultSet.getString("company_name");
+                    String representative_name = resultSet.getString("representative_name");
+                    String Stats = String.format("%.0f", resultSet.getDouble("Stats"));
+                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", i, companyName, representative_name, Stats);
+                    System.out.println("│_______│________________________│________________________│________________________│");
+                    i++;
+                }
+                System.out.println("================================ DANH SÁCH KẾT THÚC ================================");
+            } else {
+                System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
+            }
+            waitForEnter();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+        }
+    }
+    public static void statsTop5Officer(Connection con) {
+        try {
+            if (countRecords(con, "DonateDetail") > 0) {
+                System.out.println("\t\t\t - Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n");
+                System.out.println();
+                System.out.println("================================= DANH SÁCH ỦNG HỘ =================================");
+                System.out.println("._______.________________________.________________________.________________________.");
+                System.out.println("│   ID  │       Tên Cán bộ       │         Ủy ban         │  Tổng số lần tham gia  │");
+                System.out.println("│_______│________________________│________________________│________________________│");
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.executeQuery("""
+                        SELECT TOP 5
+                            Officer.id,
+                            Officer.name,
+                            Commission.precint_name,
+                            COUNT(OfficerDistribution.officer_id) as Stats
+                        FROM
+                            Officer
+                                LEFT JOIN
+                            dbo.Commission ON Officer.id = Commission.officer_id
+                                LEFT JOIN
+                            dbo.Distribution ON Commission.id = Distribution.commission_id
+                                LEFT JOIN
+                            dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
+                        GROUP BY
+                            Officer.id, Officer.name, Commission.precint_name
+                        ORDER BY
+                            Stats DESC;
+                        """);
+                int i = 1;
+                while (resultSet.next()) {
+                    int ID = resultSet.getInt("id");
+                    String companyName = resultSet.getString("name");
+                    String precintName = resultSet.getString("precint_name");
+                    int Stats = resultSet.getInt("Stats");
+                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", ID, companyName, precintName, Stats);
+                    System.out.println("│_______│________________________│________________________│________________________│");
+                    i++;
+                }
+                System.out.println("================================ DANH SÁCH KẾT THÚC ================================");
+            } else {
+                System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
+            }
+            waitForEnter();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+        }
+    }
+
+    public static void statsSumAmountOfficer(Connection con){
+        String selectQuery = """
+                SELECT
+                                           Officer.id,
+                                           Officer.name,
+                                           Commission.precint_name,
+                                           SUM(Distribution.amount_received) as Stats
+                                       FROM
+                                           Officer
+                                               LEFT JOIN
+                                           dbo.Commission ON Officer.id = Commission.officer_id
+                                               LEFT JOIN
+                                           dbo.Distribution ON Commission.id = Distribution.commission_id
+                                               LEFT JOIN
+                                           dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
+                                        WHERE Officer.id = ?
+                                       GROUP BY
+                                           Officer.id, Officer.name, Commission.precint_name
+                                       ORDER BY
+                                           Stats DESC""";
+        try (PreparedStatement selectStatement = con.prepareStatement(selectQuery)){
+            System.out.println("\t\t\t - Liệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n");
+            System.out.println();
+            OfficerManager.displayOfficerTable();
+            waitForEnter();
+            System.out.println("\t\t\tNhập vào ID của cán bộ: ");
+            int id = Processing.inputID(sc, "Officer", "id");
+            selectStatement.setInt(1, id);
+            int i = 1;
+            try (ResultSet resultSet = selectStatement.executeQuery()) {
+                if (countRecords(con, "OfficerDistribution") > 0) {
+                    System.out.println();
+                    System.out.println("================================= DANH SÁCH ỦNG HỘ =================================");
+                    System.out.println("._______.________________________.________________________.________________________.");
+                    System.out.println("│  STT  │       Tên Cán bộ       │         Ủy ban         │  Tổng giá trị ủng hộ   │");
+                    System.out.println("│_______│________________________│________________________│________________________│");
+                    while (resultSet.next()) {
+                        String companyName = resultSet.getString("name");
+                        String precintName = resultSet.getString("precint_name");
+                        int Stats = resultSet.getInt("Stats");
+                        System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", i, companyName, precintName, Stats);
+                        System.out.println("│_______│________________________│________________________│________________________│");
+                        i++;
+                    }
+                    System.out.println("================================ DANH SÁCH KẾT THÚC ================================");
+                } else {
+                    System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
+                }
+                waitForEnter();
+            }
+            }catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+        }
+    }
 }

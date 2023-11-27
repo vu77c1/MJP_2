@@ -45,7 +45,7 @@ public class MainManager {
             int m = -1;
             do {
                 try {
-                    System.out.print("Please choose....");
+                    System.out.print("\t\tPlease choose....");
                     m = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException e) {
                     System.out.println("\u001B[31mKý tự nhập vào không hợp lệ!\nVui lòng nhập lại (0-11)!\u001B[0m");
@@ -123,7 +123,7 @@ public class MainManager {
                     break;
                 case 9:
                     CitizenManager citizenManager = new CitizenManager(DBConnect.connectDatabase());
-                    System.out.println("Quản lý công dân");
+                    System.out.println("\t\tQuản lý công dân");
                     citizenManager.handleCitizenManagement(citizenManager, sc);
                     break;
                 case 10:
@@ -161,14 +161,14 @@ public class MainManager {
 
                     break;
                 case 11:
-                    System.out.println("Thống kê");
-
+                    System.out.println("\t\tThống kê");
+                    Statistics(con);
                     break;
                 case 0:
-                    System.out.println("Close program.....");
+                    System.out.println("\t\tClose program.....");
                     DBConnect.disconnectDatabase();
+                    System.exit(0);
                     break;
-
             }
         } catch (Exception e) {
             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
@@ -280,5 +280,61 @@ public class MainManager {
             }
         }
         while (choice >=0 && choice <=4);
+    }
+    public static void Statistics(Connection con){
+        int choice = -1;
+        do{
+            System.out.println("\t\t Menu thống kê");
+            System.out.println("\t\t\t1. Hiển thị top 5 hộ dân có giá trị ủng hộ nhiều nhất trong 1 đợt ủng hộ X (X nhập vào từ bàn phím)\n" +
+                               "\t\t\t2. Liệt kê thông tin hộ dân có hệ số ưu tiên cao nhất\n" +
+                               "\t\t\t3. Hiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)\n" +
+                               "\t\t\t4. Liệt kê top 5 hộ có nhiều đối tượng ưu tiên nhất\n" +
+                               "\t\t\t5. Hiển thị top 3 đơn vị có tổng giá trị ủng hộ nhiều nhất \n" +
+                               "\t\t\t6. Liệt kê các cá nhân ủng hộ cho 1 đợt từ thiện X (X là MaDotUngHo được nhập từ bàn phím)\n" +
+                               "\t\t\t7. Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n" +
+                               "\t\t\t8. Liệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n" +
+                               "\t\t\t0. Trở về menu chính");
+            do {
+                try
+                {
+                    System.out.print("\t\t\tEnter the program number: (0-8): ");
+                    choice = Integer.parseInt(sc.nextLine());
+                }
+                catch (NumberFormatException input)
+                {
+                    System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-8)!\u001B[0m");
+                }
+            }
+            while (choice == -1);
+            switch (choice){
+                case 1:
+                    break;
+                case 2:
+                    break;
+                case 3:
+                    break;
+                case 4:
+                    break;
+                case 5:
+                    break;
+                case 6:
+                    break;
+                case 7:
+                    statsTop5Officer(con);
+                    break;
+                case 8:
+                    statsSumAmountOfficer(con);
+                    break;
+                case 0:
+                    System.out.println("\t\t\tTrở về màn hình chính");
+                    waitForEnter();
+                    MainManager.main(new String[]{});
+                    break;
+                default:
+                    System.out.println("\t\t\t\u001B[31mChức năng không hợp lệ. Vui lòng chọn lại.\u001B[0m");
+                    waitForEnter();
+            }
+        }
+        while (choice >=0 && choice <=8);
     }
 }
