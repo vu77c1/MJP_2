@@ -51,7 +51,7 @@ public class MainManager {
 
             do {
                 try {
-                    System.out.print("Please choose....");
+                    System.out.print("\t\t\tPlease choose....");
                     m = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException e) {
                     System.out.println("Invalid input. Please enter a valid integer.");
