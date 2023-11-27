@@ -168,6 +168,7 @@ public class DonateDetailManager {
         System.out.println();
         System.out.print("Bạn sắp thao tác xóa một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong co sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý Ủy ban\")\n (Nhấn Enter để tiếp tục)  ");
         sc.nextLine();
+        printDonateDetail(con);
         System.out.print("Vui lòng nhập vào ID của record muốn xóa: ");
         int identity = inputID(sc, "DonateDetail", "id");// Tạm thời xóa record theo ID
         printDonateDetailByID(con, identity);
@@ -218,6 +219,7 @@ public class DonateDetailManager {
         System.out.println();
         System.out.print("Bạn sắp thao tác cập nhật một record của 1 lần ủng hộ của nhà tài trợ.\nVui lòng tham khảo các bảng khác trong cơ sở dữ liệu để tránh sai xót!\n(Các bảng liên quan xin vui lòng tham khảo menu \"Quản lý người đại diện\" và \" Quản lý ủy ban\")\n (Nhấn Enter để tiếp tục) ");
         sc.nextLine();
+        printDonateDetail(con);
         System.out.println("Vui lòng nhập vào ID của record muốn update: ");
         int identity = inputID(sc, "DonateDetail", "id");// Tạm thời xóa record theo ID
         printDonateDetailByID(con, identity);
