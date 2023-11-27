@@ -48,7 +48,7 @@ public class MainManager {
                     System.out.print("\t\tPlease choose....");
                     m = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException e) {
-                    System.out.println("\u001B[31mKý tự nhập vào không hợp lệ!\nVui lòng nhập lại (0-11)!\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mKý tự nhập vào không hợp lệ!\n\t\t\tVui lòng nhập lại (0-11)!\u001B[0m");
                 }
             } while (m == -1);
             n = m;

@@ -15,10 +15,10 @@ public class DonateDetailManager {
         try {
             if (countRecords(con, "DonateDetail")>0){
                 System.out.println();
-                System.out.println("============================================================= DANH SÁCH ỦNG HỘ ============================================================");
-                System.out.println("._______.____________________.____________________.____________________.____________________.______________________.______________________.");
-                System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │   Người đại diện   │      Tên Công ty     │   Cán bộ tiếp nhận   │");
-                System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+                System.out.println("========================================================== DANH SÁCH ỦNG HỘ =========================================================");
+                System.out.println("._______.____________________.____________________.____________________.________________________.______________________.____________.");
+                System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │      Người đại diện    │      Tên Công ty     │   Cán bộ   │");
+                System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
                 Statement statement = con.createStatement();
                 ResultSet resultSet = statement.executeQuery("""
                         SELECT
@@ -44,10 +44,10 @@ public class DonateDetailManager {
                     String representative_name = resultSet.getString("representative_name");
                     String company_name = resultSet.getString("company_name");
                     String name = resultSet.getString("name");
-                    System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
-                    System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+                    System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
+                    System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
                 }
-                System.out.println("============================================================ DANH SÁCH KẾT THÚC ===========================================================");
+                System.out.println("=========================================================== DANH SÁCH KẾT THÚC ======================================================");
             }else{
                 System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
             }
@@ -80,20 +80,20 @@ public class DonateDetailManager {
                     while (resultSet.next())
                     {
                         System.out.println();
-                        System.out.println("============================================================= DANH SÁCH ỦNG HỘ ============================================================");
-                        System.out.println("._______.____________________.____________________.____________________.____________________.______________________.______________________.");
-                        System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │   Người đại diện   │      Tên Công ty     │   Cán bộ tiếp nhận   │");
-                        System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+                        System.out.println("========================================================== DANH SÁCH ỦNG HỘ =========================================================");
+                        System.out.println("._______.____________________.____________________.____________________.________________________.______________________.____________.");
+                        System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │      Người đại diện    │      Tên Công ty     │   Cán bộ   │");
+                        System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
                         String amount = String.format("%.0f", resultSet.getDouble("amount"));
                         LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
                         String precint_name = resultSet.getString("precint_name");
                         String representative_name = resultSet.getString("representative_name");
                         String company_name = resultSet.getString("company_name");
                         String name = resultSet.getString("name");
-                        System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
-                        System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+                        System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", ID, amount, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
+                        System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
                     }
-                    System.out.println("============================================================ DANH SÁCH KẾT THÚC ===========================================================");
+                    System.out.println("=========================================================== DANH SÁCH KẾT THÚC ======================================================");
                 }else{
                     System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
                 }
@@ -625,45 +625,47 @@ public class DonateDetailManager {
         try {
             if (countRecords(con, "DonateDetail") > 0) {
                 System.out.println();
-                System.out.println("================================================= DANH SÁCH HỘ DÂN ==========================================");
-                System.out.println("._______.________________________.________________________.________________________.________________________.");
-                System.out.println("│   ID  │      Họ tên chủ hộ     │        Địa chỉ         │   Đối tượng công dân   │    Đối tượng hộ dân    │");
-                System.out.println("│_______│________________________│________________________│________________________│________________________│");
+                System.out.println("================================================================ DANH SÁCH HỘ DÂN ===========================================================");
+                System.out.println("._______.________________________.________________________.________________________.___________________________.____________._______________.");
+                System.out.println("│   ID  │      Họ tên chủ hộ     │        Địa chỉ         │   Đối tượng công dân   │     Đối tượng hộ dân      │    COUNT   │       SUM     │");
+                System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
                 Statement statement = con.createStatement();
                 ResultSet resultSet = statement.executeQuery("""
                        
                         SELECT
-                                          House.id,
-                                          Citizen.name,
-                                          Citizen.address,
-                                          CO.type_name_object,
-                                          PriorityObject.object_type,
-                                          COUNT(Distribution.amount_received) AS SL,
-                                          SUM(Distribution.amount_received) AS TS
-                                      FROM
-                                          House
-                                              LEFT JOIN
-                                          Citizen ON House.id = Citizen.house_id
-                                              LEFT JOIN
-                                          dbo.CitizenObject CO ON CO.id = Citizen.citizen_object_id
-                                              LEFT JOIN
-                                          PriorityObject ON House.priority_object_id = PriorityObject.id
-                                              LEFT JOIN
-                                          Distribution ON House.id = Distribution.household_id
-                                      WHERE
-                                              Citizen.is_household_lord = 1
-                                      GROUP BY
-                                          House.id, Citizen.name, Citizen.address, CO.type_name_object,PriorityObject.object_type;""");
+                              House.id,
+                              Citizen.name,
+                              Citizen.address,
+                              CO.type_name_object,
+                              PriorityObject.object_type,
+                              COUNT(Distribution.amount_received) AS SL,
+                              SUM(Distribution.amount_received) AS TS
+                          FROM
+                              House
+                                  LEFT JOIN
+                              Citizen ON House.id = Citizen.house_id
+                                  LEFT JOIN
+                              dbo.CitizenObject CO ON CO.id = Citizen.citizen_object_id
+                                  LEFT JOIN
+                              PriorityObject ON House.priority_object_id = PriorityObject.id
+                                  LEFT JOIN
+                              Distribution ON House.id = Distribution.household_id
+                          WHERE
+                                  Citizen.is_household_lord = 1
+                          GROUP BY
+                              House.id, Citizen.name, Citizen.address, CO.type_name_object,PriorityObject.object_type;""");
                 while (resultSet.next()) {
                     int houseID = resultSet.getInt("id");
                     String citizenName = resultSet.getString("name");
+                    String citizenAddress = resultSet.getString("address");
                     String typeNameObject = resultSet.getString("type_name_object");
+                    String objectType = resultSet.getString("object_type");
                     int SL = resultSet.getInt("Sl");
                     String TS = String.format("%.0f",resultSet.getDouble("TS"));
-                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │ %-22s │\n", houseID, citizenName, typeNameObject, SL, TS);
-                    System.out.println("│_______│________________________│________________________│________________________│________________________│");
+                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │ %-25s │ %-10s │ %-13s │\n", houseID, citizenName, citizenAddress, typeNameObject, objectType, SL, TS);
+                    System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
                 }
-                System.out.println("========================================== DANH SÁCH KẾT THÚC ==========================================");
+                System.out.println("============================================================ DANH SÁCH KẾT THÚC =============================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
             }
