@@ -621,4 +621,56 @@ public class DonateDetailManager {
             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
     }
+    public static void statsCountSumAmount(Connection con){
+        try {
+            if (countRecords(con, "DonateDetail") > 0) {
+                System.out.println();
+                System.out.println("================================================= DANH SÁCH HỘ DÂN ==========================================");
+                System.out.println("._______.________________________.________________________.________________________.________________________.");
+                System.out.println("│   ID  │      Họ tên chủ hộ     │        Địa chỉ         │   Đối tượng công dân   │    Đối tượng hộ dân    │");
+                System.out.println("│_______│________________________│________________________│________________________│________________________│");
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.executeQuery("""
+                       
+                        SELECT
+                                          House.id,
+                                          Citizen.name,
+                                          Citizen.address,
+                                          CO.type_name_object,
+                                          PriorityObject.object_type,
+                                          COUNT(Distribution.amount_received) AS SL,
+                                          SUM(Distribution.amount_received) AS TS
+                                      FROM
+                                          House
+                                              LEFT JOIN
+                                          Citizen ON House.id = Citizen.house_id
+                                              LEFT JOIN
+                                          dbo.CitizenObject CO ON CO.id = Citizen.citizen_object_id
+                                              LEFT JOIN
+                                          PriorityObject ON House.priority_object_id = PriorityObject.id
+                                              LEFT JOIN
+                                          Distribution ON House.id = Distribution.household_id
+                                      WHERE
+                                              Citizen.is_household_lord = 1
+                                      GROUP BY
+                                          House.id, Citizen.name, Citizen.address, CO.type_name_object,PriorityObject.object_type;""");
+                while (resultSet.next()) {
+                    int houseID = resultSet.getInt("id");
+                    String citizenName = resultSet.getString("name");
+                    String typeNameObject = resultSet.getString("type_name_object");
+                    int SL = resultSet.getInt("Sl");
+                    String TS = String.format("%.0f",resultSet.getDouble("TS"));
+                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │ %-22s │\n", houseID, citizenName, typeNameObject, SL, TS);
+                    System.out.println("│_______│________________________│________________________│________________________│________________________│");
+                }
+                System.out.println("========================================== DANH SÁCH KẾT THÚC ==========================================");
+            } else {
+                System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
+            }
+            waitForEnter();
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+        }
+    }
 }

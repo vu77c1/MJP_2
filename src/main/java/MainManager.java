@@ -69,12 +69,14 @@ public class MainManager {
                     System.out.println("\t\tQuản lý cán bộ");
                     break;
                 case 3:
-                    System.out.println("\t\tQuản lý người đại diện");
-
+                    RepresentativeManager representativeManager =new RepresentativeManager(DBConnect.connectDatabase());
+                    System.out.println("\t\t\tQuản lý người đại diện");
+                    representativeManager.handleRepresentative(representativeManager,sc);
                     break;
                 case 4:
-                    System.out.println("\t\tQuản lý công ty ủng hộ");
-
+                    CompanyManager companyManager = new CompanyManager(DBConnect.connectDatabase());
+                    System.out.println("\t\t\tQuản lý đơn vị ủng hộ");
+                    companyManager.handleCompany(companyManager,sc);
                     break;
                 case 5:
                     System.out.println("\t\tQuản lý Ủy Ban");
@@ -292,11 +294,12 @@ public class MainManager {
                                "\t\t\t6. Liệt kê các cá nhân ủng hộ cho 1 đợt từ thiện X (X là MaDotUngHo được nhập từ bàn phím)\n" +
                                "\t\t\t7. Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n" +
                                "\t\t\t8. Liệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n" +
-                               "\t\t\t0. Trở về menu chính");
+                               "\t\t\t9. Liệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.)\n" +
+                                "\t\t\t0. Trở về menu chính");
             do {
                 try
                 {
-                    System.out.print("\t\tEnter the program number: (0-8): ");
+                    System.out.print("\t\tEnter the program number: (0-9): ");
                     choice = Integer.parseInt(sc.nextLine());
                 }
                 catch (NumberFormatException input)
@@ -326,6 +329,10 @@ public class MainManager {
                     System.out.println("\t\t\tLiệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n");
                     statsSumAmountOfficer(con);
                     break;
+                case 9:
+                    System.out.println("\t\t\tLiệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.");
+                    statsCountSumAmount(con);
+                    break;
                 case 0:
                     System.out.println("\t\t\tTrở về màn hình chính");
                     waitForEnter();
@@ -336,6 +343,6 @@ public class MainManager {
                     waitForEnter();
             }
         }
-        while (choice >=0 && choice <=8);
+        while (choice >=0 && choice <=9);
     }
 }
