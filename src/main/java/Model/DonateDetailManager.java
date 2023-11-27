@@ -13,28 +13,91 @@ public class DonateDetailManager {
     private final static Scanner sc = new Scanner(System.in);
     public static void printDonateDetail(Connection con){
         try {
-            System.out.println();
-            System.out.println("============================================================= DANH SÁCH ỦNG HỘ ============================================================");
-            System.out.println("._______.____________________.____________________.____________________.____________________.______________________.______________________.");
-            System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │   Người đại diện   │      Tên Công ty     │   Cán bộ tiếp nhận   │");
-            System.out.print("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
-            Statement statement = con.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT dbo.DonateDetail.id, amount, donate_date, precint_name, representative_name, company_name, name FROM DonateDetail left Join dbo.Commission C on DonateDetail.commission_id = C.id left JOIN dbo.Representative R on R.id = DonateDetail.representative_id left join dbo.Company C2 on C2.id = R.company_id left join dbo.Officer O on O.id = C.officer_id");
-            while (resultSet.next())
-            {
-                String ID = resultSet.getString("id");
-                double amount = resultSet.getDouble("amount");
-                String amountStr = String.format("%.0f", amount);
-                LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
-                String precint_name = resultSet.getString("precint_name");
-                String representative_name = resultSet.getString("representative_name");
-                String company_name = resultSet.getString("company_name");
-                String name = resultSet.getString("name");
-                System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amountStr, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
-                System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+            if (countRecords(con, "DonateDetail")>0){
+                System.out.println();
+                System.out.println("============================================================= DANH SÁCH ỦNG HỘ ============================================================");
+                System.out.println("._______.____________________.____________________.____________________.____________________.______________________.______________________.");
+                System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │   Người đại diện   │      Tên Công ty     │   Cán bộ tiếp nhận   │");
+                System.out.print("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+                Statement statement = con.createStatement();
+                ResultSet resultSet = statement.executeQuery("SELECT\n" +
+                        "    dbo.DonateDetail.id,\n" +
+                        "    amount,\n" +
+                        "    donate_date,\n" +
+                        "    C.precint_name,\n" +
+                        "    representative_name,\n" +
+                        "    company_name,\n" +
+                        "    O.name\n" +
+                        "FROM\n" +
+                        "    DonateDetail\n" +
+                        "        LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id\n" +
+                        "        LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id\n" +
+                        "        LEFT JOIN dbo.Company C2 ON C2.id = R.company_id\n" +
+                        "        LEFT JOIN dbo.Officer O ON O.id = C.officer_id");
+                while (resultSet.next())
+                {
+                    String ID = resultSet.getString("id");
+                    double amount = resultSet.getDouble("amount");
+                    String amountStr = String.format("%.0f", amount);
+                    LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
+                    String precint_name = resultSet.getString("precint_name");
+                    String representative_name = resultSet.getString("representative_name");
+                    String company_name = resultSet.getString("company_name");
+                    String name = resultSet.getString("name");
+                    System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amountStr, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
+                    System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+                }
+                System.out.println("============================================================ DANH SÁCH KẾT THÚC ===========================================================");
+            }else{
+                System.out.println("\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
             }
-            System.out.println("============================================================ DANH SÁCH KẾT THÚC ===========================================================");
             waitForEnter();
+        }catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+        }
+    }
+    public static void printDonateDetailByID(Connection con, int ID){
+        String selectQuery = "SELECT\n" +
+                "    dbo.DonateDetail.id,\n" +
+                "    amount,\n" +
+                "    donate_date,\n" +
+                "    C.precint_name,\n" +
+                "    representative_name,\n" +
+                "    company_name,\n" +
+                "    O.name\n" +
+                "FROM\n" +
+                "    DonateDetail\n" +
+                "        LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id\n" +
+                "        LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id\n" +
+                "        LEFT JOIN dbo.Company C2 ON C2.id = R.company_id\n" +
+                "        LEFT JOIN dbo.Officer O ON O.id = C.officer_id WHERE DonateDetail.id = ?";
+        try (PreparedStatement selectStatement = con.prepareStatement(selectQuery)){
+            selectStatement.setInt(1, ID);
+            try (ResultSet resultSet = selectStatement.executeQuery()) {
+                if (countRecords(con, "DonateDetail")>0){
+                    while (resultSet.next())
+                    {
+                        System.out.println();
+                        System.out.println("============================================================= DANH SÁCH ỦNG HỘ ============================================================");
+                        System.out.println("._______.____________________.____________________.____________________.____________________.______________________.______________________.");
+                        System.out.println("│   ID  │       Số tiền      │    Ngày ủng hộ     │      Xã/Phường     │   Người đại diện   │      Tên Công ty     │   Cán bộ tiếp nhận   │");
+                        System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+                        double amount = resultSet.getDouble("amount");
+                        String amountStr = String.format("%.0f", amount);
+                        LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
+                        String precint_name = resultSet.getString("precint_name");
+                        String representative_name = resultSet.getString("representative_name");
+                        String company_name = resultSet.getString("company_name");
+                        String name = resultSet.getString("name");
+                        System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-18s │ %-20s │ %-20s │\n", ID, amountStr, dateFormat.format(donate_date), precint_name,representative_name ,company_name, name);
+                        System.out.println("│_______│____________________│____________________│____________________│____________________│______________________│______________________│");
+                    }
+                    System.out.println("============================================================ DANH SÁCH KẾT THÚC ===========================================================");
+                }else{
+                    System.out.println("\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
+                }
+            }
         }catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
@@ -103,6 +166,7 @@ public class DonateDetailManager {
         sc.nextLine();
         System.out.print("Vui lòng nhập vào ID của record muốn xóa: ");
         int identity = inputID(sc, "DonateDetail", "id");// Tạm thời xóa record theo ID
+        printDonateDetailByID(con, identity);
         System.out.println();
         PreparedStatement pstmt = null;
         String tableName = "DonateDetail";
@@ -152,6 +216,7 @@ public class DonateDetailManager {
         sc.nextLine();
         System.out.print("Vui lòng nhập vào ID của record muốn update: ");
         int identity = inputID(sc, "DonateDetail", "id");// Tạm thời xóa record theo ID
+        printDonateDetailByID(con, identity);
         System.out.println();
         PreparedStatement pstmt = null;
 //		Kiem Tra id Da Co Trong Bang Khang Hang Hay Chua? Neu Co Thi Tien Hanh Update
