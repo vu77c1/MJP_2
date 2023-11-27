@@ -181,7 +181,7 @@ public class MainManager {
 
 
     public static void handleDonate() {
-        DonateManage donateManage= new DonateManage();;
+        DonateManage1 donateManage1 = new DonateManage1();;
         int choice = -1;
         do{
 
@@ -213,11 +213,11 @@ public class MainManager {
                     main(new String[]{});
                     break;
                 case 1:
-                    donateManage.TopVlaue(con);
+                    donateManage1.TopVlaue(con);
                     break;
                 case 2:
 
-                    donateManage.printDistribution(con);
+                    donateManage1.printDistribution(con);
 
                     break;
 

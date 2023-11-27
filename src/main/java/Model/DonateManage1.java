@@ -1,7 +1,5 @@
 package Model;
 
-import Common.JDBCQuery1;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -11,14 +9,13 @@ import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.ResolverStyle;
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.Scanner;
 
 import static Model.Processing1.waitForEnter;
 
 
-public class DonateManage {
+public class DonateManage1 {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT);
     private static Scanner sc= new Scanner(System.in);
     public static SimpleDateFormat formatter = new SimpleDateFormat("yyyy/MM/dd");
