@@ -6,6 +6,7 @@ import static Model.DistributionManager.*;
 import static Model.Processing.*;
 import Common.InputValidator;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MainManager {
@@ -282,7 +283,7 @@ public class MainManager {
         }
         while (choice >=0 && choice <=4);
     }
-    public static void Statistics(Connection con){
+    public static void Statistics(Connection con) throws SQLException {
         int choice = -1;
         do{
             System.out.println("\t\t Menu thống kê");
@@ -290,13 +291,22 @@ public class MainManager {
                                "\t\t\t2. Liệt kê thông tin hộ dân có hệ số ưu tiên cao nhất\n" +
                                "\t\t\t3. Hiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)\n" +
                                "\t\t\t4. Liệt kê top 5 hộ có nhiều đối tượng ưu tiên nhất\n" +
-                               "\t\t\t5. Hiển thị top 3 đơn vị có tổng giá trị ủng hộ nhiều nhất \n" +
+                               "\t\t\t5. Hiển thị top 3 đơn vị có tổng giá trị ủng hộ nhiều nhất\n" +
                                "\t\t\t6. Liệt kê các cá nhân ủng hộ cho 1 đợt từ thiện X (X là MaDotUngHo được nhập từ bàn phím)\n" +
                                "\t\t\t7. Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n" +
                                "\t\t\t8. Liệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n" +
-                               "\t\t\t9. Liệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.)\n" +
-                                "\t\t\t10. Hiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)\n" +
-                                "\t\t\t0. Trở về menu chính");
+                               "\t\t\t9. Thống kê số hộ khẩu có từ 2 đối tượng ưu tiên trở lên\n" +
+                               "\t\t\t10. Thống kê 5 xã/ phường được ủng hộ nhiều nhất (dựa vào số tiền)\n" +
+                               "\t\t\t11. Liệt kê các xã phường chưa được ủng hộ\n" +
+                               "\t\t\t12. Liệt Kê hộ dân chưa được ủng hộ bằng tiền mặt\n" +
+                               "\t\t\t13. Hệ thống tự động xác định số hộ dân chưa được nhận cứu trợ của một đợt cũng như giá trị còn lại của đợt đó,\n sau đó tự động phân bổ giá trị cho từng hộ và hiển thị kết quả phân chia dưới dạng bảng,\n nếu người dùng đồng ý với kết quả tính toán thì chọn \"\"Lưu\"\" và hệ thống sẽ lưu vào bảng \"\"PHANPHOI\"\".\n(Đợt ủng hộ được nhập từ bàn phím, hiển thị danh sách hộ sẽ được nhận + giá trị được nhận tương ứng) \n" +
+                               "\t\t\t14. Tìm kiếm các đơn vị ủng hộ theo ngày nhận và hiển thị chi tiết ủng hộ tương ứng của đơn vị đó \n" +
+                               "\t\t\t15. Liệt kê các đợt ủng hộ và giá trị tương ứng của từng cán bộ, cán bộ nào chưa có đợt ủng hộ cũng liệt kê\n" +
+                               "\t\t\t16. Hiển thị thông tin chi tiết  số tiền còn lại (chưa phân phối) của 1 đợt ủng hộ (Đợt ủng hộ X nhập từ bàn phím)\n" +
+                               "\t\t\t17. + Khi nhập mới một xét duyệt ưu tiên là có trẻ em thì hệ thống sẽ hỏi là có muốn xoá 1 xét duyệt ưu tiên là phụ nữ mang thai và tăng nhân khẩu của hộ đó lên hay không.\nBấm yes hệ thống sẽ tự động cập nhật. \n" +
+                               "\t\t\t+ Ngược lại khi xoá một xét duyệt ưu tiên là phụ nữ mang thai thì hệ thống tự động hỏi là có thêm 1 ưu tiên trẻ em và thêm nhân khẩu hay không nếu có sẽ tự động cập nhật.\n" +
+                               "\t\t\t18. Liệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.\n" +
+                               "\t\t\t0. Trở về menu chính");
             do {
                 try
                 {
@@ -323,20 +333,28 @@ public class MainManager {
                 case 6:
                     break;
                 case 7:
-                    System.out.println("\t\t\tHiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất");
-                    statsTop5Officer(con);
                     break;
                 case 8:
-                    System.out.println("\t\t\tLiệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n");
-                    statsSumAmountOfficer(con);
                     break;
                 case 9:
-                    System.out.println("\t\t\tLiệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.");
-                    statsCountSumAmount(con);
                     break;
                 case 10:
-                    System.out.println("\t\t\tHiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)");
-                    statsHouseholdX(con);
+                    break;
+                case 11:
+                    break;
+                case 12:
+                    break;
+                case 13:
+                    break;
+                case 14:
+                    break;
+                case 15:
+                    break;
+                case 16:
+                    break;
+                case 17:
+                    break;
+                case 18:
                     break;
                 case 0:
                     System.out.println("\t\t\tTrở về màn hình chính");
