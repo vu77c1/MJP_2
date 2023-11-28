@@ -83,20 +83,19 @@ public class CommissionDao {
 						   String sqlString = "  select * from Commission left join Officer on Commission.officer_id= Officer.id";   
 //						   System.out.println("Ban da thuc thi: " + sqlString);
 						   ResultSet rs = statement.executeQuery(sqlString);
+					        System.out.println(String.format(" %-25s  %-25s  %-25s  %-25s  %-25s %-25s %-25s", "ID", "precint_name", "city_name ", "province_name","officer_id","name_officer","phone" ));
+
 						   // lay tung thuoc tinh cua doi tuong
 						   while (rs.next()) {
 								    int id = rs.getInt("id");
-								    System.out.print(id+"\t");
 								    String precint_name = rs.getString("precint_name");
-								    System.out.print(precint_name+"\t");
 								    String city_name = rs.getString("city_name");
-								    System.out.print(city_name+"\t\t");
 								    String province_name = rs.getString("province_name");
-								    System.out.print(province_name+"\t");
 								    int officer_id = rs.getInt("officer_id");
-								    System.out.print(officer_id+"\t\t");
 								    String name_officer = rs.getString("name");
-								    System.out.print(name_officer+"\t");
+								    String phone = rs.getString("phone_number");
+								    System.out.println(String.format(" %-20.25s  %-25.25s  %-30.25s  %-35.25s %-30.25s %-30.25s %-30.25s ",id, precint_name,
+													 city_name, province_name,officer_id,name_officer,phone));
 								    System.out.println();
 								    // tao doi tuong tu cac thuoc tinh o tren
 //								    Commission commission = new Commission(id, precint_name, city_name,
