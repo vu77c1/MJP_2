@@ -34,7 +34,9 @@ public class DonateDetailManager {
                                 LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id
                                 LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
                                 LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
-                                LEFT JOIN dbo.Officer O ON O.id = C.officer_id""");
+                                LEFT JOIN dbo.Distribution D on C.id = D.commission_id
+                                Left Join dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
+                                LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id""");
                 while (resultSet.next())
                 {
                     String ID = resultSet.getString("id");
@@ -72,7 +74,10 @@ public class DonateDetailManager {
                         LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id
                         LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
                         LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
-                        LEFT JOIN dbo.Officer O ON O.id = C.officer_id WHERE DonateDetail.id = ?""";
+                        LEFT JOIN dbo.Distribution D on C.id = D.commission_id
+                        Left Join dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
+                        LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id
+                WHERE DonateDetail.id = ?""";
         try (PreparedStatement selectStatement = con.prepareStatement(selectQuery)){
             selectStatement.setInt(1, ID);
             try (ResultSet resultSet = selectStatement.executeQuery()) {
@@ -536,7 +541,7 @@ public class DonateDetailManager {
                        FROM
                            Officer
                                LEFT JOIN
-                           dbo.Commission ON Officer.id = Commission.officer_id
+                           dbo.Commission ON Officer.commision_id = Commission.id
                                LEFT JOIN
                            dbo.Distribution ON Commission.id = Distribution.commission_id
                                LEFT JOIN
@@ -571,11 +576,11 @@ public class DonateDetailManager {
                    Officer.id,
                    Officer.name,
                    Commission.precint_name,
-                   SUM(Distribution.amount_received) as Stats
+                   SUM(Distribution.amount_distribution) as Stats
                FROM
                    Officer
                        LEFT JOIN
-                   dbo.Commission ON Officer.id = Commission.officer_id
+                           dbo.Commission ON Officer.commision_id = Commission.id
                        LEFT JOIN
                    dbo.Distribution ON Commission.id = Distribution.commission_id
                        LEFT JOIN
@@ -635,8 +640,8 @@ public class DonateDetailManager {
                            Citizen.address,
                            CO.type_name_object,
                            PriorityObject.object_type,
-                           COUNT(Distribution.amount_received) AS SL,
-                           SUM(Distribution.amount_received) AS TS
+                           COUNT(Distribution.amount_distribution) AS SL,
+                           SUM(Distribution.amount_distribution) AS TS
                        FROM
                            House
                                LEFT JOIN
@@ -681,12 +686,25 @@ public class DonateDetailManager {
 
         try  {
             String sql = """
-                        SELECT DISTINCT house.id AS house_id, Citizen.address, citizen.name AS name, CO.type_name_object
-                        FROM house
-                        LEFT JOIN citizen ON house.id = citizen.house_id
-                        LEFT JOIN dbo.CitizenObject CO on citizen.citizen_object_id = CO.id
-                        LEFT JOIN dbo.PriorityObject PO on PO.id = house.priority_object_id
-                        WHERE CO.id = ?
+                        
+                    SELECT DISTINCT
+                            House.id AS house_id,
+                            Citizen.address,
+                            Citizen.name AS name,
+                            CitizenObject.type_name_object,
+                            Citizen.date_of_birth,
+                            CASE
+                                WHEN DATEDIFF(YEAR, Citizen.date_of_birth, GETDATE()) >= 60 THEN 'Nguoi gia'
+                                WHEN DATEDIFF(YEAR, Citizen.date_of_birth, GETDATE()) <= 8 THEN 'Tre em'
+                                ELSE 'Nguoi lon'
+                                END AS age_group
+                        FROM
+                            House
+                                LEFT JOIN Citizen ON House.id = Citizen.house_id
+                                LEFT JOIN dbo.CitizenObject ON Citizen.citizen_object_id = CitizenObject.id
+                                LEFT JOIN dbo.PriorityObject ON PriorityObject.id = House.priority_object_id
+                        WHERE
+                                CitizenObject.id = ?;
                         """;
 
             System.out.println("\t\t\tNhập vào ID đối tượng ưu tiên: ");
@@ -702,14 +720,16 @@ public class DonateDetailManager {
                             String address = resultSet.getString("address");
                             String name = resultSet.getString("name");
                             String typeNameObject = resultSet.getString("type_name_object");
+                            LocalDate dateOfBirth = resultSet.getDate("date_of_birth").toLocalDate();
 
                             // Get Household Lord Name
                             String householdLordName = getHouseholdLordName(houseId, con);
 
                             // Display the data
-                            displayHouseData(houseId, address, name, householdLordName, typeNameObject);
-                            waitForEnter();
+                            displayHouseData(houseId, address, name, householdLordName, typeNameObject, dateOfBirth);
+
                         }
+                        waitForEnter();
                     }
                 } else {
                     System.out.println("\t\t\t\u001B[31mKhông có hộ dân nào\u001B[0m");
@@ -720,7 +740,18 @@ public class DonateDetailManager {
             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
     }
+    // Function to calculate age group based on date of birth
+    private static String getAgeGroup(LocalDate dateOfBirth) {
+        int age = LocalDate.now().getYear() - dateOfBirth.getYear();
 
+        if (age >= 60) {
+            return "Người già";
+        } else if (age <= 8) {
+            return "Trẻ em";
+        } else {
+            return "Người lớn";
+        }
+    }
     // Function to get Household Lord Name
     private static String getHouseholdLordName(int houseId, Connection connection) throws SQLException {
         String householdLordName = "N/A";
@@ -739,13 +770,16 @@ public class DonateDetailManager {
         return householdLordName;
     }
 
-    // Function to display house data
-    private static void displayHouseData(int houseId, String address, String name, String householdLordName, String typeNameObject) {
+    // Function to display house data with age group
+    private static void displayHouseData(int houseId, String address, String name, String householdLordName, String typeNameObject, LocalDate dateOfBirth) {
+        String ageGroup = getAgeGroup(dateOfBirth);
+        System.out.println();
         System.out.println("\t\t\tHouse ID: " + houseId);
         System.out.println("\t\t\tAddress: " + address);
         System.out.println("\t\t\tName: " + name);
         System.out.println("\t\t\tHousehold Lord Name: " + householdLordName);
         System.out.println("\t\t\tType Name Object: " + typeNameObject);
+        System.out.println("\t\t\tAge Group: " + ageGroup);
         System.out.println("\t\t\t------------");
     }
     /*
