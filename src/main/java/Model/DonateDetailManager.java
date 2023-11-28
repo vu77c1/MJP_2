@@ -546,7 +546,6 @@ public class DonateDetailManager {
                        ORDER BY
                            Stats DESC;
                         """);
-                int i = 1;
                 while (resultSet.next()) {
                     int ID = resultSet.getInt("id");
                     String companyName = resultSet.getString("name");
@@ -554,7 +553,6 @@ public class DonateDetailManager {
                     int Stats = resultSet.getInt("Stats");
                     System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", ID, companyName, precintName, Stats);
                     System.out.println("│_______│________________________│________________________│________________________│");
-                    i++;
                 }
                 System.out.println("================================ DANH SÁCH KẾT THÚC ================================");
             } else {
@@ -682,36 +680,44 @@ public class DonateDetailManager {
     public static void statsHouseholdX(Connection con) {
 
         try  {
-            String sql = "SELECT DISTINCT house.id AS house_id, Citizen.address, citizen.name AS name, CO.type_name_object " +
-                    "FROM house " +
-                    "LEFT JOIN citizen ON house.id = citizen.house_id " +
-                    "LEFT JOIN dbo.CitizenObject CO on citizen.citizen_object_id = CO.id " +
-                    "LEFT JOIN dbo.PriorityObject PO on PO.id = house.priority_object_id " +
-                    "WHERE CO.id = ?";
+            String sql = """
+                        SELECT DISTINCT house.id AS house_id, Citizen.address, citizen.name AS name, CO.type_name_object
+                        FROM house
+                        LEFT JOIN citizen ON house.id = citizen.house_id
+                        LEFT JOIN dbo.CitizenObject CO on citizen.citizen_object_id = CO.id
+                        LEFT JOIN dbo.PriorityObject PO on PO.id = house.priority_object_id
+                        WHERE CO.id = ?
+                        """;
+
             System.out.println("\t\t\tNhập vào ID đối tượng ưu tiên: ");
             int x = Processing.inputID(sc, "CitizenObject", "id");
             try (PreparedStatement statement = con.prepareStatement(sql)) {
                 // Set parameter for the placeholder
                 statement.setInt(1, x);
 
-                try (ResultSet resultSet = statement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int houseId = resultSet.getInt("house_id");
-                        String address = resultSet.getString("address");
-                        String name = resultSet.getString("name");
-                        String typeNameObject = resultSet.getString("type_name_object");
+                if (countRecords(con, "House") > 0){
+                    try (ResultSet resultSet = statement.executeQuery()) {
+                        while (resultSet.next()) {
+                            int houseId = resultSet.getInt("house_id");
+                            String address = resultSet.getString("address");
+                            String name = resultSet.getString("name");
+                            String typeNameObject = resultSet.getString("type_name_object");
 
-                        // Get Household Lord Name
-                        String householdLordName = getHouseholdLordName(houseId, con);
+                            // Get Household Lord Name
+                            String householdLordName = getHouseholdLordName(houseId, con);
 
-                        // Display the data
-                        displayHouseData(houseId, address, name, householdLordName, typeNameObject);
-                        waitForEnter();
+                            // Display the data
+                            displayHouseData(houseId, address, name, householdLordName, typeNameObject);
+                            waitForEnter();
+                        }
                     }
+                } else {
+                    System.out.println("\t\t\t\u001B[31mKhông có hộ dân nào\u001B[0m");
                 }
             }
         } catch (SQLException e) {
-            e.printStackTrace();
+            System.out.println(e.getMessage());
+            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
     }
 
