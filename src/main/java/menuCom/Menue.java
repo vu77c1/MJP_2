@@ -119,13 +119,13 @@ public class Menue {
 		 }
 
 		 public void menuUpdate(int id) {
-				  System.out.println("1: Update commission name");
-				  System.out.println("2: Update city name");
-				  System.out.println("3: Update province name");
-				  System.out.println("4: Update all commission");
-				  System.out.println("0: Exit");
-				  int n = Integer.parseInt(String.valueOf(input_int()));
-				  switch (n) {
+//				  System.out.println("1: Update commission name");
+//				  System.out.println("2: Update city name");
+//				  System.out.println("3: Update province name");
+//				  System.out.println("4: Update all commission");
+//				  System.out.println("0: Exit");
+//				  int n = Integer.parseInt(String.valueOf(input_int()));
+				  switch (4) {
 				  case 0:
 						   
 						   break;
