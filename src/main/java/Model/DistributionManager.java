@@ -112,8 +112,22 @@ public class DistributionManager {
     }
     //Enter data
     public Distribution inputDistribution() {
-        Integer comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
-        Integer houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+        Integer comid;
+        Integer houseid;
+        do {
+             comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
+            if (!isCommissionIdExists(comid)==true){
+                System.out.println("\t\t\tPlease enter again");
+            }
+        }while(isCommissionIdExists(comid));
+         do {
+             houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+             if (!isHouseIdExists(comid)==true){
+                 System.out.println("\t\t\tPlease enter again");
+             }
+
+         }while (isHouseIdExists(houseid));
+
         Double amount= InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
         java.util.Date datereceived= InputValidator1.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
         Distribution di = new Distribution();
@@ -151,6 +165,10 @@ public class DistributionManager {
     //hàm cập nhật lại thông tin
     public void updateDistribution() {
         int flag=0;
+        Integer comid;
+        Double amount;
+        Integer houseid;
+        java.util.Date datereceived;
         do {
             int id;
             id = InputValidator1.validateIntInput("\t\t\tEnter ID to update: ");
@@ -158,11 +176,27 @@ public class DistributionManager {
             if (isIdExists(id)) {
                 displayDistribution(getDistribution("select * from Distribution where id=" + id));
 
+                do {
+                    comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
+                    if (!isCommissionIdExists(comid)==true){
+                        System.out.println("\t\t\tPlease enter again");
+                    }
+                }while(!isCommissionIdExists(comid));
 
-                Integer comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
-                Integer houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
-                Double amount= InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
-                java.util.Date datereceived= InputValidator1.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
+
+                do {
+                    houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+                    if (!isHouseIdExists(comid)==true){
+                        System.out.println("\t\t\tPlease enter again");
+                    }
+                }while(isHouseIdExists(houseid));
+
+
+                amount= InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
+
+
+
+                datereceived= InputValidator1.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
 
 
                 try {
@@ -268,6 +302,53 @@ public class DistributionManager {
         }
         return exists;
     }
+        //Kiểm tra id commission
+    public boolean isCommissionIdExists(int id) {
+        boolean exists = false;
+        try {
+            JDBCQuery1.openConnection();
+
+            String sql = "SELECT COUNT(*) FROM Commission WHERE id = ?";
+            Object[] params = {id};
+
+            ResultSet rs = JDBCQuery1.executeSelectQuery(sql, params);
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                exists = (count > 0);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            JDBCQuery1.closeConnection();
+        }
+        return exists;
+    }
+
+        //Kiểm tra id House tồn tại chưa
+    public boolean isHouseIdExists(int id){
+        boolean exists=false;
+        try {
+            JDBCQuery1.openConnection();
+            String sql ="Select count (*) from House where id=?";
+            Object[] parms={id};
+
+            ResultSet rs=JDBCQuery1.executeSelectQuery(sql, parms);
+            if(rs.next()){
+                int count= rs.getInt(1);
+                exists=(count>0);
+
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }finally {
+            JDBCQuery1.closeConnection();
+        }
+        return exists;
+    }
+
+
+
 
     public static void displayDistribution1(ArrayList<Distribution> distributions) {
         System.out.println("\t\t\tID\t|\tCommissionID|\tHouseHoldID\t|\tAmountReceived\t|\tDateReceived");

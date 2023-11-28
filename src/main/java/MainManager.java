@@ -100,6 +100,10 @@ public class MainManager {
                 case 9:
                     System.out.println("Citizen management");
 
+                    ProcessPriorityDecision1 p = new ProcessPriorityDecision1();
+                    p.processPriorityDecision(sc,con);
+
+
                     break;
                 case 10:
                     System.out.println("Managing citizen objects");
@@ -133,7 +137,7 @@ public class MainManager {
             System.out.println("\t\t\tManage distribution lists");
             System.out.println("\t\t\t1. Show distribution list");
             System.out.println("\t\t\t2. Add distribution information");
-            System.out.println("\t\t\t3. Edit distribution information");
+            System.out.println("\t\t\t3. Update distribution information");
             System.out.println("\t\t\t4. Delete distribution information");
             System.out.println("\t\t\t0. Return to menu main");
             System.out.println();
