@@ -1,19 +1,26 @@
 
-import Common.DBConnect;
+import static Model.DonateDetailManager.addDonateDetail;
+import static Model.DonateDetailManager.deleteDonateDetail;
+import static Model.DonateDetailManager.printDonateDetail;
+import static Model.DonateDetailManager.updateDonateDetail;
+import static Model.Processing.closeScanner;
+import static Model.Processing.waitForEnter;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import Common.InputValidator;
-import Model.CitizenObjectManager;
-import Model.PriorityObjectManager;
 import java.util.Scanner;
-import Model.*;
-import static Model.DonateDetailManager.*;
-import static Model.Processing.*;
+
+import Common.DBConnect;
+import Common.InputValidator;
+import Model.CitizenManager;
+import Model.CitizenObjectManager;
+import Model.HouseManager;
+import Model.PriorityObjectManager;
+import menuCom.Menue;
 
 public class MainManager {
     private static Scanner sc = new Scanner(System.in);
-    private static Connection con = DBConnect.connectDatabase();
+//    private static Connection con = DBConnect.connectDatabase();
     public static void main(String[] args) {
         int n;
         do {
@@ -83,6 +90,8 @@ public class MainManager {
                     break;
                 case 5:
                     System.out.println("Quản lý Ủy Ban");
+                    Menue menue = new Menue();
+				  menue.subMenu();
                     break;
                 case 6:
                     System.out.println("Quản lý phân phối");

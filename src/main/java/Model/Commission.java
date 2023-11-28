@@ -24,12 +24,19 @@ public class Commission {
 				  this.cityName=cityName;
 				  this.officerId = officerId;
 		 }
-		 @Override
+		 
+		 
+@Override
 		 public String toString() {
-				  System.out.println("- ----------------------------------------------------------------------------------------------------------------------------------------------");
-				  return "Commission [id=UB_" + id + ", precintName=" + precintName + ", cityName=" + cityName
-				                        + ", provinceName=" + provinceName + ", officerId=CB_" + officerId + "]";
+				  return "id:UB_" + id + "\t Phuong/xa:" + precintName + "\t\t Thanh Pho:" + cityName
+				                        + "\t\t Tinh:" + provinceName + "\t\t id:CB_" + officerId ;
 		 }
+		 //		 
+//@Override
+//		 public String toString() {
+//				  return "UB_" + id + "\t\t precintName=" + precintName + "\t\t cityName=" + cityName
+//				                        + "\t\t provinceName=" + provinceName + "\t\t officerId=" + officerId ;
+//		 }
 		 public Commission(String precintName, String cityName, String provinceName) {
 				  super();
 				  this.precintName = precintName;

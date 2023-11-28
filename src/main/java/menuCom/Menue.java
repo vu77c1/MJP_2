@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Scanner;
 
 import Model.Commission;
+import Model.Officer;
 import dao.CommissionDao;
 
 
@@ -15,21 +16,20 @@ import dao.CommissionDao;
 public class Menue {
 		 Scanner scanner = new Scanner(System.in);
 		 public static boolean checkSpecialCharacter(String str) {
-				  // Kiểm tra xem chuỗi có chứa ký tự đặc biệt hay không
-				  return str.matches(".*[^a-zA-Z0-9].*");
-		 }
-		 public void checkString(String s) {
+			        // Kiểm tra xem chuỗi có chứa ký tự đặc biệt hay không
+			        return str.matches("^[a-z0-9 ]{0,255}$");
+			    }
+		 public static void checkString(String s) {
 				  int numberLeng;
+				  Scanner scanner = new Scanner(System.in);
 				  do {
 						   s = s.trim();
 						   numberLeng = s.length();
-						   if (numberLeng >= 255||checkSpecialCharacter(s)) {
-								    System.err.println("The name is too long\n ");
+						   if (!checkSpecialCharacter(s)) {
 								    System.out.println("Input again: ");
 								    s = scanner.nextLine();
 						   }
-
-				  } while (numberLeng >= 255);
+				  } while (!checkSpecialCharacter(s));
 		 }
 
 		 public static String input_int() {
@@ -65,7 +65,7 @@ public class Menue {
 				  System.out.println("wait...");
 				  Integer checkId = 0;
 				  List<Commission> CommissionDelete = new ArrayList<>();
-				  CommissionDelete = CommissionDao.getInstant().selectAll();
+				  CommissionDelete = CommissionDao.getInstant().selectAllCommissions();
 				  // kiem tra ton tai
 				  for (Commission com : CommissionDelete) {
 						   if (String.valueOf(com.getId()).equalsIgnoreCase(id)) {
@@ -76,11 +76,33 @@ public class Menue {
 				  return checkId;
 		 }
 
+//		 kiem tra su ton tai cua ID
+		 public int checkExistOfficerID(String str) {
+				  String str2 = "CB";
+				  String str1 = str.substring(0, 2);
+				  if (!str2.equals(str1)) {
+						   return 0;
+				  }
+				  // cat chuoi tu vi tri thu 3
+				  String id = str.substring(str.indexOf("_") + 1);
+				  System.out.println("wait...");
+				  Integer checkId = 0;
+				  List<Officer> officerID= new ArrayList<>();
+				  officerID = CommissionDao.getInstant().selectAllOfficer();
+				  // kiem tra ton tai
+				  for (Officer com : officerID) {
+						   if (String.valueOf(com.getId()).equalsIgnoreCase(id)) {
+								    checkId = 1;
+								    break;
+						   }
+				  }
+				  return checkId;
+		 }
 //		Kiem tra su ton tai cua doi tuong Commission
 		 public int checkExistCommission(Commission c) {
 				  int check = 0;
 				  List<Commission> result = new ArrayList<>();
-				  result = CommissionDao.getInstant().selectAll();
+				  result = CommissionDao.getInstant().selectAllCommissions();
 				  // kiem tra du lieu nhap co ton tai trong data khong
 				  for (Commission commission : result) {
 						   if (c.getPrecintName().equalsIgnoreCase(commission.getPrecintName()) == true
@@ -134,12 +156,16 @@ public class Menue {
 						   String officerId = scanner.nextLine();
 						   String id1 = officerId.substring(officerId.indexOf("_") + 1);
 						   Integer officer_ID=Integer.valueOf(id1);
-						   System.out.println("Please...");
-						   // tao doi tuong moi tu ban phim
-						   Commission commissionNew = new Commission(id, precint_name, city_name, province_name,officer_ID);
-						   
-						   CommissionDao.getInstant().update(commissionNew);
-						   System.out.println("Update Success");
+						   // check ID officer_ID
+						   int checkIdOff = checkExistOfficerID(officerId);
+						   if (checkIdOff==1) {
+								    // tao doi tuong moi tu ban phim
+								    Commission commissionNew = new Commission(id, precint_name, city_name, province_name,officer_ID);
+								    CommissionDao.getInstant().update(commissionNew);
+								    System.out.println("Update Success");
+						   }else {
+								    System.out.println("ID officer no exist");
+						   }
 						   break;
 				  }
 
@@ -154,12 +180,15 @@ public class Menue {
 				  int n = Integer.parseInt(String.valueOf(input_int()));
 				  switch (n) {
 				  case 0:
-
+						   CommissionDao commissionDao1 = new CommissionDao();
+						   commissionDao1.printlnOffice(commissionDao1.selectAllOfficer());
 						   break;
 				  case 1:
 						   System.out.println("Connecting...");
+						   
+//						   System.out.println("id \t\t\tPrecintName \t\t\tCityName \t\t\tProvinceName \t\t\tOfficerId ");
 						   CommissionDao commissionDao = new CommissionDao();
-						   commissionDao.println(commissionDao.selectAll());
+						   commissionDao.printlnCommissions(commissionDao.selectAllCommissions());
 						   break;
 				  case 2:
 
@@ -188,7 +217,7 @@ public class Menue {
 						   } else {
 								    CommissionDao.getInstant().insert(commissionNew);
 								    CommissionDao commissionInsert = new CommissionDao();
-								    commissionInsert.println(commissionInsert.selectAll());
+								    commissionInsert.printlnCommissions(commissionInsert.selectAllCommissions());
 						   }
 						   break;
 				  case 3:
