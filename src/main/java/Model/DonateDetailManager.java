@@ -652,53 +652,89 @@ public class DonateDetailManager {
 
 
     public static void displayAndSaveDistribution(Connection connection){
+        LocalDate userInputDate;
+        String userInputDateStr;
+        do
+        {
+            System.out.print("\t\t\tNhập vào ngày của đợt ủng hộ (theo định dạng dd/MM/yyyy): ");
+            userInputDateStr = sc.nextLine();
+
+            try
+            {
+                userInputDate = LocalDate.parse(userInputDateStr, dateFormat);
+                if (userInputDate.isAfter(LocalDate.now()))
+                {
+                    System.out.println("\t\t\t\u001B[31mNgày nhận hỗ trợ phải trước hơn ngày hiện tại!\n Bạn không thể du hành thời gian đúng chứ!\u001B[0m");
+                    userInputDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
+                }
+            }
+            catch (DateTimeParseException ex)
+            {
+                System.out.println("\t\t\t\u001B[31m Ngày tháng nhập vào \"" + userInputDateStr + "\" không hợp lệ.\u001B[0m");
+                userInputDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
+            }
+        }
+        while (userInputDate == null);
         // Thực hiện truy vấn SQL để lấy dữ liệu
         String sqlQuery = """
-                            WITH UnaidedHouseholds AS (
-                                SELECT
-                                    h.id AS household_id,
-                                    d.id AS distribution_id,
-                                    d.amount_distribution - COALESCE(SUM(dd.amount), 0) AS remaining_amount
-                                FROM
-                                    House h
-                                INNER JOIN
-                                    Distribution d ON h.id = d.household_id
-                                LEFT JOIN
-                                    DonateDetail dd ON d.id = dd.id
-                                WHERE
-                                    d.date_distribution < GETDATE()
-                                GROUP BY
-                                    h.id, d.id, d.amount_distribution
-                            ),
-                            TotalRemainingAmount AS (
-                                SELECT
-                                    distribution_id,
-                                    SUM(remaining_amount) AS total_remaining_amount
-                                FROM
-                                    UnaidedHouseholds
-                                GROUP BY
-                                    distribution_id
-                            )
-                            SELECT
-                                c.id AS commission_id,
-                                uhh.household_id,
-                                IIF(tra.total_remaining_amount = 0, 0, uhh.remaining_amount / NULLIF(tra.total_remaining_amount, 0) * d.amount_distribution) AS allocated_amount,
-                                c.precint_name as precint_name,  -- Add precinct_name from Commission table
-                                citizen.name as household_lord_name     -- Add citizen name with the condition is_household_lord = 1
-                            FROM
-                                UnaidedHouseholds uhh
-                            JOIN
-                                TotalRemainingAmount tra ON uhh.distribution_id = tra.distribution_id
-                            JOIN
-                                Distribution d ON uhh.distribution_id = d.id
-                            JOIN
-                                Commission c ON d.commission_id = c.id
-                            JOIN
-                                House h ON uhh.household_id = h.id
-                            JOIN
-                                Citizen citizen ON h.id = citizen.house_id AND citizen.is_household_lord = 1;
+            
+                WITH UnaidedHouseholds AS (
+                SELECT
+                    h.id AS household_id,
+                    d.id AS distribution_id,
+                    d.amount_distribution - COALESCE(SUM(dd.amount), 0) AS remaining_amount
+                FROM
+                    House h
+                        INNER JOIN
+                    Distribution d ON h.id = d.household_id
+                        LEFT JOIN
+                    DonateDetail dd ON d.id = dd.id
+                WHERE
+                    d.date_distribution BETWEEN DATEADD(MONTH, DATEDIFF(MONTH, 0, ?), 0) AND DATEADD(MONTH, DATEDIFF(MONTH, 0, ?) + 1, -1)
+                GROUP BY
+                    h.id, d.id, d.amount_distribution
+            ),
+                 TotalRemainingAmount AS (
+                     SELECT
+                         distribution_id,
+                         SUM(remaining_amount) AS total_remaining_amount
+                     FROM
+                         UnaidedHouseholds
+                     GROUP BY
+                         distribution_id
+                 )
+            SELECT
+                c.id AS commission_id,
+                uhh.household_id,
+                IIF(tra.total_remaining_amount = 0, 0, uhh.remaining_amount / NULLIF(tra.total_remaining_amount, 0) * d.amount_distribution) AS allocated_amount,
+                c.precint_name as precint_name,
+                citizen.name as household_lord_name
+            FROM
+                UnaidedHouseholds uhh
+                    JOIN
+                TotalRemainingAmount tra ON uhh.distribution_id = tra.distribution_id
+                    JOIN
+                Distribution d ON uhh.distribution_id = d.id
+                    JOIN
+                Commission c ON d.commission_id = c.id
+                    JOIN
+                House h ON uhh.household_id = h.id
+                    JOIN
+                Citizen citizen ON h.id = citizen.house_id AND citizen.is_household_lord = 1
+                         ORDER BY allocated_amount DESC;
                         """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+            // Assuming userInputDate is a LocalDate
+            LocalDate thirtyDaysAgo = userInputDate.minusDays(30);
+
+            // Convert LocalDate to java.sql.Date
+            Date userInputSqlDate = Date.valueOf(userInputDate);
+            Date thirtyDaysAgoSqlDate = Date.valueOf(thirtyDaysAgo);
+
+            // Use in preparedStatement
+            preparedStatement.setDate(2, userInputSqlDate);
+            preparedStatement.setDate(1, thirtyDaysAgoSqlDate);
+
             // Thực hiện truy vấn và hiển thị kết quả
             ResultSet resultSet = preparedStatement.executeQuery();
             while (resultSet.next()) {
