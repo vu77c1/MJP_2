@@ -337,6 +337,7 @@ public class MainManager {
                 case 10:
                     System.out.println("\t\t\tHiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)");
                     statsHouseholdX(con);
+                    break;
                 case 0:
                     System.out.println("\t\t\tTrở về màn hình chính");
                     waitForEnter();
