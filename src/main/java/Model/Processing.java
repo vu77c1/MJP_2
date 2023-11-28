@@ -17,7 +17,7 @@ public class Processing {
     public static void waitForEnter() {
         while (true) {
             try {
-                System.out.print("\t\t\t\u001B[32mNhấn Enter để tiếp tục...\u001B[0m");
+                System.out.print("\t\t\t\u001B[32mNhấn Enter để tiếp tục...\t\u001B[0m");
                 String input = sc.nextLine();
                 if (input.isEmpty()) {
                     // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp

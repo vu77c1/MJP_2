@@ -591,51 +591,55 @@ public class DonateDetailManager {
             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
     }
-    public static void statsCountSumAmount(Connection con){
-        try {
+    public static void statsCountSumAmount(Connection con) {
+        System.out.println("\t\t\tNhập ID của hộ dân (X): ");
+        int householdId = Processing.inputID(sc, "House", "id");
+        String SQL_QUERY_STATS_BY_HOUSEHOLD = """
+        SELECT
+            House.id,
+            Citizen.name,
+            Citizen.address,
+            CO.type_name_object,
+            PriorityObject.object_type,
+            COUNT(Distribution.amount_distribution) AS SL,
+            SUM(Distribution.amount_distribution) AS TS
+        FROM
+            House
+            LEFT JOIN Citizen ON House.id = Citizen.house_id
+            LEFT JOIN dbo.CitizenObject CO ON CO.id = Citizen.citizen_object_id
+            LEFT JOIN PriorityObject ON House.priority_object_id = PriorityObject.id
+            LEFT JOIN Distribution ON House.id = Distribution.household_id
+        WHERE
+            House.id = ? AND Citizen.is_household_lord = 1
+        GROUP BY
+            House.id, Citizen.name, Citizen.address, CO.type_name_object, PriorityObject.object_type
+        ORDER BY
+            TS DESC;
+    """;
+        try (PreparedStatement preparedStatement = con.prepareStatement(SQL_QUERY_STATS_BY_HOUSEHOLD)) {
+            preparedStatement.setInt(1, householdId);
+
             if (countRecords(con, "DonateDetail") > 0) {
                 System.out.println();
                 System.out.println("================================================================ DANH SÁCH HỘ DÂN ===========================================================");
                 System.out.println("._______.________________________.________________________.________________________.___________________________.____________._______________.");
                 System.out.println("│   ID  │      Họ tên chủ hộ     │        Địa chỉ         │   Đối tượng công dân   │     Đối tượng hộ dân      │    COUNT   │      SUM      │");
                 System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
-                Statement statement = con.createStatement();
-                ResultSet resultSet = statement.executeQuery("""
-                       SELECT
-                           House.id,
-                           Citizen.name,
-                           Citizen.address,
-                           CO.type_name_object,
-                           PriorityObject.object_type,
-                           COUNT(Distribution.amount_distribution) AS SL,
-                           SUM(Distribution.amount_distribution) AS TS
-                       FROM
-                           House
-                               LEFT JOIN
-                           Citizen ON House.id = Citizen.house_id
-                               LEFT JOIN
-                           dbo.CitizenObject CO ON CO.id = Citizen.citizen_object_id
-                               LEFT JOIN
-                           PriorityObject ON House.priority_object_id = PriorityObject.id
-                               LEFT JOIN
-                           Distribution ON House.id = Distribution.household_id
-                       WHERE
-                               Citizen.is_household_lord = 1
-                       GROUP BY
-                           House.id, Citizen.name, Citizen.address, CO.type_name_object,PriorityObject.object_type
-                       ORDER BY TS DESC;""");
-                while (resultSet.next()) {
-                    int houseID = resultSet.getInt("id");
-                    String citizenName = resultSet.getString("name");
-                    String citizenAddress = resultSet.getString("address");
-                    String typeNameObject = resultSet.getString("type_name_object");
-                    String objectType = resultSet.getString("object_type");
-                    int SL = resultSet.getInt("Sl");
-                    String TS = String.format("%.0f",resultSet.getDouble("TS"));
-                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │ %-25s │ %-10s │ %-13s │\n", houseID, citizenName, citizenAddress, typeNameObject, objectType, SL, TS);
-                    System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
+
+                try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                    while (resultSet.next()) {
+                        int houseID = resultSet.getInt("id");
+                        String citizenName = resultSet.getString("name");
+                        String citizenAddress = resultSet.getString("address");
+                        String typeNameObject = resultSet.getString("type_name_object");
+                        String objectType = resultSet.getString("object_type");
+                        int SL = resultSet.getInt("SL"); // Corrected column name
+                        String TS = String.format("%.0f", resultSet.getDouble("TS"));
+                        System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │ %-25s │ %-10s │ %-13s │%n", houseID, citizenName, citizenAddress, typeNameObject, objectType, SL, TS);
+                        System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
+                    }
+                    System.out.println("============================================================ DANH SÁCH KẾT THÚC =============================================================");
                 }
-                System.out.println("============================================================ DANH SÁCH KẾT THÚC =============================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
             }
@@ -646,112 +650,6 @@ public class DonateDetailManager {
         }
     }
 
-    /*
-    TEST
-     */
-    public static void statsHouseholdX(Connection con) {
-
-        try  {
-            String sql = """
-                        
-                    SELECT DISTINCT
-                            House.id AS house_id,
-                            Citizen.address,
-                            Citizen.name AS name,
-                            CitizenObject.type_name_object,
-                            Citizen.date_of_birth,
-                            CASE
-                                WHEN DATEDIFF(YEAR, Citizen.date_of_birth, GETDATE()) >= 60 THEN 'Nguoi gia'
-                                WHEN DATEDIFF(YEAR, Citizen.date_of_birth, GETDATE()) <= 8 THEN 'Tre em'
-                                ELSE 'Nguoi lon'
-                                END AS age_group
-                        FROM
-                            House
-                                LEFT JOIN Citizen ON House.id = Citizen.house_id
-                                LEFT JOIN dbo.CitizenObject ON Citizen.citizen_object_id = CitizenObject.id
-                                LEFT JOIN dbo.PriorityObject ON PriorityObject.id = House.priority_object_id
-                        WHERE
-                                CitizenObject.id = ?;
-                        """;
-
-            System.out.println("\t\t\tNhập vào ID đối tượng ưu tiên: ");
-            int x = Processing.inputID(sc, "CitizenObject", "id");
-            try (PreparedStatement statement = con.prepareStatement(sql)) {
-                // Set parameter for the placeholder
-                statement.setInt(1, x);
-
-                if (countRecords(con, "House") > 0){
-                    try (ResultSet resultSet = statement.executeQuery()) {
-                        while (resultSet.next()) {
-                            int houseId = resultSet.getInt("house_id");
-                            String address = resultSet.getString("address");
-                            String name = resultSet.getString("name");
-                            String typeNameObject = resultSet.getString("type_name_object");
-                            LocalDate dateOfBirth = resultSet.getDate("date_of_birth").toLocalDate();
-
-                            // Get Household Lord Name
-                            String householdLordName = getHouseholdLordName(houseId, con);
-
-                            // Display the data
-                            displayHouseData(houseId, address, name, householdLordName, typeNameObject, dateOfBirth);
-
-                        }
-                        waitForEnter();
-                    }
-                } else {
-                    System.out.println("\t\t\t\u001B[31mKhông có hộ dân nào\u001B[0m");
-                }
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
-        }
-    }
-    // Function to calculate age group based on date of birth
-    private static String getAgeGroup(LocalDate dateOfBirth) {
-        int age = LocalDate.now().getYear() - dateOfBirth.getYear();
-
-        if (age >= 60) {
-            return "Người già";
-        } else if (age <= 8) {
-            return "Trẻ em";
-        } else {
-            return "Người lớn";
-        }
-    }
-    // Function to get Household Lord Name
-    private static String getHouseholdLordName(int houseId, Connection connection) throws SQLException {
-        String householdLordName = "N/A";
-        String householdLordSql = "SELECT name FROM citizen WHERE house_id = ? AND is_household_lord = 1";
-
-        try (PreparedStatement householdLordStatement = connection.prepareStatement(householdLordSql)) {
-            householdLordStatement.setInt(1, houseId);
-
-            try (ResultSet householdLordResultSet = householdLordStatement.executeQuery()) {
-                if (householdLordResultSet.next()) {
-                    householdLordName = householdLordResultSet.getString("name");
-                }
-            }
-        }
-
-        return householdLordName;
-    }
-
-    // Function to display house data with age group
-    private static void displayHouseData(int houseId, String address, String name, String householdLordName, String typeNameObject, LocalDate dateOfBirth) {
-        String ageGroup = getAgeGroup(dateOfBirth);
-        System.out.println();
-        System.out.println("\t\t\tHouse ID: " + houseId);
-        System.out.println("\t\t\tAddress: " + address);
-        System.out.println("\t\t\tName: " + name);
-        System.out.println("\t\t\tHousehold Lord Name: " + householdLordName);
-        System.out.println("\t\t\tType Name Object: " + typeNameObject);
-        System.out.println("\t\t\tAge Group: " + ageGroup);
-        System.out.println("\t\t\t------------");
-    }
-    /*
-    TEST END
-     */
 
     public static void displayAndSaveDistribution(Connection connection){
         // Thực hiện truy vấn SQL để lấy dữ liệu
@@ -817,7 +715,7 @@ public class DonateDetailManager {
                 System.out.println("\t\t\tAllocated Amount per Household: " + allocatedAmount);
                 System.out.println("\t\t\t----------------------------");
             }
-
+            waitForEnter();
             // Hỏi người dùng có muốn thực hiện INSERT không
             System.out.print("\t\t\t\u001B[32mBạn có muốn thực hiện INSERT không? (Y/N): \u001B[0m");
             String input = sc.nextLine();
@@ -830,9 +728,11 @@ public class DonateDetailManager {
                 String print = sc.nextLine();
                 if ("Y".equalsIgnoreCase(print)) {
                     printDistribution(con);
+                    waitForEnter();
                 }
             } else {
                 System.out.println("\t\t\t\u001B[31mNgười dùng đã chọn không thực hiện INSERT.\u001B[0m");
+                waitForEnter();
             }
         }catch (SQLException e) {
             System.out.println(e.getMessage());
