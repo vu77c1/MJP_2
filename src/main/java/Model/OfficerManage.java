@@ -46,7 +46,7 @@ public class OfficerManage {
 
     // create method display menu of Officer table
     public static void displayMenu() {
-        System.out.println(String.format("| %-25s |", "= Officer Manager Menu ="));
+        System.out.println(String.format("| %-25s |", "= Officer Manage Menu ="));
         System.out.println(String.format("| %-25s |", "-------------------------"));
         System.out.println(String.format("| %-25s |", "0. Exit program"));
         System.out.println(String.format("| %-25s |", "1. Add new Officer"));
@@ -63,6 +63,7 @@ public class OfficerManage {
         System.out.println(String.format("| %-30s |", "1. Update Officer name"));
         System.out.println(String.format("| %-30s |", "2. Update Officer phone number"));
         System.out.println(String.format("| %-30s |", "3. Update Officer address"));
+        System.out.println(String.format("| %-30s |", "4. Update Commission ID"));
         System.out.println(String.format("| %-30s |", "=============================="));
     }
 
@@ -71,46 +72,58 @@ public class OfficerManage {
         Statement st = connection.createStatement();
         int maxLengthName = 50;
         String name = "";
-        boolean check1 = false;
+        boolean isCheckStringLength = false;
         do {
             sc.nextLine();
             System.out.println("Input name:");
             name = sc.nextLine();
-            check1 = validateStringLength(name, maxLengthName);
-            if (check1 == false) {
+            isCheckStringLength = validateStringLength(name, maxLengthName);
+            if (isCheckStringLength == false) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 50 characters. Please try again!\u001B[0m");
             }
-        } while (check1 == false);
+        } while (isCheckStringLength == false);
 
         int maxLengthPhoneNumber = 11;
         String phoneNumber = "";
-        boolean check2 = false;
+        boolean isCheckStringLength1 = false;
         do {
             System.out.println("Input phone number:");
             phoneNumber = sc.next();
-            check2 = validateStringLength(phoneNumber, maxLengthPhoneNumber);
-            if (check2 == false) {
+            isCheckStringLength1 = validateStringLength(phoneNumber, maxLengthPhoneNumber);
+            if (isCheckStringLength1 == false) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 11 characters. Please try again!\u001B[0m");
             }
-        } while (check2 == false);
+        } while (isCheckStringLength1 == false);
 
         int maxLengthAddress = 255;
         String address = "";
-        boolean check3 = false;
+        boolean isCheckStringLength2 = false;
         do {
             sc.nextLine();
             System.out.println("Input address:");
             address = sc.nextLine();
-            check3 = validateStringLength(address, maxLengthAddress);
-            if (check3 == false) {
+            isCheckStringLength2 = validateStringLength(address, maxLengthAddress);
+            if (isCheckStringLength2 == false) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 255 characters. Please try again!\u001B[0m");
             }
-        } while (check3 == false);
+        } while (isCheckStringLength2 == false);
+
+        // add commission id
+        int commissionId = 0;
+        boolean isCheckExistence = false;
+        do {
+            System.out.println("Input commission id: ");
+            commissionId = checkInputInt();
+            isCheckExistence = checkCommissionIdExistence(commissionId);
+            if (isCheckExistence == false) {
+                System.out.println("\u001B[31m* Warning: ID does not exist in the Commission table!\u001B[0m");
+            }
+        } while (isCheckExistence == false);
 
         // create sql statement and execute
-        String sql = "INSERT INTO [dbo].[Officer] VALUES ('" + name + "', '" + phoneNumber + "', '" + address + "');";
-        int check = st.executeUpdate(sql);
-        if (check > 0) {
+        String sql = "INSERT INTO [dbo].[Officer] VALUES ('" + name + "', '" + phoneNumber + "', '" + address + "', " + commissionId +");";
+        int isCheckQuery = st.executeUpdate(sql);
+        if (isCheckQuery > 0) {
             System.out.println("\u001B[32m* Notification: Insert success.\u001B[0m");
             System.out.println();
         } else {
@@ -119,9 +132,7 @@ public class OfficerManage {
     }
 
     // create Validate for String:
-    private static boolean validateStringLength(String input, int maxLength) {
-        return input.length() <= maxLength;
-    }
+    private static boolean validateStringLength(String input, int maxLength) { return input.length() <= maxLength; }
 
     // create method 2: Update Officer table
     public static void updateOfficerTable() throws SQLException {
@@ -129,7 +140,7 @@ public class OfficerManage {
         int selectUpdate = 0;
         do {
             System.out.println("What information do you want to update?...");
-            selectUpdate = sc.nextInt();
+            selectUpdate = checkInputInt();
             switch (selectUpdate) {
                 case 0:
                     System.out.println("\u001B[32m* Notification: Update program is closed\u001B[0m");
@@ -146,6 +157,10 @@ public class OfficerManage {
                     updateOfficerAddress();
                     displayUpdateMenu();
                     break;
+                case 4:
+                    updateCommissionId();
+                    displayUpdateMenu();
+                    break;
                 default:
                     System.out.println("\u001B[31m* Warning: Input is invalid. Please try again!\u001B[0m");
                     break;
@@ -157,11 +172,11 @@ public class OfficerManage {
     private static boolean checkOfficerIdExistence(int id) throws SQLException {
         // get the ID value in the Officer table
         ArrayList<Integer> s1 = new ArrayList<>();
-        String sql1 = "SELECT * FROM Officer";
-        PreparedStatement pstm = connection.prepareStatement(sql1);
-        ResultSet rs1 = pstm.executeQuery();
-        while (rs1.next()) {
-            s1.add(0, rs1.getInt(1));
+        String sql = "SELECT * FROM Officer";
+        PreparedStatement pstm = connection.prepareStatement(sql);
+        ResultSet rs = pstm.executeQuery();
+        while (rs.next()) {
+            s1.add(0, rs.getInt(1));
         }
         int count = 0;
         for (int i = 0; i < s1.size(); i++) {
@@ -174,55 +189,55 @@ public class OfficerManage {
 
     // create method 2.1:
     public static void updateOfficerName() throws SQLException {
-        boolean check1 = false;
+        String sql = "UPDATE Officer SET name = ?  WHERE id = ?";
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        boolean isCheckExistOfficerId = false;
         int id = 0;
         do {
             System.out.println("Enter the id you want to edit:");
             id = checkInputInt();
-            check1 = checkOfficerIdExistence(id);
-            if (check1 == false) {
+            isCheckExistOfficerId = checkOfficerIdExistence(id);
+            if (isCheckExistOfficerId == false) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
             }
-        } while (check1 == false);
+        } while (isCheckExistOfficerId == false);
         System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
         displayOfficerTableById(id);
 
-        String sql = "UPDATE Officer SET name = ?  WHERE id = ?";
-        PreparedStatement pstm = connection.prepareStatement(sql);
-
         int maxLength = 50;
-        boolean check2 = false;
+        boolean isCheckStringLength = false;
         String newName = "";
         do {
             sc.nextLine();
             System.out.println("Enter new name:");
             newName = sc.nextLine();
-            check2 = validateStringLength(newName, maxLength);
-            if (check2 == false) {
+            isCheckStringLength = validateStringLength(newName, maxLength);
+            if (isCheckStringLength == false) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 50 characters. Please try again!\u001B[0m");
             }
-        } while (check2 == false);
+        } while (isCheckStringLength == false);
         pstm.setString(1, newName);
         pstm.setInt(2, id);
 
-        int check = pstm.executeUpdate();
-        if (check > 0) {
+        int isCheckQuery = pstm.executeUpdate();
+        if (isCheckQuery > 0) {
             System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
         }
     }
 
     // create method 2.2:
     public static void updateOfficerPhoneNumber() throws SQLException {
-        boolean check1 = false;
+        boolean isCheckExistOfficerId = false;
         int id = 0;
         do {
             System.out.println("Enter the id you want to edit:");
             id = checkInputInt();
-            check1 = checkOfficerIdExistence(id);
-            if (check1 == false) {
+            isCheckExistOfficerId = checkOfficerIdExistence(id);
+            if (isCheckExistOfficerId == false) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
             }
-        } while (check1 == false);
+        } while (isCheckExistOfficerId == false);
         System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
         displayOfficerTableById(id);
 
@@ -230,37 +245,38 @@ public class OfficerManage {
         PreparedStatement pstm = connection.prepareStatement(sql);
 
         int maxLength = 11;
-        boolean check2 = false;
+        boolean isCheckStringLength = false;
         String newPhoneNumber = "";
         do {
             System.out.println("Enter new phone number:");
             newPhoneNumber = sc.next();
-            check2 = validateStringLength(newPhoneNumber, maxLength);
-            if (check2 == false) {
+            isCheckStringLength = validateStringLength(newPhoneNumber, maxLength);
+            if (isCheckStringLength == false) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 11 characters. Please try again!\u001B[0m");
             }
-        } while (check2 == false);
+        } while (isCheckStringLength == false);
+
         pstm.setString(1, newPhoneNumber);
         pstm.setInt(2, id);
 
-        int check = pstm.executeUpdate();
-        if (check > 0) {
+        int isCheckQuery = pstm.executeUpdate();
+        if (isCheckQuery > 0) {
             System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
         }
     }
 
     // create method 2.3:
     public static void updateOfficerAddress() throws SQLException {
-        boolean check1 = false;
+        boolean isCheckExistOfficerId = false;
         int id = 0;
         do {
             System.out.println("Enter the id you want to edit:");
             id = checkInputInt();
-            check1 = checkOfficerIdExistence(id);
-            if (check1 == false) {
+            isCheckExistOfficerId = checkOfficerIdExistence(id);
+            if (isCheckExistOfficerId == false) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
             }
-        } while (check1 == false);
+        } while (isCheckExistOfficerId == false);
         System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
         displayOfficerTableById(id);
 
@@ -268,18 +284,67 @@ public class OfficerManage {
         PreparedStatement pstm = connection.prepareStatement(sql);
 
         int maxLength = 255;
-        boolean check2 = false;
+        boolean isCheckStringLength = false;
         String newAddress = "";
         do {
             sc.nextLine();
             System.out.println("Enter new address:");
             newAddress = sc.nextLine();
-            check2 = validateStringLength(newAddress,maxLength);
-            if (check2 == false) {
+            isCheckStringLength = validateStringLength(newAddress,maxLength);
+            if (isCheckStringLength == false) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 255 characters. Please try again!\u001B[0m");
             }
-        } while (check2 == false);
+        } while (isCheckStringLength == false);
+
         pstm.setString(1, newAddress);
+        pstm.setInt(2, id);
+
+        int isCheckQuery = pstm.executeUpdate();
+        if (isCheckQuery > 0) {
+            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
+        }
+    }
+
+    // create method 2.4: Update Commission ID
+    public static void updateCommissionId() throws SQLException {
+        int select = 0;
+        do {
+            System.out.println("If you don't remember Officer ID, press 1 to review the Officer table.");
+            System.out.println("If you don't need it, press any number to continue");
+            select = checkInputInt();
+            if (select == 1) {
+                displayCommissionTable();
+            }
+        } while (false);
+
+        String sql = "UPDATE Officer SET commission_id = ?  WHERE id = ?";
+        PreparedStatement pstm = connection.prepareStatement(sql);
+
+        boolean isCheckExistOfficerId = false;
+        int id = 0;
+        do {
+            System.out.println("Enter the id you want to edit:");
+            id = checkInputInt();
+            isCheckExistOfficerId = checkOfficerIdExistence(id);
+            if (isCheckExistOfficerId == false) {
+                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
+            }
+        } while (isCheckExistOfficerId == false);
+        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
+        displayOfficerTableById(id);
+
+        int newCommissionId = 0;
+        boolean isCheckExistence = false;
+        do {
+            System.out.println("Input commission id: ");
+            newCommissionId = checkInputInt();
+            isCheckExistence = checkCommissionIdExistence(newCommissionId);
+            if (isCheckExistence == false) {
+                System.out.println("\u001B[31m* Warning: ID does not exist in the Commission table!\u001B[0m");
+            }
+        } while (isCheckExistence == false);
+
+        pstm.setInt(1, newCommissionId);
         pstm.setInt(2, id);
 
         int check = pstm.executeUpdate();
@@ -292,24 +357,24 @@ public class OfficerManage {
     public static void deleteOfficer() throws SQLException {
         String sql = "DELETE FROM Officer WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
-        boolean check1 = false;
+        boolean isCheckExistOfficerId = false;
         int id = 0;
         do {
             System.out.println("Enter the id you want to delete:");
             id = checkInputInt();
-            check1 = checkOfficerIdExistence(id);
-            if (check1 == false) {
+            isCheckExistOfficerId = checkOfficerIdExistence(id);
+            if (isCheckExistOfficerId == false) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
             }
-        } while (check1 == false);
+        } while (isCheckExistOfficerId == false);
         System.out.println("\u001B[31mThis is the table you want to delete whose id is " + id +"\u001B[0m");
         displayOfficerTableById(id);
         System.out.println("If you are sure you want to delete, press number 1. Otherwise, press any number (except number 1) to return to the main menu");
         int select = checkInputInt();
         if (select == 1) {
             pstm.setInt(1, id);
-            int check = pstm.executeUpdate();
-            if (check > 0) {
+            int isCheckQuey = pstm.executeUpdate();
+            if (isCheckQuey > 0) {
                 System.out.println("\u001B[32m* Notification: Delete success\u001B[0m");
             }
         } else {
@@ -322,15 +387,15 @@ public class OfficerManage {
         Statement st = connection.createStatement();
         String sql = "select * from Officer";
         ResultSet rs = st.executeQuery(sql);
-        System.out.println("\u001B[33m=====================================Officer Table======================================");
-        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "ID", "Name", "Phone number", "Address"));
-        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |\u001B[0m", "-----", "--------------------", "---------------",
-                    "-----------------------------------"));
+        System.out.println("\u001B[33m============================================= Officer Table ==============================================");
+        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", "ID", "Name", "Phone number", "Address","Commission ID"));
+        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |\u001B[0m", "-----", "--------------------", "---------------",
+                "-----------------------------------", "---------------"));
         while (rs.next()) {
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", rs.getInt(1), rs.getString(2),
-                    rs.getString(3), rs.getString(4)));
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "-----", "--------------------", "---------------",
-                    "-----------------------------------"));
+            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4), rs.getInt(5)));
+            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", "-----", "--------------------", "---------------",
+                    "-----------------------------------", "---------------"));
         }
         System.out.println();
     }
@@ -340,15 +405,15 @@ public class OfficerManage {
         Statement st = connection.createStatement();
         String sql = "SELECT * FROM Officer WHERE id = " + id;
         ResultSet rs = st.executeQuery(sql);
-        System.out.println("\u001B[33m=====================================Officer Table======================================");
-        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "ID", "Name", "Phone number", "Address"));
-        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |\u001B[0m", "-----", "--------------------", "---------------",
-                "-----------------------------------"));
+        System.out.println("\u001B[33m============================================= Officer Table ==============================================");
+        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", "ID", "Name", "Phone number", "Address","Commission ID"));
+        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |\u001B[0m", "-----", "--------------------", "---------------",
+                "-----------------------------------", "---------------"));
         while (rs.next()) {
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", rs.getInt(1), rs.getString(2),
-                    rs.getString(3), rs.getString(4)));
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "-----", "--------------------", "---------------",
-                    "-----------------------------------"));
+            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4), rs.getInt(5)));
+            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", "-----", "--------------------", "---------------",
+                    "-----------------------------------", "---------------"));
         }
         System.out.println();
     }
@@ -367,5 +432,40 @@ public class OfficerManage {
             }
         }
         return input;
+    }
+
+    // create method display Commission table
+    public static void displayCommissionTable() throws SQLException {
+        Statement st = connection.createStatement();
+        String sql = "SELECT * FROM Commission";
+        ResultSet rs = st.executeQuery(sql);
+        System.out.println("\u001B[33m====================== Commission Table =======================");
+        System.out.println(String.format("| %-5s | %-15s | %-15s | %-15s |", "ID", "Precinct", "City/District", "Province"));
+        System.out.println(String.format("| %-5s | %-15s | %-15s | %-15s |\u001B[0m", "-----", "--------------", "--------------", "--------------"));
+        while (rs.next()) {
+            System.out.println(String.format("| %-5s | %-15s | %-15s | %-15s |", rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4)));
+            System.out.println(String.format("| %-5s | %-15s | %-15s | %-15s |\u001B[0m", "-----", "--------------", "--------------", "--------------"));
+        }
+        System.out.println();
+    }
+
+    // create method check existence of Commission ID
+    private static boolean checkCommissionIdExistence(int id) throws SQLException {
+        // get the ID value int the Officer Distribution table
+        ArrayList<Integer> s1 = new ArrayList<>();
+        String sql2 = "Select * from Commission";
+        PreparedStatement pstm = connection.prepareStatement(sql2);
+        ResultSet rs2 = pstm.executeQuery();
+        while (rs2.next()) {
+            s1.add(0, rs2.getInt(1));
+        }
+        int count = 0;
+        for (int i = 0; i < s1.size(); i++) {
+            if (id == s1.get(i)) {
+                count++;
+            }
+        }
+        return count > 0;
     }
 }
