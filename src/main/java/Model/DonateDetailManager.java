@@ -7,6 +7,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeParseException;
 import java.util.Scanner;
 
+import static Model.DistributionManager.printDistribution;
 import static Model.Processing.*;
 
 public class DonateDetailManager {
@@ -489,40 +490,6 @@ public class DonateDetailManager {
             waitForEnter();
         }
     }
-    public static void statsTop3Amount(Connection con) {
-        try {
-            if (countRecords(con, "DonateDetail") > 0) {
-                System.out.println("\t\t\t - Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n");
-                System.out.println();
-                System.out.println("================================= DANH SÁCH ỦNG HỘ =================================");
-                System.out.println("._______.________________________.________________________.________________________.");
-                System.out.println("│  STT  │       Tên Công ty      │     Người đại diện     │      Tổng số tiền      │");
-                System.out.println("│_______│________________________│________________________│________________________│");
-                Statement statement = con.createStatement();
-                ResultSet resultSet = statement.executeQuery("""
-                        SELECT TOP 3 Company.company_name, Representative.representative_name, SUM(amount) AS Stats FROM DonateDetail
-                            LEFT JOIN dbo.Representative ON DonateDetail.representative_id = Representative.id
-                            LEFT JOIN dbo.Company on Representative.company_id = Company.id
-                            GROUP BY Company.company_name, Representative.representative_name ORDER BY Stats DESC""");
-                int i = 1;
-                while (resultSet.next()) {
-                    String companyName = resultSet.getString("company_name");
-                    String representative_name = resultSet.getString("representative_name");
-                    String Stats = String.format("%.0f", resultSet.getDouble("Stats"));
-                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", i, companyName, representative_name, Stats);
-                    System.out.println("│_______│________________________│________________________│________________________│");
-                    i++;
-                }
-                System.out.println("================================ DANH SÁCH KẾT THÚC ================================");
-            } else {
-                System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
-            }
-            waitForEnter();
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
-        }
-    }
     public static void statsTop5Officer(Connection con) {
         try {
             if (countRecords(con, "DonateDetail") > 0) {
@@ -785,4 +752,119 @@ public class DonateDetailManager {
     /*
     TEST END
      */
+
+    public static void displayAndSaveDistribution(Connection connection){
+        // Thực hiện truy vấn SQL để lấy dữ liệu
+        String sqlQuery = """
+                            WITH UnaidedHouseholds AS (
+                                SELECT
+                                    h.id AS household_id,
+                                    d.id AS distribution_id,
+                                    d.amount_distribution - COALESCE(SUM(dd.amount), 0) AS remaining_amount
+                                FROM
+                                    House h
+                                INNER JOIN
+                                    Distribution d ON h.id = d.household_id
+                                LEFT JOIN
+                                    DonateDetail dd ON d.id = dd.id
+                                WHERE
+                                    d.date_distribution < GETDATE()
+                                GROUP BY
+                                    h.id, d.id, d.amount_distribution
+                            ),
+                            TotalRemainingAmount AS (
+                                SELECT
+                                    distribution_id,
+                                    SUM(remaining_amount) AS total_remaining_amount
+                                FROM
+                                    UnaidedHouseholds
+                                GROUP BY
+                                    distribution_id
+                            )
+                            SELECT
+                                c.id AS commission_id,
+                                uhh.household_id,
+                                IIF(tra.total_remaining_amount = 0, 0, uhh.remaining_amount / NULLIF(tra.total_remaining_amount, 0) * d.amount_distribution) AS allocated_amount,
+                                c.precint_name as precint_name,  -- Add precinct_name from Commission table
+                                citizen.name as household_lord_name     -- Add citizen name with the condition is_household_lord = 1
+                            FROM
+                                UnaidedHouseholds uhh
+                            JOIN
+                                TotalRemainingAmount tra ON uhh.distribution_id = tra.distribution_id
+                            JOIN
+                                Distribution d ON uhh.distribution_id = d.id
+                            JOIN
+                                Commission c ON d.commission_id = c.id
+                            JOIN
+                                House h ON uhh.household_id = h.id
+                            JOIN
+                                Citizen citizen ON h.id = citizen.house_id AND citizen.is_household_lord = 1;
+                        """;
+        try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+            // Thực hiện truy vấn và hiển thị kết quả
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int householdId = resultSet.getInt("household_id");
+                int commissionId = resultSet.getInt("commission_id");
+                String householdLordName = resultSet.getString("household_lord_name");
+                String precintName = resultSet.getString("precint_name");
+                String allocatedAmount = String.format("%.0f",resultSet.getDouble("allocated_amount"));
+                System.out.println();
+                System.out.println("\t\t\tHousehold ID: " + householdId);
+                System.out.println("\t\t\tHousehold Lord Name: " + householdLordName);
+                System.out.println("\t\t\tCommission ID: " + commissionId);
+                System.out.println("\t\t\tCommission Name: " + precintName);
+                System.out.println("\t\t\tAllocated Amount per Household: " + allocatedAmount);
+                System.out.println("\t\t\t----------------------------");
+            }
+
+            // Hỏi người dùng có muốn thực hiện INSERT không
+            System.out.print("\t\t\t\u001B[32mBạn có muốn thực hiện INSERT không? (Y/N): \u001B[0m");
+            String input = sc.nextLine();
+
+            // Nếu người dùng nhập Y, thực hiện lệnh INSERT
+            if ("Y".equalsIgnoreCase(input)) {
+                insertIntoDistribution(connection, preparedStatement);
+                System.out.println("\t\t\t\u001B[32mInstert thành công!!!\u001B[0m");
+                System.out.print("\t\t\tBạn có muốn xem lại bảng 'PHANPHOI' không? (Y/N): ");
+                String print = sc.nextLine();
+                if ("Y".equalsIgnoreCase(print)) {
+                    printDistribution(con);
+                }
+            } else {
+                System.out.println("\t\t\t\u001B[31mNgười dùng đã chọn không thực hiện INSERT.\u001B[0m");
+            }
+        }catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+        }
+    }
+    private static void insertIntoDistribution(Connection connection, PreparedStatement preparedStatement){
+        // Thực hiện lệnh INSERT
+        String insertQuery = "INSERT INTO dbo.Distribution (commission_id, household_id, amount_distribution, date_distribution) "
+                + "VALUES (?, ?, ?, GETDATE())";
+
+        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+            ResultSet resultSet = preparedStatement.executeQuery();
+            while (resultSet.next()) {
+                int commissionId = resultSet.getInt("commission_id");
+                int householdId = resultSet.getInt("household_id");
+                double allocatedAmount = resultSet.getDouble("allocated_amount");
+
+                // Thiết lập giá trị cho lệnh INSERT
+                insertStatement.setInt(1, commissionId);
+                insertStatement.setInt(2, householdId);
+                insertStatement.setDouble(3, allocatedAmount);
+
+                // Thực hiện lệnh INSERT
+                int affectedRows = insertStatement.executeUpdate();
+                if (affectedRows == 0) {
+                    System.out.println("\u001B[31mĐã có lỗi xảy ra khi thực hiện lệnh INSERT.\u001B[0m");
+                }
+            }
+        }catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+        }
+    }
 }
