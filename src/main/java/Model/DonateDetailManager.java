@@ -36,7 +36,7 @@ public class DonateDetailManager {
                                 LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
                                 LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
                                 LEFT JOIN dbo.Distribution D on C.id = D.commission_id
-                                Left Join dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
+                                LEFT JOIN dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
                                 LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id""");
                 while (resultSet.next())
                 {
@@ -582,7 +582,7 @@ public class DonateDetailManager {
                     }
                     System.out.println("================================ DANH SÁCH KẾT THÚC ================================");
                 } else {
-                    System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[31");
+                    System.out.println("\t\t\t\u001B[31mChưa có đợt ủng hộ nào.\u001B[0m");
                 }
                 waitForEnter();
             }
