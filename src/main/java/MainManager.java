@@ -295,16 +295,17 @@ public class MainManager {
                                "\t\t\t7. Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n" +
                                "\t\t\t8. Liệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n" +
                                "\t\t\t9. Liệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.)\n" +
+                                "\t\t\t10. Hiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)\n" +
                                 "\t\t\t0. Trở về menu chính");
             do {
                 try
                 {
-                    System.out.print("\t\tEnter the program number: (0-9): ");
+                    System.out.print("\t\tEnter the program number: (0-10): ");
                     choice = Integer.parseInt(sc.nextLine());
                 }
                 catch (NumberFormatException input)
                 {
-                    System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-8)!\u001B[0m");
+                    System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-10)!\u001B[0m");
                 }
             }
             while (choice == -1);
@@ -333,6 +334,9 @@ public class MainManager {
                     System.out.println("\t\t\tLiệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.");
                     statsCountSumAmount(con);
                     break;
+                case 10:
+                    System.out.println("\t\t\tHiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)");
+                    statsHouseholdX(con);
                 case 0:
                     System.out.println("\t\t\tTrở về màn hình chính");
                     waitForEnter();

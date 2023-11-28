@@ -627,33 +627,33 @@ public class DonateDetailManager {
                 System.out.println();
                 System.out.println("================================================================ DANH SÁCH HỘ DÂN ===========================================================");
                 System.out.println("._______.________________________.________________________.________________________.___________________________.____________._______________.");
-                System.out.println("│   ID  │      Họ tên chủ hộ     │        Địa chỉ         │   Đối tượng công dân   │     Đối tượng hộ dân      │    COUNT   │       SUM     │");
+                System.out.println("│   ID  │      Họ tên chủ hộ     │        Địa chỉ         │   Đối tượng công dân   │     Đối tượng hộ dân      │    COUNT   │      SUM      │");
                 System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
                 Statement statement = con.createStatement();
                 ResultSet resultSet = statement.executeQuery("""
-                       
-                        SELECT
-                              House.id,
-                              Citizen.name,
-                              Citizen.address,
-                              CO.type_name_object,
-                              PriorityObject.object_type,
-                              COUNT(Distribution.amount_received) AS SL,
-                              SUM(Distribution.amount_received) AS TS
-                          FROM
-                              House
-                                  LEFT JOIN
-                              Citizen ON House.id = Citizen.house_id
-                                  LEFT JOIN
-                              dbo.CitizenObject CO ON CO.id = Citizen.citizen_object_id
-                                  LEFT JOIN
-                              PriorityObject ON House.priority_object_id = PriorityObject.id
-                                  LEFT JOIN
-                              Distribution ON House.id = Distribution.household_id
-                          WHERE
-                                  Citizen.is_household_lord = 1
-                          GROUP BY
-                              House.id, Citizen.name, Citizen.address, CO.type_name_object,PriorityObject.object_type;""");
+                       SELECT
+                           House.id,
+                           Citizen.name,
+                           Citizen.address,
+                           CO.type_name_object,
+                           PriorityObject.object_type,
+                           COUNT(Distribution.amount_received) AS SL,
+                           SUM(Distribution.amount_received) AS TS
+                       FROM
+                           House
+                               LEFT JOIN
+                           Citizen ON House.id = Citizen.house_id
+                               LEFT JOIN
+                           dbo.CitizenObject CO ON CO.id = Citizen.citizen_object_id
+                               LEFT JOIN
+                           PriorityObject ON House.priority_object_id = PriorityObject.id
+                               LEFT JOIN
+                           Distribution ON House.id = Distribution.household_id
+                       WHERE
+                               Citizen.is_household_lord = 1
+                       GROUP BY
+                           House.id, Citizen.name, Citizen.address, CO.type_name_object,PriorityObject.object_type
+                       ORDER BY TS DESC;""");
                 while (resultSet.next()) {
                     int houseID = resultSet.getInt("id");
                     String citizenName = resultSet.getString("name");
@@ -675,4 +675,74 @@ public class DonateDetailManager {
             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
     }
+
+    /*
+    TEST
+     */
+    public static void statsHouseholdX(Connection con) {
+
+        try  {
+            String sql = "SELECT DISTINCT house.id AS house_id, Citizen.address, citizen.name AS name, CO.type_name_object " +
+                    "FROM house " +
+                    "LEFT JOIN citizen ON house.id = citizen.house_id " +
+                    "LEFT JOIN dbo.CitizenObject CO on citizen.citizen_object_id = CO.id " +
+                    "LEFT JOIN dbo.PriorityObject PO on PO.id = house.priority_object_id " +
+                    "WHERE CO.id = ?";
+            System.out.println("\t\t\tNhập vào ID đối tượng ưu tiên: ");
+            int x = Processing.inputID(sc, "CitizenObject", "id");
+            try (PreparedStatement statement = con.prepareStatement(sql)) {
+                // Set parameter for the placeholder
+                statement.setInt(1, x);
+
+                try (ResultSet resultSet = statement.executeQuery()) {
+                    while (resultSet.next()) {
+                        int houseId = resultSet.getInt("house_id");
+                        String address = resultSet.getString("address");
+                        String name = resultSet.getString("name");
+                        String typeNameObject = resultSet.getString("type_name_object");
+
+                        // Get Household Lord Name
+                        String householdLordName = getHouseholdLordName(houseId, con);
+
+                        // Display the data
+                        displayHouseData(houseId, address, name, householdLordName, typeNameObject);
+                        waitForEnter();
+                    }
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Function to get Household Lord Name
+    private static String getHouseholdLordName(int houseId, Connection connection) throws SQLException {
+        String householdLordName = "N/A";
+        String householdLordSql = "SELECT name FROM citizen WHERE house_id = ? AND is_household_lord = 1";
+
+        try (PreparedStatement householdLordStatement = connection.prepareStatement(householdLordSql)) {
+            householdLordStatement.setInt(1, houseId);
+
+            try (ResultSet householdLordResultSet = householdLordStatement.executeQuery()) {
+                if (householdLordResultSet.next()) {
+                    householdLordName = householdLordResultSet.getString("name");
+                }
+            }
+        }
+
+        return householdLordName;
+    }
+
+    // Function to display house data
+    private static void displayHouseData(int houseId, String address, String name, String householdLordName, String typeNameObject) {
+        System.out.println("\t\t\tHouse ID: " + houseId);
+        System.out.println("\t\t\tAddress: " + address);
+        System.out.println("\t\t\tName: " + name);
+        System.out.println("\t\t\tHousehold Lord Name: " + householdLordName);
+        System.out.println("\t\t\tType Name Object: " + typeNameObject);
+        System.out.println("\t\t\t------------");
+    }
+    /*
+    TEST END
+     */
 }
