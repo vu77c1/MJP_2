@@ -4,7 +4,9 @@ import Common.DBConnect;
 import Common.InputValidator;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -233,6 +235,27 @@ public class Processing {
             // Handle the exception according to your needs
             return true; // Return false in case of an exception
         }
+    }
+    public static LocalDate validateDateInput(String prompt) {
+        LocalDate newDonateDate;
+        String newDonateDateStr;
+        do {
+            System.out.print(prompt);
+            newDonateDateStr = sc.nextLine();
+
+            try {
+                newDonateDate = LocalDate.parse(newDonateDateStr, dateFormat);
+                if (newDonateDate.isAfter(LocalDate.now())) {
+                    System.out.println("\t\t\t\u001B[31mNgày nhận hỗ trợ phải trước hơn ngày hiện tại!\n\t\t\tBạn không thể du hành thời gian đúng chứ!\u001B[0m");
+                    newDonateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
+                }
+            } catch (DateTimeParseException ex) {
+                System.out.println("\t\t\t\u001B[31m Ngày tháng nhập vào \"" + newDonateDateStr + "\" không hợp lệ.\u001B[0m");
+                newDonateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
+            }
+        } while (newDonateDate == null);
+
+        return newDonateDate;
     }
     public static void closeScanner() {
         if (sc != null) {

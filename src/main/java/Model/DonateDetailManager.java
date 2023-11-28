@@ -291,29 +291,7 @@ public class DonateDetailManager {
 //			Update ngày ủng hộ
                 case "2":
                     String sql2 = "UPDATE DonateDetail SET donate_date =? WHERE id =?";
-                    LocalDate newDonateDate;
-                    String newDonateDateStr;
-                    do
-                    {
-                        System.out.print("\t\t\tNhập vào ngày nhận hỗ trợ (theo định dạng dd/MM/yyyy): ");
-                        newDonateDateStr = sc.nextLine();
-
-                        try
-                        {
-                            newDonateDate = LocalDate.parse(newDonateDateStr, dateFormat);
-                            if (newDonateDate.isAfter(LocalDate.now()))
-                            {
-                                System.out.println("\t\t\t\u001B[31mNgày nhận hỗ trợ phải trước hơn ngày hiện tại!\n Bạn không thể du hành thời gian đúng chứ!\u001B[0m");
-                                newDonateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
-                            }
-                        }
-                        catch (DateTimeParseException ex)
-                        {
-                            System.out.println("\t\t\t\u001B[31m Ngày tháng nhập vào \"" + newDonateDateStr + "\" không hợp lệ.\u001B[0m");
-                            newDonateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
-                        }
-                    }
-                    while (newDonateDate == null);
+                    LocalDate newDonateDate = Processing.validateDateInput("\t\t\tNhập vào ngày nhận mới: ");
                     try {
                         pstmt = con.prepareStatement(sql2);
                         pstmt.setDate(1, Date.valueOf(newDonateDate));
@@ -422,28 +400,7 @@ public class DonateDetailManager {
                     System.out.print("\t\t\tNhập vào số tiền: ");
                     double newAmountAll = sc.nextDouble();
                     sc.nextLine(); // Consume the newline character
-                    LocalDate newDonateDateAll = null;
-                    String newDonateDateAllStr;
-                    do
-                    {
-                        System.out.print("\t\t\tNhập vào ngày nhận hỗ trợ (theo định dạng dd/MM/yyyy): ");
-                        newDonateDateAllStr = sc.nextLine();
-
-                        try
-                        {
-                            newDonateDateAll = LocalDate.parse(newDonateDateAllStr, dateFormat);
-                            if (newDonateDateAll.isAfter(LocalDate.now()))
-                            {
-                                System.out.println("\t\t\t\u001B[31mNgày nhận hỗ trợ phải trước hơn ngày hiện tại!\n Bạn không thể du hành thời gian đúng chứ!\u001B[0m");
-                                newDonateDateAll = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
-                            }
-                        }
-                        catch (DateTimeParseException ex)
-                        {
-                            System.out.println("\t\t\t\u001B[31m Ngày tháng nhập vào \"" + newDonateDateAllStr + "\" không hợp lệ.\u001B[0m");
-                        }
-                    }
-                    while (newDonateDateAll == null);
+                    LocalDate newDonateDateAll = Processing.validateDateInput("\t\t\tNhập vào ngày nhận mới: ");
                     System.out.println("\t\t\tNhập vào ID Ủy ban: ");
                     int newCommissionIdAll = inputID(sc,"Commission", "id");
                     System.out.println("\t\t\tNhập vào ID của người đại diện: ");
@@ -652,29 +609,7 @@ public class DonateDetailManager {
 
 
     public static void displayAndSaveDistribution(Connection connection){
-        LocalDate userInputDate;
-        String userInputDateStr;
-        do
-        {
-            System.out.print("\t\t\tNhập vào ngày của đợt ủng hộ (theo định dạng dd/MM/yyyy): ");
-            userInputDateStr = sc.nextLine();
-
-            try
-            {
-                userInputDate = LocalDate.parse(userInputDateStr, dateFormat);
-                if (userInputDate.isAfter(LocalDate.now()))
-                {
-                    System.out.println("\t\t\t\u001B[31mNgày nhận hỗ trợ phải trước hơn ngày hiện tại!\n Bạn không thể du hành thời gian đúng chứ!\u001B[0m");
-                    userInputDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
-                }
-            }
-            catch (DateTimeParseException ex)
-            {
-                System.out.println("\t\t\t\u001B[31m Ngày tháng nhập vào \"" + userInputDateStr + "\" không hợp lệ.\u001B[0m");
-                userInputDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
-            }
-        }
-        while (userInputDate == null);
+        LocalDate userInputDate = Processing.validateDateInput("Nhập vào đợt ủng hộ: ");
         // Thực hiện truy vấn SQL để lấy dữ liệu
         String sqlQuery = """
             
