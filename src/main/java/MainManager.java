@@ -7,6 +7,7 @@ import static Model.Processing.closeScanner;
 import static Model.Processing.waitForEnter;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.Scanner;
 
@@ -173,6 +174,12 @@ public class MainManager {
                     }
                     break;
                 case 11:
+               		  Scanner scanner2=new Scanner(System.in);
+               		  System.out.println("Input start day:");
+               		  String startDay=scanner2.nextLine();
+               		  System.out.println("Input end day:");
+               		  String enDay=scanner2.nextLine();
+               		 CommissionDao.getInstant().fineDonateByDate(startDay, enDay);
                		  System.out.println("Thống kê");
                		  CommissionDao.getInstant().fineHouseHoleNotReceived();
                     break;

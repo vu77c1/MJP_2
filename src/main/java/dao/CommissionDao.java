@@ -3,9 +3,11 @@ package dao;
 
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Stack;
@@ -71,7 +73,38 @@ public class CommissionDao {
 				  }
 				  return result;
 		 }
+		 //lay thong tin donate theo ngay
+		 public List<String> fineDonateByDate(String a, String b) {
+				
+				  List<String> result = new ArrayList<>();
+				  try {
+						   // b1: Tao ket noi
+						   Connection connection = JdbcUtil.getConnection();
+						   // b2: tao doi tuong statement
+						   Statement statement = connection.createStatement();
+						   // b3: thuc hien cau lenh sql
+						   String sqlString = " select CONCAT (DD.donate_date,':  ', RP.representative_name,', Phone: ',RP.phone_number,', Address: ',\r\n"
+						   				  + "RP.representative_address,', Amount:  ', format(DD.amount, '0000') ,'  ',CP.company_name,' ', CP.company_address ) as listDonate\r\n"
+						   				  + "from Representative as RP\r\n"
+						   				  + "join DonateDetail as DD on RP.id=DD.representative_id\r\n"
+						   				  + "left join Company as CP on CP.id=RP.id\r\n"
+						   				  + "where DD.donate_date   BETWEEN '"+a+"' AND '"+b+"'";   
+						   System.out.println("Ban da thuc thi: " + sqlString);
+						   ResultSet rs = statement.executeQuery(sqlString);
+//					         // lay tung thuoc tinh cua doi tuong
+						   while (rs.next()) {
+								    String lists = rs.getString("listDonate");
+								    System.out.println("\n"+lists);
+//								   
+						   }
+				  } catch (SQLException e) {
+						   // TODO Auto-generated catch block
+						   e.printStackTrace();
+				  }
+				  return result;
+		 }
 		 
+		 // tim ho dan chua nhan duoc tien
 		 public List<String> fineHouseHoleNotReceived() {
 				  List<String> result = new ArrayList<>();
 				  try {
@@ -80,7 +113,7 @@ public class CommissionDao {
 						   // b2: tao doi tuong statement
 						   Statement statement = connection.createStatement();
 						   // b3: thuc hien cau lenh sql
-						   String sqlString = " select CONCAT (name,' ', phone_number, ' Dia chi ', address) as Ho_Dan from Citizen\r\n"
+						   String sqlString = " select CONCAT (name,' ', phone_number, ' Dia chi ', address) as NotReceved from Citizen\r\n"
 						   				  + " left join House on Citizen.house_id=House.id\r\n"
 						   				  + "left join Distribution on House.id=Distribution.household_id\r\n"
 						   				  + "where Citizen.is_household_lord= 'true' and House.id not IN (select household_id from Distribution )";   
@@ -88,7 +121,7 @@ public class CommissionDao {
 						   ResultSet rs = statement.executeQuery(sqlString);
 //					         // lay tung thuoc tinh cua doi tuong
 						   while (rs.next()) {
-								    String precint_name = rs.getString("Ho_Dan");
+								    String precint_name = rs.getString("NotReceved");
 								    System.out.println("\n"+precint_name);
 //								   
 						   }
