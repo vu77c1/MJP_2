@@ -609,7 +609,14 @@ public class DonateDetailManager {
 
 
     public static void displayAndSaveDistribution(Connection connection){
-        LocalDate userInputDate = Processing.validateDateInput("Nhập vào đợt ủng hộ: ");
+//        LocalDate userInputDate = Processing.validateDateInput("Nhập vào đợt ủng hộ: ");
+        String userInputMonthYear = Processing.validateMonthYearInput("\t\t\tNhập vào đợt ủng hộ (MM/yyyy): ");
+
+        // Assuming userInputMonthYear is a String in the format "MM/yyyy"
+        // Split the input to extract month and year separately
+        String[] parts = userInputMonthYear.split("/");
+        int inputMonth = Integer.parseInt(parts[0]);
+        int inputYear = Integer.parseInt(parts[1]);
         // Thực hiện truy vấn SQL để lấy dữ liệu
         String sqlQuery = """
                 WITH UnaidedHouseholds AS (
@@ -659,6 +666,7 @@ public class DonateDetailManager {
                  ORDER BY allocated_amount DESC;
                         """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+/*
             // Assuming userInputDate is a LocalDate
             LocalDate thirtyDaysAgo = userInputDate.minusDays(30);
 
@@ -669,22 +677,41 @@ public class DonateDetailManager {
             // Use in preparedStatement
             preparedStatement.setDate(2, userInputSqlDate);
             preparedStatement.setDate(1, thirtyDaysAgoSqlDate);
+ Assuming userInputDate is a LocalDate
+ Create a LocalDate for the first day of the input month
+*/
+
+            LocalDate userInputDate = LocalDate.of(inputYear, inputMonth, 1);
+            LocalDate thirtyDaysAgo = userInputDate.plusDays(30);
+
+            // Convert LocalDate to java.sql.Date
+            Date userInputSqlDate = Date.valueOf(userInputDate);
+            Date thirtyDaysAgoSqlDate = Date.valueOf(thirtyDaysAgo);
+
+            // Use in preparedStatement
+            preparedStatement.setDate(1, userInputSqlDate);
+            preparedStatement.setDate(2, thirtyDaysAgoSqlDate);
 
             // Thực hiện truy vấn và hiển thị kết quả
             ResultSet resultSet = preparedStatement.executeQuery();
-            while (resultSet.next()) {
-                int householdId = resultSet.getInt("household_id");
-                int commissionId = resultSet.getInt("commission_id");
-                String householdLordName = resultSet.getString("household_lord_name");
-                String precintName = resultSet.getString("precint_name");
-                String allocatedAmount = String.format("%.0f",resultSet.getDouble("allocated_amount"));
+            if (countRecords(con, "Distribution") > 0){
                 System.out.println();
-                System.out.println("\t\t\tHousehold ID: " + householdId);
-                System.out.println("\t\t\tHousehold Lord Name: " + householdLordName);
-                System.out.println("\t\t\tCommission ID: " + commissionId);
-                System.out.println("\t\t\tCommission Name: " + precintName);
-                System.out.println("\t\t\tAllocated Amount per Household: " + allocatedAmount);
-                System.out.println("\t\t\t----------------------------");
+                System.out.println("===================================================== DANH SÁCH HỘ DÂN =================================================");
+                System.out.println("._______._____________________________________.___________._____________________________________.______________________.");
+                System.out.println("│  ID   │            Họ tên chủ hộ            │ ID ủy ban │             Tên xã/phường           │       Số tiền        │");
+                System.out.println("│_______│_____________________________________│___________│_____________________________________│______________________│");
+                while (resultSet.next()) {
+                    int householdId = resultSet.getInt("household_id");
+                    int commissionId = resultSet.getInt("commission_id");
+                    String householdLordName = resultSet.getString("household_lord_name");
+                    String precintName = resultSet.getString("precint_name");
+                    String allocatedAmount = String.format("%.0f",resultSet.getDouble("allocated_amount"));
+                    System.out.printf("│ %-5S │ %-35s │ %-9s │ %-35s │ %-20s │%n", householdId, householdLordName, commissionId, precintName, allocatedAmount);
+                    System.out.println("│_______│_____________________________________│___________│_____________________________________│______________________│");
+                }
+                System.out.println("================================================== DANH SÁCH KẾT THÚC ==================================================");
+            } else {
+                System.out.println("\t\t\t\u001B[31m Chưa có dữ liệu!!!\u001B[0m");
             }
             waitForEnter();
             // Hỏi người dùng có muốn thực hiện INSERT không

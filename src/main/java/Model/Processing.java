@@ -5,6 +5,7 @@ import Common.InputValidator;
 
 import java.sql.*;
 import java.time.LocalDate;
+import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
@@ -256,6 +257,36 @@ public class Processing {
         } while (newDonateDate == null);
 
         return newDonateDate;
+    }
+
+    public static String validateMonthYearInput(String message) {
+        Scanner sc = new Scanner(System.in);
+        String userInput;
+        boolean isValid;
+
+        do {
+            System.out.print(message);
+            userInput = sc.nextLine();
+
+            // Validate the input format (MM/yyyy)
+            if (userInput.matches("\\d{2}/\\d{4}")) {
+                String[] parts = userInput.split("/");
+                int month = Integer.parseInt(parts[0]);
+                int year = Integer.parseInt(parts[1]);
+
+                // Validate month (1 to 12) and year (positive)
+                isValid = month >= 1 && month <= 12 && year > 0;
+
+                if (!isValid) {
+                    System.out.println("\u001B[31mTháng phải từ 1 đến 12 và năm phải lớn hơn 0.\u001B[0m");
+                }
+            } else {
+                System.out.println("\u001B[31mĐịnh dạng không hợp lệ. Vui lòng nhập lại theo định dạng MM/yyyy.\u001B[0m");
+                isValid = false;
+            }
+        } while (!isValid);
+
+        return userInput;
     }
     public static void closeScanner() {
         if (sc != null) {
