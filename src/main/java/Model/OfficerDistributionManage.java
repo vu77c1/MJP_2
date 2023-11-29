@@ -102,20 +102,8 @@ public class OfficerDistributionManage {
         } while (isExistOfficerDistributionID == false);
 
         // add date distribution
-        Date date = null;
-        boolean isValidDate = false;
-        String dateDistribution = "";
-        while (!isValidDate) {
-            System.out.println("Enter date distribution (yyyy/MM/dd):");
-            dateDistribution = sc.next();
-            try {
-                date = (Date) dateFormat.parse(dateDistribution);
-                isValidDate = true;
-            } catch (ParseException e) {
-                System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
-                System.out.println("\u001B[31m* Warning: Entered is incorrect format. Please try again!\u001B[0m");
-            }
-        }
+        System.out.println("Enter date distribution (yyyy/MM/dd):");
+        String dateDistribution = checkValidDate();
 
         // add address distribution
         int maxLengthAddress = 255;
@@ -355,20 +343,9 @@ public class OfficerDistributionManage {
         System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
         displayOfficerDistributionTableById(id);
 
-        Date date = null;
-        boolean isValidDate = false;
-        String newDateDistribution = "";
-        while (!isValidDate) {
-            System.out.println("Enter date distribution (yyyy/MM/dd):");
-            newDateDistribution = sc.next();
-            try {
-                date = (Date) dateFormat.parse(newDateDistribution);
-                isValidDate = true;
-            } catch (ParseException e) {
-                System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
-                System.out.println("\u001B[31m* Warning: Entered is incorrect format. Please try again!\u001B[0m");
-            }
-        }
+        System.out.println("Enter new date distribution (yyyy/MM/dd):");
+        String newDateDistribution = checkValidDate();
+
         pstm.setString(1, newDateDistribution);
         pstm.setInt(2, id);
 
@@ -500,6 +477,24 @@ public class OfficerDistributionManage {
             }
         }
         return input;
+    }
+
+    // create method check Date
+    private static String checkValidDate() {
+        Date date = null;
+        String checkDate = "";
+        boolean isValidDate = false;
+        while (!isValidDate) {
+            checkDate = sc.next();
+            try {
+                date = (Date) dateFormat.parse(checkDate);
+                isValidDate = true;
+            }  catch (ParseException e) {
+                System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
+                System.out.println("\u001B[31m* Warning: Entered is incorrect format. Please try again!\u001B[0m");
+            }
+        }
+        return checkDate;
     }
 
     // create method display Distribution table
