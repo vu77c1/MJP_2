@@ -100,11 +100,16 @@ public class Task1002OfDung {
                 "-----------------", "------------------"));
         while (rs.next()) {
             System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s | %-18s |", rs.getInt(1), rs.getString(2),
-                    rs.getString(3), rs.getString(4), rs.getFloat(5)));
+                    rs.getString(3), rs.getString(4), formatFloatingPoint(rs.getFloat(5))));
             System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s | %-18s |", "---------------", "---------------", "---------------",
                     "-----------------", "------------------"));
         }
         System.out.println();
+    }
+
+    private static String formatFloatingPoint(float value) {
+        // Format the floating-point number with desired precision
+        return String.format("%.0f", value);
     }
 
     // create method 2: Statistics of wards that have not been donated

@@ -77,12 +77,17 @@ public class Task1003OfDung {
                 "-----------------------------------"));
         while (rs.next()) {
             String dateDistributionFormatted = (rs.getDate(3) != null) ? dateFormat.format(rs.getDate(3)) : "null";
-            System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |", rs.getString(1), rs.getFloat(2),
-                    dateDistributionFormatted, rs.getString(4)));
+            System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |", rs.getString(1),
+                    formatFloatingPoint(rs.getFloat(2)), dateDistributionFormatted, rs.getString(4)));
             System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |\u001B[0m", "--------------------", "--------------------", "--------------------",
                     "-----------------------------------"));
         }
         System.out.println();
+    }
+
+    private static String formatFloatingPoint(float value) {
+        // Format the floating-point number with desired precision
+        return String.format("%.0f", value);
     }
 
     private static String checkValidDate() {

@@ -513,10 +513,15 @@ public class OfficerDistributionManage {
                 "------------------", "------------------"));
         while (rs.next()) {
             System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", rs.getInt(1), rs.getInt(2),
-                    rs.getInt(3), rs.getFloat(4), dateFormat.format(rs.getDate(5))));
+                    rs.getInt(3), formatFloatingPoint(rs.getFloat(4)), dateFormat.format(rs.getDate(5))));
             System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", "-----", "--------------", "------------",
                     "------------------", "------------------"));
         }
         System.out.println();
+    }
+
+    private static String formatFloatingPoint(float value) {
+        // Format the floating-point number with desired precision
+        return String.format("%.0f", value);
     }
 }
