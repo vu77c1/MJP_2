@@ -19,14 +19,14 @@ public class CompanyManager {
     }
     public Company inputCompany(Scanner scanner){
         Company newCompany = new Company();
-//      System.out.print("Tên công ty:");
         String companyName = InputValidatorKhue.validateStringCompany("Tên công ty:");
         newCompany.setCompanyName(companyName);
-//        System.out.print("Địa chỉ:");
         String companyAddrress = InputValidatorKhue.validateStringCompany("Địa chỉ:");
         newCompany.setCompanyAddrress(companyAddrress);
         return newCompany;
     }
+
+    //Thêm Company vào cơ sở dữ liệu và trả về companyName
     public String addCompanyInput(Scanner scanner) {
         Company newCompany = inputCompany(scanner);
         addCompany(newCompany);
@@ -95,6 +95,15 @@ public class CompanyManager {
 
     }
 
+    public void updatecompanyidForRepresentative(int id) throws SQLException{
+        String query ="UPDATE Representative set company_id = Null WHERE company_id ="+ id;
+        try (PreparedStatement statement =connection.prepareStatement(query)){
+            statement.executeUpdate();
+        } finally {
+            JDBCQuery.closeConnection();
+        }
+    }
+
     public Company getSingleCompanyById(int id) throws SQLException {
         String query = "SELECT * FROM Company WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -130,7 +139,6 @@ public class CompanyManager {
     }
 
     // Phương thức xóa một Company từ cơ sở dữ liệu
-
     public void deleteCompany(int companyId) throws SQLException {
         String query = "DELETE FROM Company WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -162,6 +170,7 @@ public class CompanyManager {
         return companies;
     }
 
+    //Hiển thị bảng Company
     public void displayCompany() throws SQLException {
         Statement st = null;
         ResultSet rs = null;
@@ -197,6 +206,7 @@ public class CompanyManager {
         }
     }
 
+    // Trình quản lý bảng Company
     public void handleCompany(CompanyManager companyManager, Scanner scanner) {
         System.out.println("Quản lý đơn vị ủng hộ - Chọn chức năng:");
         System.out.println("1. Hiển thị đơn vị ủng hộ");
@@ -221,10 +231,10 @@ public class CompanyManager {
                         break;
                     case 3:
                         // Xóa đơn vị ủng hộ
-                        System.out.print("Nhập ID đơn vị ủng hộ cần xóa: ");
-                        int representativeIdToDelete = Integer.parseInt(scanner.nextLine());
-                        companyManager.deleteCompany(representativeIdToDelete);
-                        System.out.println("Đơn vị ủng hộ có ID " + representativeIdToDelete + " đã được xóa thành công.");
+                        int companyIdToDelete = InputValidatorKhue.validateIntInput("Nhập ID đơn vị ủng hộ cần xóa: ");
+                        companyManager.updatecompanyidForRepresentative(companyIdToDelete);
+                        companyManager.deleteCompany(companyIdToDelete);
+                        System.out.println("Đơn vị ủng hộ có ID " + companyIdToDelete + " đã được xóa thành công.");
                         break;
                     case 4:
                         // Sửa đơn vị ủng hộ

@@ -328,6 +328,8 @@ public class MainManager {
                     statsSumAmountOfficer(con);
                     break;
                 case 9:
+                    ListOfStaticTwoPiority listOfStaticTwoPiority =  new ListOfStaticTwoPiority();
+                    listOfStaticTwoPiority.statisticsOfTwoPriorityObjects();
                     break;
                 case 10:
                     System.out.println("\t\t\tTop 5 wards with the most donate");
@@ -358,7 +360,8 @@ public class MainManager {
                     break;
                 case 18:
                     System.out.println("\t\t\tLi?t kê xem h? dân X (X nh?p t? bàn phím) dã nh?n bao nhiêu l?n quà t? t?t c? các d?t ?ng h? và t?ng giá tr? quà nh?n du?c c?a các d?t ?ng h? dó.\n");
-                    statsCountSumAmount(con);
+                    ListOfHouseHolds listOfHouseHolds = new ListOfHouseHolds();
+                    listOfHouseHolds.numDonateAndSumAmoutReceived(sc);
                     break;
                 case 0:
                     System.out.println("\t\t\tTr? v? màn hình chính");
