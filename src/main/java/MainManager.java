@@ -232,7 +232,7 @@ public class MainManager {
             switch (choice) {
                 case 0:
                     System.out.println("\t\t\tReturn to the main screen");
-                    waitForEnter();
+                   // waitForEnter();
                     main(new String[]{});
                     break;
                 case 1:
@@ -253,7 +253,7 @@ public class MainManager {
 
             }
         }
-        while (!(choice >= 0 && choice <= 4));
+        while (choice !=0);
     }
 
     public static void Statistics(Connection connection) throws SQLException {
