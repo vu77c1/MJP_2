@@ -188,7 +188,7 @@ public class OfficerManage {
     }
 
     // create method 2.1:
-    public static void updateOfficerName() throws SQLException {
+    private static void updateOfficerName() throws SQLException {
         String sql = "UPDATE Officer SET name = ?  WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
 
@@ -227,7 +227,7 @@ public class OfficerManage {
     }
 
     // create method 2.2:
-    public static void updateOfficerPhoneNumber() throws SQLException {
+    private static void updateOfficerPhoneNumber() throws SQLException {
         boolean isCheckExistOfficerId = false;
         int id = 0;
         do {
@@ -266,7 +266,7 @@ public class OfficerManage {
     }
 
     // create method 2.3:
-    public static void updateOfficerAddress() throws SQLException {
+    private static void updateOfficerAddress() throws SQLException {
         boolean isCheckExistOfficerId = false;
         int id = 0;
         do {
@@ -306,7 +306,7 @@ public class OfficerManage {
     }
 
     // create method 2.4: Update Commission ID
-    public static void updateCommissionId() throws SQLException {
+    private static void updateCommissionId() throws SQLException {
         int select = 0;
         do {
             System.out.println("If you don't remember Officer ID, press 1 to review the Officer table.");
@@ -435,7 +435,7 @@ public class OfficerManage {
     }
 
     // create method display Commission table
-    public static void displayCommissionTable() throws SQLException {
+    private static void displayCommissionTable() throws SQLException {
         Statement st = connection.createStatement();
         String sql = "SELECT * FROM Commission";
         ResultSet rs = st.executeQuery(sql);

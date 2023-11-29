@@ -241,7 +241,7 @@ public class OfficerDistributionManage {
     }
 
     // create method 2.1:
-    public static void updateOfficerId() throws SQLException {
+    private static void updateOfficerId() throws SQLException {
         int select = 0;
         do {
             System.out.println("If you don't remember Officer ID, press 1 to review the Officer table.");
@@ -289,7 +289,7 @@ public class OfficerDistributionManage {
     }
 
     // create method 2.2:
-    public static void updateDistributionId() throws SQLException {
+    private static void updateDistributionId() throws SQLException {
         int select = 0;
         do {
             System.out.println("If you don't remember Distribution ID, press 1 to review the Distribution table.");
@@ -338,7 +338,7 @@ public class OfficerDistributionManage {
     }
 
     // create method 2.3:
-    public static void updateDateDistribution() throws SQLException {
+    private static void updateDateDistribution() throws SQLException {
         String sql = "UPDATE OfficerDistribution SET date_distribution = ? WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
 
@@ -379,7 +379,7 @@ public class OfficerDistributionManage {
     }
 
     // create method 2.4:
-    public static void updateAddressDistribution() throws SQLException {
+    private static void updateAddressDistribution() throws SQLException {
         String sql = "UPDATE OfficerDistribution SET address_distribution = ? WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
 
@@ -503,7 +503,7 @@ public class OfficerDistributionManage {
     }
 
     // create method display Distribution table
-    public static void displayDistributionTable() throws SQLException {
+    private static void displayDistributionTable() throws SQLException {
         Statement st = connection.createStatement();
         String sql = "SELECT * FROM Distribution";
         ResultSet rs = st.executeQuery(sql);
