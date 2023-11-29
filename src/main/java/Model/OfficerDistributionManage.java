@@ -42,10 +42,6 @@ public class OfficerDistributionManage {
                     OfficerDistributionManage.displayOfficerDistributionTable();
                     displayMenu();
                     break;
-                case 5:
-                    OfficerDistributionManage.displayReceivingDetails();
-                    displayMenu();
-                    break;
                 default:
                     System.out.println("\u001B[31m* Warning: Input is invalid. Please try again!\u001B[0m");
                     break;
@@ -55,14 +51,13 @@ public class OfficerDistributionManage {
 
     // create method display menu of Officer Distribution table
     public static void displayMenu() {
-        System.out.println(String.format("| %-40s |", "== Officer Distribution Manage Menu =="));
+        System.out.println(String.format("| %-40s |", "=== Officer Distribution Manage Menu ==="));
         System.out.println(String.format("| %-40s |", "----------------------------------------"));
         System.out.println(String.format("| %-40s |", "0. Exit program"));
         System.out.println(String.format("| %-40s |", "1. Add new data"));
         System.out.println(String.format("| %-40s |", "2. Update Officer Distribution table"));
         System.out.println(String.format("| %-40s |", "3. Delete data by ID"));
         System.out.println(String.format("| %-40s |", "4. Display Officer Distribution table"));
-        System.out.println(String.format("| %-40s |", "5. Display Receiving Details table"));
         System.out.println(String.format("| %-40s |", "========================================"));
     }
 
@@ -118,7 +113,7 @@ public class OfficerDistributionManage {
                 isValidDate = true;
             } catch (ParseException e) {
                 System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
-                System.out.println("\u001B[31m* Warning: Entered is incorrect format!\u001B[0m");
+                System.out.println("\u001B[31m* Warning: Entered is incorrect format. Please try again!\u001B[0m");
             }
         }
 
@@ -371,7 +366,7 @@ public class OfficerDistributionManage {
                 isValidDate = true;
             } catch (ParseException e) {
                 System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
-                System.out.println("\u001B[31m* Warning: Entered is incorrect format!\u001B[0m");
+                System.out.println("\u001B[31m* Warning: Entered is incorrect format. Please try again!\u001B[0m");
             }
         }
         pstm.setString(1, newDateDistribution);
@@ -522,43 +517,6 @@ public class OfficerDistributionManage {
                     rs.getInt(3), rs.getFloat(4), dateFormat.format(rs.getDate(5))));
             System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", "-----", "--------------", "------------",
                     "------------------", "------------------"));
-        }
-        System.out.println();
-    }
-
-    // create method display receiving details
-    public static void displayReceivingDetails() throws SQLException {
-        Statement st = connection.createStatement();
-        String sql = "select od.id, o.name, c.name, po.object_type,\n" +
-                "od.date_distribution, d.date_received, d.amount_received, od.address_distribution\n" +
-                "from OfficerDistribution as od\n" +
-                "JOIN Officer as o \n" +
-                "on od.officer_id = o.id\n" +
-                "JOIN Distribution as d\n" +
-                "on od.distribution_id = d.id\n" +
-                "JOIN House as h\n" +
-                "on h.id = d.household_id\n" +
-                "JOIN Citizen as c\n" +
-                "on c.house_id = h.id\n" +
-                "JOIN PriorityObject as po\n" +
-                "on po.id = h.priority_object_id";
-        ResultSet rs = st.executeQuery(sql);
-        System.out.println("\u001B[33m=============================================================================== Receving Details" +
-                " ================================================================================");
-        System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-18s | %-18s | %-18s | %-35s |",
-                "ID", "Officer Name","Recipient's Name", "Priority Object", "Date Distribution", "Date Received",
-                "Amount Received", "Address Distribution"));
-        System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-18s | %-18s | %-18s | %-35s |\u001B[0m", "-----",
-                "--------------------", "--------------------", "------------------","------------------",
-                "------------------", "------------------", "-----------------------------------"));
-        while (rs.next()) {
-            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-18s | %-18s | %-18s | %-35s |",
-                    rs.getInt(1), rs.getString(2),rs.getString(3), rs.getString(4),
-                    dateFormat.format(rs.getDate(5)), dateFormat.format(rs.getDate(6)),
-                    rs.getFloat(7), rs.getString(8)));
-            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-18s | %-18s | %-18s | %-35s |\u001B[0m", "-----",
-                    "--------------------", "--------------------", "------------------","------------------",
-                    "------------------", "------------------", "-----------------------------------"));
         }
         System.out.println();
     }
