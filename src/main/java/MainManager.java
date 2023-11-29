@@ -1,8 +1,5 @@
 import Common.DBConnect;
-import Model.Company;
-import Model.CompanyManager;
-import Model.Representative;
-import Model.RepresentativeManager;
+import Model.*;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -40,6 +37,8 @@ public class MainManager {
             System.out.println("            9. Quản lý công dân");
             System.out.println("            10. Quản lý đối tượng công dân");
             System.out.println("            11. Thống kê");
+            System.out.println("            12. Liệt kê trên 2 đối tượng ưu tiên");
+            System.out.println("            13. Liệt kê số lần ủng hộ và tổng số tiền ủng hộ");
             System.out.println();
             System.out.println("            What do you want to choose?");
 
@@ -58,7 +57,7 @@ public class MainManager {
             n = m;
 
 
-        } while (!(n >= 0 && n <= 11));
+        } while (!(n >= 0 && n <= 13));
         return n;
     }
 
@@ -73,14 +72,14 @@ public class MainManager {
                     System.out.println("Quản lý cán bộ");
                     break;
                 case 3:
+                    //Quản lý người đại diện
                     RepresentativeManager representativeManager =new RepresentativeManager(DBConnect.connectDatabase());
-                    System.out.println("Quản lý người đại diện");
                     representativeManager.handleRepresentative(representativeManager,sc);
 
                     break;
                 case 4:
+                    //Quản lý đơn vị ủng hộ
                     CompanyManager companyManager = new CompanyManager(DBConnect.connectDatabase());
-                    System.out.println("Quản lý đơn vị ủng hộ");
                     companyManager.handleCompany(companyManager,sc);
                     break;
                 case 5:
@@ -110,6 +109,14 @@ public class MainManager {
                 case 11:
                     System.out.println("Thống kê");
 
+                    break;
+                case 12:
+                    ListOfStaticTwoPiority listOfStaticTwoPiority = new ListOfStaticTwoPiority();
+                    listOfStaticTwoPiority.statisticsOfTwoPriorityObjects();
+                    break;
+                case 13:
+                    ListOfHouseHolds listOfHouseHolds = new ListOfHouseHolds();
+                    listOfHouseHolds.numDonateAndSumAmoutReceived(sc);
                     break;
                 case 0:
                     System.out.println("Close program.....");

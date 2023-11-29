@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
+import static Common.JdbcConfig.connection;
+
 public class RepresentativeManager {
     private Connection connection;
 
@@ -24,22 +26,20 @@ public class RepresentativeManager {
 
     public Representative inputRepresentative(Scanner scanner) throws SQLException {
         Representative newRepreesentative = new Representative();
-        System.out.println("Nhập thông tin cho người đại diện:");
-//        System.out.print("Tên người đại diện:");
         String representativeName = InputValidatorKhue.validateStringRepresentative("Tên người đại diện:");
         newRepreesentative.setRepresentativeName(representativeName);
-//        System.out.print("Địa chỉ:");
         String representativeAddress = InputValidatorKhue.validateStringRepresentative("Địa chỉ:");
         newRepreesentative.setRepresentativeAddress(representativeAddress);
-//        System.out.print("Số điện thoại:");
         String phoneNumber =InputValidatorKhue.validateStringRepresentative("Số điện thoại:");
         newRepreesentative.setPhoneNumber(phoneNumber);
         System.out.println("Có đại diện cho đơn vị nào không (Y/N)");
         String isCompany = scanner.nextLine();
         int companyId = 0;
+        //Tạo đơn vị ủng hộ
         if(isCompany.equalsIgnoreCase("Y")){
             CompanyManager companyManager =new CompanyManager();
             String companyName = companyManager.addCompanyInput(scanner);
+            // add Id lại cho companyId
             companyId = companyManager.getSingleCompanyByName(companyName);
             newRepreesentative.setCompanyId(companyId);
         }else {
@@ -55,6 +55,7 @@ public class RepresentativeManager {
 
     public void addRepresentativeInput(Scanner scanner) throws SQLException {
         Representative newRepresentative = inputRepresentative(scanner);
+        // add dữ liệu không có id hoặc có id
         if(newRepresentative.getCompanyId()!=0){
             addRepresentative(newRepresentative);
         }else {
@@ -63,6 +64,8 @@ public class RepresentativeManager {
 
     }
 
+
+    //Thêm người đại diện có đơn vị ủng hộ
     public void addRepresentative(Representative newRepresentative) {
         String query = "INSERT INTO Representative (representative_name, representative_address, phone_number, company_id) VALUES (?, ?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -85,6 +88,7 @@ public class RepresentativeManager {
         }
     }
 
+    //Thêm người đại diện không có đơn vị ủng hộ
     public void addRepresentativeNoCompany(Representative newRepresentative) {
         String query = "INSERT INTO Representative (representative_name, representative_address, phone_number) VALUES (?, ?, ?)";
         try (PreparedStatement preparedStatement = connection.prepareStatement(query)) {
@@ -109,8 +113,7 @@ public class RepresentativeManager {
     // Phương thức sửa thông tin Representative trong cơ sở dữ liệu
     public void updateRepresentativeFromConsoleInput(Scanner scanner) {
         try {
-            System.out.print("Nhập ID người đại diện cần sửa: ");
-            int representativeId = Integer.parseInt(scanner.nextLine());
+            int representativeId = InputValidatorKhue.validateIntInput("Nhập ID người đại diện cần sửa: ");
 
             Representative existingRepresentative = getSingleRepresentativeById(representativeId);
             if (existingRepresentative != null) {
@@ -144,6 +147,7 @@ public class RepresentativeManager {
         }
     }
 
+    //Tìm kiếm Representative theo ID
     public Representative getSingleRepresentativeById(int id) throws SQLException {
         String query = "SELECT * FROM Representative WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -166,7 +170,6 @@ public class RepresentativeManager {
     }
 
     // Phương thức xóa một Representative từ cơ sở dữ liệu
-
     public void deleteRepresentative(int representativeId) throws SQLException {
         String query = "DELETE FROM Representative WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
@@ -198,6 +201,7 @@ public class RepresentativeManager {
         return representatives;
     }
 
+    //Hiển thị bảng Representative
     public void displayRepresentative() throws SQLException {
         Statement st = null;
         ResultSet rs = null;
@@ -234,6 +238,7 @@ public class RepresentativeManager {
         }
     }
 
+    // Trình quản lý bảng Representative
     public void handleRepresentative(RepresentativeManager representativeManager, Scanner scanner) {
         System.out.println("Quản lý người đại diện - Chọn chức năng:");
         System.out.println("1. Hiển thị danh sách người đại diện");
@@ -258,8 +263,7 @@ public class RepresentativeManager {
                         break;
                     case 3:
                         // Xóa người đại diện
-                        System.out.print("Nhập ID người đại diện cần xóa: ");
-                        int representativeIdToDelete = Integer.parseInt(scanner.nextLine());
+                        int representativeIdToDelete = InputValidatorKhue.validateIntInput("Nhập ID người đại diện cần xóa: ");
                         representativeManager.deleteRepresentative(representativeIdToDelete);
                         System.out.println("Người đại diện có ID " + representativeIdToDelete + " đã được xóa thành công.");
                         break;
@@ -281,5 +285,8 @@ public class RepresentativeManager {
             }
         } while (choice != 0);
     }
+
+
+
 
 }

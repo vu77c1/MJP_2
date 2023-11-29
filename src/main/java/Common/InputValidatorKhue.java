@@ -111,6 +111,7 @@ public class InputValidatorKhue {
             try {
                 System.out.print(prompt);
                 userInput = Integer.parseInt(scanner.nextLine());
+                isValid = true;
             } catch (NumberFormatException ex) {
                 System.out.println("Error: Please enter a valid integer");
             }
