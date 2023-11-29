@@ -213,7 +213,7 @@ public class MainManager {
             System.out.println("\t\t\tManage distribution lists");
             System.out.println("\t\t\t1. Show distribution list");
             System.out.println("\t\t\t2. Add distribution information");
-            System.out.println("\t\t\t3. Edit distribution information");
+            System.out.println("\t\t\t3. Update distribution information");
             System.out.println("\t\t\t4. Delete distribution information");
             System.out.println("\t\t\t0. Return to menu main");
             System.out.println();
@@ -225,7 +225,7 @@ public class MainManager {
                     System.out.print("\t\t\tEnter the program number: (0-4): ");
                     choice = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException input) {
-                    System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-4)!\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mInvalid character entered!\n\t\t\tPlease re-enter (0-4)!\u001B[0m");
                 }
             }
             while (choice == -1);
@@ -249,11 +249,11 @@ public class MainManager {
                     distributionManager.deleteDistribution();
                     break;
                 default:
-                    System.out.println("\u001B[31mInvalid function. Please re-enter.\u001B[0m");
-                    waitForEnter();
+                    System.out.println("\t\t\t\u001B[31mInvalid function. Please re-enter.\u001B[0m\n");
+
             }
         }
-        while (choice >= 0 && choice <= 4);
+        while (!(choice >= 0 && choice <= 4));
     }
 
     public static void Statistics(Connection connection) throws SQLException {

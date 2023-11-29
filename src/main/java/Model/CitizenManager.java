@@ -670,7 +670,7 @@ public class CitizenManager {
         }
     }
     public void checkHouseBefore(Connection con, int houseId) {
-        System.out.println("\t\t\tBefore ");
+        System.out.println("\t\t\tAfter ");
         Integer id=houseId;
         try {
             System.out.println("\t\t\t.___________________________________________________________________");
@@ -692,7 +692,7 @@ public class CitizenManager {
         }
     }
     public void checkHouseAfter(Connection con, int houseId) {
-        System.out.println("\t\t\tBefore ");
+        System.out.println("\t\t\t ");
         Integer id=houseId;
         try {
             System.out.println("\t\t\t.___________________________________________________________________");
