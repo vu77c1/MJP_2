@@ -612,51 +612,51 @@ public class DonateDetailManager {
         LocalDate userInputDate = Processing.validateDateInput("Nhập vào đợt ủng hộ: ");
         // Thực hiện truy vấn SQL để lấy dữ liệu
         String sqlQuery = """
-            
                 WITH UnaidedHouseholds AS (
-                SELECT
-                    h.id AS household_id,
-                    d.id AS distribution_id,
-                    d.amount_distribution - COALESCE(SUM(dd.amount), 0) AS remaining_amount
-                FROM
-                    House h
-                        INNER JOIN
-                    Distribution d ON h.id = d.household_id
-                        LEFT JOIN
-                    DonateDetail dd ON d.id = dd.id
-                WHERE
-                    d.date_distribution BETWEEN DATEADD(MONTH, DATEDIFF(MONTH, 0, ?), 0) AND DATEADD(MONTH, DATEDIFF(MONTH, 0, ?) + 1, -1)
-                GROUP BY
-                    h.id, d.id, d.amount_distribution
-            ),
-                 TotalRemainingAmount AS (
                      SELECT
-                         distribution_id,
-                         SUM(remaining_amount) AS total_remaining_amount
+                         h.id AS household_id,
+                         d.id AS distribution_id,
+                         dd.amount - COALESCE(SUM(d.amount_distribution), 0) AS remaining_amount
                      FROM
-                         UnaidedHouseholds
+                         House h
+                             INNER JOIN
+                         Distribution d ON h.id = d.household_id
+                             LEFT JOIN
+                         DonateDetail dd ON d.id = dd.id
+                     WHERE
+                         d.date_distribution BETWEEN DATEADD(MONTH, DATEDIFF(MONTH, 0, ?), 0) AND DATEADD(MONTH, DATEDIFF(MONTH, 0, ?) + 1, -1)
                      GROUP BY
-                         distribution_id
-                 )
-            SELECT
-                c.id AS commission_id,
-                uhh.household_id,
-                IIF(tra.total_remaining_amount = 0, 0, uhh.remaining_amount / NULLIF(tra.total_remaining_amount, 0) * d.amount_distribution) AS allocated_amount,
-                c.precint_name as precint_name,
-                citizen.name as household_lord_name
-            FROM
-                UnaidedHouseholds uhh
-                    JOIN
-                TotalRemainingAmount tra ON uhh.distribution_id = tra.distribution_id
-                    JOIN
-                Distribution d ON uhh.distribution_id = d.id
-                    JOIN
-                Commission c ON d.commission_id = c.id
-                    JOIN
-                House h ON uhh.household_id = h.id
-                    JOIN
-                Citizen citizen ON h.id = citizen.house_id AND citizen.is_household_lord = 1
-                         ORDER BY allocated_amount DESC;
+                         h.id, d.id, dd.amount
+                 ),
+                      TotalRemainingAmount AS (
+                          SELECT
+                              distribution_id,
+                              SUM(remaining_amount) AS total_remaining_amount
+                          FROM
+                              UnaidedHouseholds
+                          GROUP BY
+                              distribution_id
+                      )
+                 SELECT
+                     c.id AS commission_id,
+                     uhh.household_id,
+                     IIF(tra.total_remaining_amount = 0, 0, uhh.remaining_amount / NULLIF(tra.total_remaining_amount, 0) * d.amount_distribution) AS allocated_amount,
+                     c.precint_name as precint_name,
+                     citizen.name as household_lord_name
+                 FROM
+                     UnaidedHouseholds uhh
+                         JOIN
+                     TotalRemainingAmount tra ON uhh.distribution_id = tra.distribution_id
+                         JOIN
+                     Distribution d ON uhh.distribution_id = d.id
+                         JOIN
+                     Commission c ON d.commission_id = c.id
+                         JOIN
+                     House h ON uhh.household_id = h.id
+                         JOIN
+                     Citizen citizen ON h.id = citizen.house_id AND citizen.is_household_lord = 1
+                     where h.priority_object_id != 5 or citizen.citizen_object_id != 6
+                 ORDER BY allocated_amount DESC;
                         """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
             // Assuming userInputDate is a LocalDate
