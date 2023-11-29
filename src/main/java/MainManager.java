@@ -4,24 +4,28 @@ import Model.*;
 import static Model.DonateDetailManager.*;
 import static Model.DistributionManager.*;
 import static Model.Processing.*;
+
 import Common.InputValidator;
+
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MainManager {
     private static final Scanner sc = new Scanner(System.in);
+
     public static void main(String[] args) {
         int n;
-        try{
+        try {
             do {
                 n = menu(sc);
                 productManagement(n, sc);
             } while (!"0".equalsIgnoreCase(String.valueOf(n)));
-        }catch (Exception e){
+        } catch (Exception e) {
             System.out.println("\t\t\t Có lỗi " + e.getMessage());
         }
     }
+
     public static int menu(Scanner sc) {
         int n;
         do {
@@ -65,19 +69,19 @@ public class MainManager {
                     HouseManager houseManager = new HouseManager(DBConnect.connectDatabase());
                     System.out.println("\t\tQuản lý hộ dân");
                     houseManager.handleHouseManagement(houseManager, sc);
-                   break;
+                    break;
                 case 2:
                     System.out.println("\t\tQuản lý cán bộ");
                     break;
                 case 3:
-                    RepresentativeManager representativeManager =new RepresentativeManager(DBConnect.connectDatabase());
+                    RepresentativeManager representativeManager = new RepresentativeManager(DBConnect.connectDatabase());
                     System.out.println("\t\t\tQuản lý người đại diện");
-                    representativeManager.handleRepresentative(representativeManager,sc);
+                    representativeManager.handleRepresentative(representativeManager, sc);
                     break;
                 case 4:
                     CompanyManager companyManager = new CompanyManager(DBConnect.connectDatabase());
                     System.out.println("\t\t\tQuản lý đơn vị ủng hộ");
-                    companyManager.handleCompany(companyManager,sc);
+                    companyManager.handleCompany(companyManager, sc);
                     break;
                 case 5:
                     System.out.println("\t\tQuản lý Ủy Ban");
@@ -180,9 +184,9 @@ public class MainManager {
     }
 
     public static void handleDistributionManager() {
-        DistributionManager distributionManager=new DistributionManager();
+        DistributionManager distributionManager = new DistributionManager();
         int choice = -1;
-        do{
+        do {
 
             System.out.println("\t\t\tManage distribution lists");
             System.out.println("\t\t\t1. Show distribution list");
@@ -195,13 +199,10 @@ public class MainManager {
 
 
             do {
-                try
-                {
+                try {
                     System.out.print("\t\t\tEnter the program number: (0-4): ");
                     choice = Integer.parseInt(sc.nextLine());
-                }
-                catch (NumberFormatException input)
-                {
+                } catch (NumberFormatException input) {
                     System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-4)!\u001B[0m");
                 }
             }
@@ -230,45 +231,43 @@ public class MainManager {
                     waitForEnter();
             }
         }
-        while (choice >=0 && choice <=4);
+        while (choice >= 0 && choice <= 4);
     }
+
     public static void Statistics(Connection con) throws SQLException {
         int choice = -1;
-        do{
+        do {
             System.out.println("\t\t Menu thống kê");
             System.out.println("\t\t\t1. Hiển thị top 5 hộ dân có giá trị ủng hộ nhiều nhất trong 1 đợt ủng hộ X (X nhập vào từ bàn phím)\n" +
-                               "\t\t\t2. Liệt kê thông tin hộ dân có hệ số ưu tiên cao nhất\n" +
-                               "\t\t\t3. Hiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)\n" +
-                               "\t\t\t4. Liệt kê top 5 hộ có nhiều đối tượng ưu tiên nhất\n" +
-                               "\t\t\t5. Hiển thị top 3 đơn vị có tổng giá trị ủng hộ nhiều nhất\n" +
-                               "\t\t\t6. Liệt kê các cá nhân ủng hộ cho 1 đợt từ thiện X (X là MaDotUngHo được nhập từ bàn phím)\n" +
-                               "\t\t\t7. Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n" +
-                               "\t\t\t8. Liệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n" +
-                               "\t\t\t9. Thống kê số hộ khẩu có từ 2 đối tượng ưu tiên trở lên\n" +
-                               "\t\t\t10. Thống kê 5 xã/ phường được ủng hộ nhiều nhất (dựa vào số tiền)\n" +
-                               "\t\t\t11. Liệt kê các xã phường chưa được ủng hộ\n" +
-                               "\t\t\t12. Liệt Kê hộ dân chưa được ủng hộ bằng tiền mặt\n" +
-                               "\t\t\t13. Hệ thống tự động xác định số hộ dân chưa được nhận cứu trợ của một đợt cũng như giá trị còn lại của đợt đó,\n\t\t\tsau đó tự động phân bổ giá trị cho từng hộ và hiển thị kết quả phân chia dưới dạng bảng,\n\t\t\tnếu người dùng đồng ý với kết quả tính toán thì chọn \"\"Lưu\"\" và hệ thống sẽ lưu vào bảng \"\"PHANPHOI\"\".\n\t\t\t(Đợt ủng hộ được nhập từ bàn phím, hiển thị danh sách hộ sẽ được nhận + giá trị được nhận tương ứng) \n" +
-                               "\t\t\t14. Tìm kiếm các đơn vị ủng hộ theo ngày nhận và hiển thị chi tiết ủng hộ tương ứng của đơn vị đó \n" +
-                               "\t\t\t15. Liệt kê các đợt ủng hộ và giá trị tương ứng của từng cán bộ, cán bộ nào chưa có đợt ủng hộ cũng liệt kê\n" +
-                               "\t\t\t16. Hiển thị thông tin chi tiết  số tiền còn lại (chưa phân phối) của 1 đợt ủng hộ (Đợt ủng hộ X nhập từ bàn phím)\n" +
-                               "\t\t\t17. + Khi nhập mới một xét duyệt ưu tiên là có trẻ em thì hệ thống sẽ hỏi là có muốn xoá 1 xét duyệt ưu tiên là phụ nữ mang thai và tăng nhân khẩu của hộ đó lên hay không.\n\t\t\tBấm yes hệ thống sẽ tự động cập nhật. \n" +
-                               "\t\t\t+ Ngược lại khi xoá một xét duyệt ưu tiên là phụ nữ mang thai thì hệ thống tự động hỏi là có thêm 1 ưu tiên trẻ em và thêm nhân khẩu hay không nếu có sẽ tự động cập nhật.\n" +
-                               "\t\t\t18. Liệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.\n" +
-                               "\t\t\t0. Trở về menu chính");
+                    "\t\t\t2. Liệt kê thông tin hộ dân có hệ số ưu tiên cao nhất\n" +
+                    "\t\t\t3. Hiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)\n" +
+                    "\t\t\t4. Liệt kê top 5 hộ có nhiều đối tượng ưu tiên nhất\n" +
+                    "\t\t\t5. Hiển thị top 3 đơn vị có tổng giá trị ủng hộ nhiều nhất\n" +
+                    "\t\t\t6. Liệt kê các cá nhân ủng hộ cho 1 đợt từ thiện X (X là MaDotUngHo được nhập từ bàn phím)\n" +
+                    "\t\t\t7. Hiển thị top 5 cán bộ tham gia nhiều đợt ủng hộ nhất\n" +
+                    "\t\t\t8. Liệt kê tổng giá trị ủng hộ được do mỗi cán bộ phụ trách X tham gia (X nhập từ bàn phím)\n" +
+                    "\t\t\t9. Thống kê số hộ khẩu có từ 2 đối tượng ưu tiên trở lên\n" +
+                    "\t\t\t10. Thống kê 5 xã/ phường được ủng hộ nhiều nhất (dựa vào số tiền)\n" +
+                    "\t\t\t11. Liệt kê các xã phường chưa được ủng hộ\n" +
+                    "\t\t\t12. Liệt Kê hộ dân chưa được ủng hộ bằng tiền mặt\n" +
+                    "\t\t\t13. Hệ thống tự động xác định số hộ dân chưa được nhận cứu trợ của một đợt cũng như giá trị còn lại của đợt đó,\n\t\t\tsau đó tự động phân bổ giá trị cho từng hộ và hiển thị kết quả phân chia dưới dạng bảng,\n\t\t\tnếu người dùng đồng ý với kết quả tính toán thì chọn \"\"Lưu\"\" và hệ thống sẽ lưu vào bảng \"\"PHANPHOI\"\".\n\t\t\t(Đợt ủng hộ được nhập từ bàn phím, hiển thị danh sách hộ sẽ được nhận + giá trị được nhận tương ứng) \n" +
+                    "\t\t\t14. Tìm kiếm các đơn vị ủng hộ theo ngày nhận và hiển thị chi tiết ủng hộ tương ứng của đơn vị đó \n" +
+                    "\t\t\t15. Liệt kê các đợt ủng hộ và giá trị tương ứng của từng cán bộ, cán bộ nào chưa có đợt ủng hộ cũng liệt kê\n" +
+                    "\t\t\t16. Hiển thị thông tin chi tiết  số tiền còn lại (chưa phân phối) của 1 đợt ủng hộ (Đợt ủng hộ X nhập từ bàn phím)\n" +
+                    "\t\t\t17. + Khi nhập mới một xét duyệt ưu tiên là có trẻ em thì hệ thống sẽ hỏi là có muốn xoá 1 xét duyệt ưu tiên là phụ nữ mang thai và tăng nhân khẩu của hộ đó lên hay không.\n\t\t\tBấm yes hệ thống sẽ tự động cập nhật. \n" +
+                    "\t\t\t+ Ngược lại khi xoá một xét duyệt ưu tiên là phụ nữ mang thai thì hệ thống tự động hỏi là có thêm 1 ưu tiên trẻ em và thêm nhân khẩu hay không nếu có sẽ tự động cập nhật.\n" +
+                    "\t\t\t18. Liệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.\n" +
+                    "\t\t\t0. Trở về menu chính");
             do {
-                try
-                {
+                try {
                     System.out.print("\t\tEnter the program number: (0-10): ");
                     choice = Integer.parseInt(sc.nextLine());
-                }
-                catch (NumberFormatException input)
-                {
+                } catch (NumberFormatException input) {
                     System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-10)!\u001B[0m");
                 }
             }
             while (choice == -1);
-            switch (choice){
+            switch (choice) {
                 case 0:
                     System.out.println("\t\t\tTrở về màn hình chính");
                     waitForEnter();
@@ -323,6 +322,6 @@ public class MainManager {
                     waitForEnter();
             }
         }
-        while (choice >=0 && choice <=9);
+        while (choice >= 0 && choice <= 9);
     }
 }
