@@ -2,6 +2,8 @@ package Model;
 import Common.DBConnect;
 
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class HouseManager {
@@ -113,6 +115,51 @@ public class HouseManager {
             }
         }
     }
+    //- Hiển thị top 5 hộ dân có giá trị ủng hộ nhiều nhất trong 1 đợt ủng hộ X (X nhập vào từ bàn phím)
+    public static void displayTop5HouseholdsByDonation(Connection connection, String donationRound) {
+        try {
+            PreparedStatement statement = connection.prepareStatement(
+                    "SELECT TOP 5 D.household_id, SUM(D.amount_distribution) AS total_donation, " +
+                            "C.name AS household_name " +
+                            "FROM Distribution D " +
+                            "INNER JOIN House H ON D.household_id = H.id " +
+                            "INNER JOIN Citizen C ON H.id = C.house_id " +
+                            "WHERE DATEPART(MONTH, D.date_distribution) = MONTH(?) " +
+                            "AND DATEPART(YEAR, D.date_distribution) = YEAR(?) " +
+                            "AND C.is_household_lord = 1 " +
+                            "GROUP BY D.household_id, C.name " +
+                            "ORDER BY total_donation DESC"
+            );
+
+            // Parsing the input donationRound to create a date in 'MM/yyyy' format
+            SimpleDateFormat dateFormat = new SimpleDateFormat("MM/yyyy");
+            java.util.Date parsedDate = dateFormat.parse(donationRound);
+            java.sql.Date sqlDate = new java.sql.Date(parsedDate.getTime());
+
+            statement.setDate(1, sqlDate);
+            statement.setDate(2, sqlDate);
+
+            ResultSet resultSet = statement.executeQuery();
+
+            System.out.println("Top 5 households with the highest donations in round " + donationRound + ":");
+            System.out.println("Household ID\tHousehold Name\t\t\t\t\tTotal Donation");
+
+            while (resultSet.next()) {
+                int householdId = resultSet.getInt("household_id");
+                String householdName = resultSet.getString("household_name");
+                double totalDonation = resultSet.getDouble("total_donation");
+
+                System.out.printf("%-13d\t%-24s\t\t%.2f\n", householdId, householdName, totalDonation);
+            }
+        } catch (SQLException | ParseException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+
+
 
     public static void handleHouseManagement(HouseManager houseManager, Scanner scanner) {
         int choice;

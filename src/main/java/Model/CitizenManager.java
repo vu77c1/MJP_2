@@ -378,8 +378,341 @@ public class CitizenManager {
             }
         }
     }
+    public void fetchCitizenInfoWithPriorityFactor() {
+        String query = "SELECT h.id AS house_id, hh.name AS household_head_name, " +
+                "SUM(" +
+                "    CASE " +
+                "        WHEN DATEDIFF(YEAR, c.date_of_birth, GETDATE()) <= 8 THEN 1 " +
+                "        WHEN DATEDIFF(YEAR, c.date_of_birth, GETDATE()) >= 60 THEN 1 " +
+                "        ELSE " +
+                "            CASE " +
+                "                WHEN co.type_name_object IN ('Phu nu mang thai', 'Nguoi tan tat','Tre em') THEN 1 " +
+                "                ELSE 0 " +
+                "            END " +
+                "    END" +
+                ") AS total_priority_factor " +
+                "FROM " +
+                "    House h " +
+                "LEFT JOIN " +
+                "    Citizen c ON h.id = c.house_id " +
+                "LEFT JOIN " +
+                "    CitizenObject co ON c.citizen_object_id = co.id " +
+                "LEFT JOIN " +
+                "    Citizen hh ON h.id = hh.house_id AND hh.is_household_lord = 1 " +
+                "WHERE " +
+                "    hh.name IS NOT NULL " +
+                "GROUP BY " +
+                "    h.id, hh.name " +
+                "ORDER BY " +
+                "    total_priority_factor DESC";
+
+        try (Statement statement = connection.createStatement();
+             ResultSet resultSet = statement.executeQuery(query)) {
+
+            System.out.println("================================== House Priority Factor ==================================");
+            System.out.println("| House ID | Household Head Name     | Total Priority Factor |");
+            System.out.println("|----------|--------------------------|-----------------------|");
+
+            while (resultSet.next()) {
+                int houseId = resultSet.getInt("house_id");
+                String householdHeadName = resultSet.getString("household_head_name");
+                int totalPriorityFactor = resultSet.getInt("total_priority_factor");
+
+                System.out.printf("| %-9s| %-25s| %-22s|%n", houseId, householdHeadName, totalPriorityFactor);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+//    public void processPriorityDecision(Scanner scanner, Connection connection) {
+//        System.out.println("Bạn muốn xét duyệt ưu tiên là có trẻ em? (yes/no)");
+//        String decision = scanner.nextLine().toLowerCase();
+//
+//        if (decision.equals("yes")) {
+//            processPregnantWomanDecision(scanner, connection);
+//        } else {
+//            System.out.println("Không cần thực hiện xét duyệt ưu tiên là có trẻ em.");
+//        }
+//    }
+//
+//    public void processPregnantWomanDecision(Scanner scanner, Connection connection) {
+//        System.out.println("Xoá xét duyệt ưu tiên là phụ nữ mang thai? (yes/no)");
+//        String input = scanner.nextLine().toLowerCase();
+//
+//        if (input.equals("yes")) {
+//            System.out.println("Bạn muốn thêm 1 ưu tiên trẻ em và thêm nhân khẩu không? (yes/no)");
+//            String confirmationInput = scanner.nextLine().toLowerCase();
+//
+//            if (confirmationInput.equals("yes")) {
+//                int houseId = getHouseIdOfPregnantWoman(connection);
+//                int childCitizenObjectId = getCitizenObjectIdForChild(connection);
+//
+//                if (houseId != -1 && childCitizenObjectId != -1) {
+//                    updateCitizenObject(connection);
+//                    String insertQuery = "INSERT INTO Citizen (house_id, citizen_object_id) VALUES (?, ?)";
+//                    performInsert(connection, houseId, childCitizenObjectId);
+//                } else {
+//                    System.out.println("Không thể lấy thông tin cần thiết.");
+//                }
+//            } else {
+//                System.out.println("Không cập nhật.");
+//            }
+//        } else {
+//            System.out.println("Không cần thực hiện xoá.");
+//        }
+//    }
+//
+//    // Các hàm xử lý truy vấn và thao tác với cơ sở dữ liệu
+//    public int getHouseIdOfPregnantWoman(Connection connection) {
+//        // Thực hiện truy vấn để lấy house_id của người phụ nữ mang thai từ CSDL
+//        String query = "SELECT house_id FROM Citizen WHERE citizen_object_id = (SELECT id FROM CitizenObject WHERE type_name_object = 'Phu nu mang thai')";
+//        try (PreparedStatement statement = connection.prepareStatement(query)) {
+//            ResultSet resultSet = statement.executeQuery();
+//            if (resultSet.next()) {
+//                return resultSet.getInt("house_id");
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return -1;
+//    }
+//
+//    public int getCitizenObjectIdForChild(Connection connection) {
+//        // Thực hiện truy vấn để lấy citizen_object_id của trẻ em từ CSDL
+//        String query = "SELECT id FROM CitizenObject WHERE type_name_object = 'Tre em'";
+//        try (PreparedStatement statement = connection.prepareStatement(query)) {
+//            ResultSet resultSet = statement.executeQuery();
+//            if (resultSet.next()) {
+//                return resultSet.getInt("id");
+//            }
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return -1;
+//    }
+//
+//    public void updateCitizenObject(Connection connection) {
+//        // Thực hiện cập nhật citizen_object_id từ 'phu nu mang thai' sang 'nguoi binh thuong'
+//        String updateQuery = "UPDATE Citizen SET citizen_object_id = (SELECT id FROM CitizenObject WHERE type_name_object = 'Binh Thuong') WHERE citizen_object_id = (SELECT id FROM CitizenObject WHERE type_name_object = 'Phu nu mang thai')";
+//        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+//            statement.executeUpdate();
+//            System.out.println("Đã cập nhật xét duyệt ưu tiên phụ nữ mang thai.");
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+//
+//    public void performInsert(Connection connection, int houseId, int childCitizenObjectId) {
+//        String insertQuery = "INSERT INTO Citizen (house_id, citizen_object_id) VALUES (?, ?)";
+//
+//        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+//            insertStatement.setInt(1, houseId);
+//            insertStatement.setInt(2, childCitizenObjectId);
+//            // Đặt các giá trị cần thiết vào các cột khác trong câu lệnh INSERT
+//            // Ví dụ:
+//            // insertStatement.setString(3, "Tên giá trị");
+//            // insertStatement.setInt(4, 123);
+//
+//            int rowsInserted = insertStatement.executeUpdate();
+//            System.out.println("Đã thêm ưu tiên trẻ em và thêm nhân khẩu.");
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//    }
+
+    public void processPriorityDecision(Scanner scanner, Connection connection) {
+        System.out.println("Bạn muốn xét duyệt ưu tiên trong một house_id cụ thể? (yes/no)");
+        String decision = scanner.nextLine().toLowerCase();
+
+        if (decision.equals("yes")) {
+            System.out.println("Nhập house_id:");
+            int houseId = scanner.nextInt();
+            scanner.nextLine(); // Đọc bỏ dòng trống sau khi nhập số
+
+            processPregnantWomanDecision(scanner, connection, houseId);
+            checkHouseBefore(connection, houseId);
+            checkHouseAfter(connection,houseId);
+        } else {
+            // Xử lý logic khi không muốn xét duyệt theo house_id cụ thể
+            System.out.println("Không cần thực hiện xét duyệt ưu tiên trong một house_id cụ thể.");
+        }
+    }
+
+    // Hàm xử lý quyết định về phụ nữ mang thai trong house_id
+    public void processPregnantWomanDecision(Scanner scanner, Connection connection, int houseId) {
+        System.out.println("Xoá xét duyệt ưu tiên là phụ nữ mang thai? (yes/no)");
+        String input = scanner.nextLine().toLowerCase();
+
+        if (input.equals("yes")) {
+            // Thêm đối tượng 'Trẻ em' trước khi xét duyệt
+            int childCitizenObjectId = insertChildCitizenObjectIfNotExists(connection);
+            if (childCitizenObjectId != -1) {
+                System.out.println("Đã thêm đối tượng 'Trẻ em'.");
+
+                // Tiếp tục xét duyệt
+                System.out.println("Bạn muốn thêm 1 ưu tiên trẻ em và thêm nhân khẩu không? (yes/no)");
+                String confirmationInput = scanner.nextLine().toLowerCase();
+
+                if (confirmationInput.equals("yes")) {
+                    updateCitizenObject(connection, houseId);
+                    performInsert(connection, houseId, childCitizenObjectId);
+                } else {
+                    System.out.println("Không cập nhật.");
+                }
+            } else {
+                System.out.println("Không thể thêm đối tượng 'Trẻ em'.");
+                System.out.println("Không thể thực hiện xét duyệt.");
+            }
+        } else {
+            System.out.println("Không cần thực hiện xoá.");
+        }
+    }
+
+    public int insertChildCitizenObjectIfNotExists(Connection connection) {
+        // Kiểm tra xem bản ghi 'Tre em' đã tồn tại trong bảng CitizenObject chưa
+        if (!checkChildCitizenObjectExists(connection)) {
+            // Nếu không tồn tại, thêm mới
+            String insertQuery = "INSERT INTO CitizenObject (type_name_object) VALUES ('Tre em')";
+            try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery, Statement.RETURN_GENERATED_KEYS)) {
+                int rowsInserted = insertStatement.executeUpdate();
+                if (rowsInserted > 0) {
+                    ResultSet generatedKeys = insertStatement.getGeneratedKeys();
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getInt(1); // Return the ID of the newly inserted record
+                    }
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        } else {
+            // Nếu đã tồn tại, trả về ID của 'Tre em' đã có sẵn
+            return getChildCitizenObjectId(connection);
+        }
+        return -1; // Trả về -1 nếu có lỗi hoặc không thể thêm
+    }
+
+    public boolean checkChildCitizenObjectExists(Connection connection) {
+        String query = "SELECT COUNT(*) AS count FROM CitizenObject WHERE type_name_object = 'Tre em'";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                int count = resultSet.getInt("count");
+                return count > 0; // Trả về true nếu 'Tre em' đã tồn tại
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public int getChildCitizenObjectId(Connection connection) {
+        String query = "SELECT id FROM CitizenObject WHERE type_name_object = 'Tre em'";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+    public int getHouseIdOfPregnantWoman(Connection connection, int houseId) {
+        String query = "SELECT house_id FROM Citizen WHERE citizen_object_id = (SELECT id FROM CitizenObject WHERE type_name_object = 'Phu nu mang thai') AND house_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, houseId);
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("house_id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public int getCitizenObjectIdForChild(Connection connection, int houseId) {
+        String query = "SELECT id FROM CitizenObject WHERE type_name_object = 'Tre em'";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) {
+                return resultSet.getInt("id");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return -1;
+    }
+
+    public void updateCitizenObject(Connection connection, int houseId) {
+        String updateQuery = "UPDATE Citizen SET citizen_object_id = (SELECT id FROM CitizenObject WHERE type_name_object = 'Binh Thuong') WHERE citizen_object_id = (SELECT id FROM CitizenObject WHERE type_name_object = 'Phu nu mang thai') AND house_id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+            statement.setInt(1, houseId);
+            statement.executeUpdate();
+            System.out.println("Đã cập nhật xét duyệt ưu tiên phụ nữ mang thai.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void performInsert(Connection connection, int houseId, int childCitizenObjectId) {
+        String insertQuery = "INSERT INTO Citizen (house_id, citizen_object_id) VALUES (?, ?)";
+
+        try (PreparedStatement insertStatement = connection.prepareStatement(insertQuery)) {
+            insertStatement.setInt(1, houseId);
+            insertStatement.setInt(2, childCitizenObjectId);
+
+            int rowsInserted = insertStatement.executeUpdate();
+            System.out.println("Đã thêm ưu tiên trẻ em và thêm nhân khẩu.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void checkHouseBefore(Connection con, int houseId) {
+        System.out.println("\t\t\tBefore ");
+        Integer id=houseId;
+        try {
+            System.out.println("\t\t\t.___________________________________________________________________");
+            System.out.println("\t\t\t│           Name HouseHold          │          Total people        │ ");
+            System.out.println("\t\t\t│___________________________________│______________________________│ ");
+            Statement statement = con.createStatement();
+            ResultSet resultSet = statement.executeQuery("(select name, (select  count(Citizen.house_id) as SL from Citizen  where  Citizen.house_id="+id+") as SL from Citizen where is_household_lord=1 and Citizen.house_id="+id+")");
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                Integer SL = resultSet.getInt("SL");
+
+                System.out.printf("\t\t\t│\t\t\t%-14s\t\t\t│  \t\t\t\t%-14s │  \n",name,  SL-1);
+                System.out.println("\t\t\t│___________________________________│______________________________│");
+            } } catch (SQLException e) {
+
+            System.out.println("\u001B[31mThere was an error during the Database connection process\u001B[0m");
 
 
+        }
+    }
+    public void checkHouseAfter(Connection con, int houseId) {
+        System.out.println("\t\t\tBefore ");
+        Integer id=houseId;
+        try {
+            System.out.println("\t\t\t.___________________________________________________________________");
+            System.out.println("\t\t\t│           Name HouseHold          │          Total people        │ ");
+            System.out.println("\t\t\t│___________________________________│______________________________│ ");
+            Statement statement = con.createStatement();
+            ResultSet resultSet = statement.executeQuery("(select name, (select  count(Citizen.house_id) as SL from Citizen  where  Citizen.house_id="+id+") as SL from Citizen where is_household_lord=1 and Citizen.house_id="+id+")");
+            while (resultSet.next()) {
+                String name = resultSet.getString("name");
+                Integer SL = resultSet.getInt("SL");
+
+                System.out.printf("\t\t\t│\t\t\t%-14s\t\t\t│  \t\t\t\t%-14s │  \n",name,  SL);
+                System.out.println("\t\t\t│___________________________________│______________________________│");
+            } } catch (SQLException e) {
+
+            System.out.println("\u001B[31mThere was an error during the Database connection process\u001B[0m");
+
+
+        }
+    }
     public static void handleCitizenManagement(CitizenManager citizenManager, Scanner scanner) {
         int choice = -1;
 

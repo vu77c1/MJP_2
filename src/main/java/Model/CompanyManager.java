@@ -1,11 +1,10 @@
 package Model;
 
 import Common.DBConnect;
+import Common.InputValidatorKhue;
+import Common.JDBCQuery;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -20,20 +19,19 @@ public class CompanyManager {
     }
     public Company inputCompany(Scanner scanner){
         Company newCompany = new Company();
-//        System.out.print("Có đại diện cho công ty nào không (true/false) ?");
-//        boolean isCompany = Boolean.parseBoolean(scanner.nextLine());
-//        if(isCompany){
-            System.out.print("Tên công ty:");
-            newCompany.setCompanyName(scanner.nextLine());
-            System.out.print("Địa chỉ:");
-            newCompany.setCompanyAddrress(scanner.nextLine());
-//        }
+//      System.out.print("Tên công ty:");
+        String companyName = InputValidatorKhue.validateStringCompany("Tên công ty:");
+        newCompany.setCompanyName(companyName);
+//        System.out.print("Địa chỉ:");
+        String companyAddrress = InputValidatorKhue.validateStringCompany("Địa chỉ:");
+        newCompany.setCompanyAddrress(companyAddrress);
         return newCompany;
     }
-    public void addCompanyInput(Scanner scanner) {
+    public String addCompanyInput(Scanner scanner) {
         Company newCompany = inputCompany(scanner);
         addCompany(newCompany);
-    }
+        return newCompany.getCompanyName();
+    };
 
     public void addCompany(Company newCompany) {
         String query = "INSERT INTO Company (company_name, company_address) VALUES (?, ?)";
@@ -51,6 +49,9 @@ public class CompanyManager {
 
         } catch (SQLException e) {
             System.out.println("Lỗi khi thêm đơn vị ủng hộ: " + e.getMessage());
+        }
+        finally {
+            JDBCQuery.closeConnection();
         }
     }
 
@@ -73,6 +74,8 @@ public class CompanyManager {
             System.out.println("ID không hợp lệ");
         } catch (SQLException e){
             System.out.println("Lỗi khi cập nhật đơn vị ủng hộ: " +e.getMessage());
+        }finally {
+            JDBCQuery.closeConnection();
         }
     }
 
@@ -86,7 +89,10 @@ public class CompanyManager {
 
             statement.executeUpdate();
 
+        } finally {
+            JDBCQuery.closeConnection();
         }
+
     }
 
     public Company getSingleCompanyById(int id) throws SQLException {
@@ -102,8 +108,25 @@ public class CompanyManager {
                     return company;
                 }
             }
+        }finally {
+            JDBCQuery.closeConnection();
         }
         return null;
+    }
+
+    public int getSingleCompanyByName(String name) throws SQLException {
+        String query = "SELECT * FROM Company WHERE company_name = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setString(1, name);
+            try (ResultSet resultSet = statement.executeQuery()) {
+                if (resultSet.next()) {
+                    return resultSet.getInt("id");
+                }
+            }
+        } finally {
+            JDBCQuery.closeConnection();
+        }
+        return -1;
     }
 
     // Phương thức xóa một Company từ cơ sở dữ liệu
@@ -113,6 +136,9 @@ public class CompanyManager {
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, companyId);
             statement.executeUpdate();
+        }
+        finally {
+            JDBCQuery.closeConnection();
         }
     }
 
@@ -130,8 +156,94 @@ public class CompanyManager {
                 companies.add(company);
             }
         }
+        finally {
+            JDBCQuery.closeConnection();
+        }
         return companies;
     }
 
-//    public boolean checkCompany () throws
+    public void displayCompany() throws SQLException {
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st =connection.createStatement();
+            System.out.println();
+            System.out.println("============== DANH SÁCH ĐƠN VỊ ỦNG HỘ ==============");
+            System.out.println("================= DANH SÁCH KẾT THÚC ================");
+            System.out.println("._______.____________________.______________________.");
+            System.out.println("│   ID  │    Tên Đơn vị      │    Địa chỉ đơn vị    │");
+            System.out.println("│_______│____________________│____________________│");
+            rs = st.executeQuery("SELECT * from Company");
+            while (rs.next())
+            {
+                String id = rs.getString("id");
+                String companyName = rs.getString("company_name");
+                String companyAddress = rs.getString("company_address");
+                System.out.printf("│ %-5S │ %-18s │ %-18s │\n", id, companyName, companyAddress );
+                System.out.println("│_______│____________________│____________________│");
+            }
+            System.out.println("================= DANH SÁCH KẾT THÚC ================");
+            InputValidatorKhue.waitForEnter();
+        }catch (SQLException e) {
+            System.out.println(e.getMessage());
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+        }finally {
+            if(rs!=null){
+                rs.close();
+            }
+            if(st!=null){
+                st.close();
+            }
+        }
+    }
+
+    public void handleCompany(CompanyManager companyManager, Scanner scanner) {
+        System.out.println("Quản lý đơn vị ủng hộ - Chọn chức năng:");
+        System.out.println("1. Hiển thị đơn vị ủng hộ");
+        System.out.println("2. Thêm đơn vị ủng hộ");
+        System.out.println("3. Xóa đơn vị ủng hộ");
+        System.out.println("4. Sửa thông tin đơn vị ủng hộ");
+        System.out.println("0. Quay lại menu chính");
+
+        int choice = -1;
+
+        do {
+            try {
+                System.out.print("Vui lòng chọn: ");
+                choice = Integer.parseInt(scanner.nextLine());
+                switch (choice) {
+                    case 1:
+                        companyManager.displayCompany();
+                        break;
+                    case 2:
+                        // Thêm đơn vị ủng hộ
+                        companyManager.addCompanyInput(scanner);
+                        break;
+                    case 3:
+                        // Xóa đơn vị ủng hộ
+                        System.out.print("Nhập ID đơn vị ủng hộ cần xóa: ");
+                        int representativeIdToDelete = Integer.parseInt(scanner.nextLine());
+                        companyManager.deleteCompany(representativeIdToDelete);
+                        System.out.println("Đơn vị ủng hộ có ID " + representativeIdToDelete + " đã được xóa thành công.");
+                        break;
+                    case 4:
+                        // Sửa đơn vị ủng hộ
+                        companyManager.updateCompanyFromConsoleInput(scanner);
+                        break;
+                    case 0:
+                        // Quay lại menu chính
+                        break;
+                    default:
+                        System.out.println("Lựa chọn không hợp lệ.");
+                        break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Vui lòng nhập số.");
+            } catch (SQLException e) {
+                System.out.println("Lỗi SQL: " + e.getMessage());
+            }
+        } while (choice != 0);
+    }
+
+
 }

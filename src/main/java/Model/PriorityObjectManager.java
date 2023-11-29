@@ -3,9 +3,10 @@ package Model;
 import Common.InputValidator;
 import Common.JDBCQuery;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class PriorityObjectManager {
     //Lay tat ca thong tin PriorityObject trong databse khong truyen tham so
@@ -157,7 +158,7 @@ public class PriorityObjectManager {
 
     //hien thi danh sach PriorityObject
     public void displayPriorityObjects(ArrayList<PriorityObject> priorityObjects) {
-        System.out.println("\t\t\tID\tObject Type");
+        System.out.println("\t\t\t\u001B[1mID\tOBJECT_TYPE\u001B[0m");
 
         for (PriorityObject priorityObject : priorityObjects) {
             System.out.println("\t\t\t" + priorityObject.getId() + "\t" + priorityObject.getObjectType());
@@ -186,6 +187,7 @@ public class PriorityObjectManager {
         }
         return exists;
     }
+
 
 
 }

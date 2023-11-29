@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-import static Model.Processing.*;
+import static Model.Processing1.*;
 
 public class DistributionManager {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT);
@@ -21,12 +21,11 @@ public class DistributionManager {
     private   static Scanner sc=new Scanner(System.in);
 
 
-
     public static void printDistribution(Connection con){
         try {
             System.out.println("\t\t\t********************************************* DISTRIBUTION LIST *****************************************");
             System.out.println("\t\t\t._______.______________________________________.____________________._________________._________________.__");
-            System.out.println("\t\t\t│   ID  │         ID Commission            │    ID Household    │ Amount received    │  date_received  │ ");
+            System.out.println("\t\t\t│   ID  │            Commission            │    ID Household    │ Amount received    │  date_received  │ ");
             System.out.println("\t\t\t│_______│__________________________________│____________________│____________________│_________________│  ");
             Statement statement = con.createStatement();
             ResultSet resultSet = statement.executeQuery("SELECT Distribution.id,commission_id, precint_name, city_name,province_name, household_id, amount_received, date_received  FROM Distribution Join dbo.Commission C on C.id= Distribution.commission_id");
@@ -40,6 +39,7 @@ public class DistributionManager {
                 String household_id = resultSet.getString("household_id");
                 double amount_received = resultSet.getFloat("amount_received");
                 LocalDate date_received = resultSet.getDate("date_received").toLocalDate();
+
                 System.out.printf("\t\t\t│ %-5S │ %-32s │ %-18s │ %-18s │%-16s │ \n", ID,precint_name+"- "+city_name+"- "+province_name, household_id, amount_received,dateFormat.format(date_received));
                 System.out.println("\t\t\t│_______│__________________________________│____________________│____________________│_________________│");
             }
@@ -47,6 +47,7 @@ public class DistributionManager {
             System.out.println("\t\t\t******************************************** LIST END ********************************************************");
             waitForEnter();
         }catch (SQLException e) {
+
             System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
             System.out.println(e.getMessage());
         }
@@ -82,7 +83,7 @@ public class DistributionManager {
     }
 
     //Lay tat ca thong tin Distribution trong database co tham so
-    public ArrayList<Distribution> getDistribution(String sql) {
+    public static ArrayList<Distribution> getDistribution(String sql) {
         ArrayList<Distribution> infoList = new ArrayList<>();
         try {
             JDBCQuery1.openConnection();
@@ -111,8 +112,22 @@ public class DistributionManager {
     }
     //Enter data
     public Distribution inputDistribution() {
-        Integer comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
-        Integer houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+        Integer comid;
+        Integer houseid;
+        do {
+            comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
+            if (!isCommissionIdExists(comid)==true){
+                System.out.println("\t\t\tPlease enter again");
+            }
+        }while(isCommissionIdExists(comid));
+        do {
+            houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+            if (!isHouseIdExists(comid)==true){
+                System.out.println("\t\t\tPlease enter again");
+            }
+
+        }while (isHouseIdExists(houseid));
+
         Double amount= InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
         java.util.Date datereceived= InputValidator1.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
         Distribution di = new Distribution();
@@ -150,6 +165,10 @@ public class DistributionManager {
     //hàm cập nhật lại thông tin
     public void updateDistribution() {
         int flag=0;
+        Integer comid;
+        Double amount;
+        Integer houseid;
+        java.util.Date datereceived;
         do {
             int id;
             id = InputValidator1.validateIntInput("\t\t\tEnter ID to update: ");
@@ -157,11 +176,27 @@ public class DistributionManager {
             if (isIdExists(id)) {
                 displayDistribution(getDistribution("select * from Distribution where id=" + id));
 
+                do {
+                    comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
+                    if (!isCommissionIdExists(comid)==true){
+                        System.out.println("\t\t\tPlease enter again");
+                    }
+                }while(!isCommissionIdExists(comid));
 
-                Integer comid = InputValidator1.validateIntInput("\t\t\tEnter New Commission ID:  ");
-                Integer houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
-                Double amount= InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
-                java.util.Date datereceived= InputValidator1.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
+
+                do {
+                    houseid= InputValidator1.validateIntInput("\t\t\tEnter New HouseHold  ID:  ");
+                    if (!isHouseIdExists(comid)==true){
+                        System.out.println("\t\t\tPlease enter again");
+                    }
+                }while(isHouseIdExists(houseid));
+
+
+                amount= InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
+
+
+
+                datereceived= InputValidator1.validateDateInput("\t\t\tEnter New Date Received with format dd/MM/yyyy:  ");
 
 
                 try {
@@ -267,9 +302,67 @@ public class DistributionManager {
         }
         return exists;
     }
+    //Kiểm tra id commission
+    public boolean isCommissionIdExists(int id) {
+        boolean exists = false;
+        try {
+            JDBCQuery1.openConnection();
+
+            String sql = "SELECT COUNT(*) FROM Commission WHERE id = ?";
+            Object[] params = {id};
+
+            ResultSet rs = JDBCQuery1.executeSelectQuery(sql, params);
+
+            if (rs.next()) {
+                int count = rs.getInt(1);
+                exists = (count > 0);
+            }
+        } catch (SQLException ex) {
+            ex.printStackTrace();
+        } finally {
+            JDBCQuery1.closeConnection();
+        }
+        return exists;
+    }
+
+    //Kiểm tra id House tồn tại chưa
+    public boolean isHouseIdExists(int id){
+        boolean exists=false;
+        try {
+            JDBCQuery1.openConnection();
+            String sql ="Select count (*) from House where id=?";
+            Object[] parms={id};
+
+            ResultSet rs=JDBCQuery1.executeSelectQuery(sql, parms);
+            if(rs.next()){
+                int count= rs.getInt(1);
+                exists=(count>0);
+
+            }
+        }catch (SQLException ex){
+            ex.printStackTrace();
+        }finally {
+            JDBCQuery1.closeConnection();
+        }
+        return exists;
+    }
+
+
+
+
+    public static void displayDistribution1(ArrayList<Distribution> distributions) {
+        System.out.println("\t\t\tID\t|\tCommissionID|\tHouseHoldID\t|\tAmountReceived\t|\tDateReceived");
+
+        for (Distribution di : distributions) {
+            System.out.println("\t\t\t" + di.getId() + "\t|\t\t" + di.getCommissionId() +"\t\t|\t\t"+
+                    di.getHouseholdID() +"\t\t|\t\t"+ di.getAmountReceived()+"\t|\t" + di.getDateReceived());
+        }
+    }
+
+
+
+
 
 
 
 }
-
-
