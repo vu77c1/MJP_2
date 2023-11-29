@@ -282,7 +282,7 @@ public class MainManager {
                     "\t\t\t0. Trở về menu chính");
             do {
                 try {
-                    System.out.print("\t\tEnter the program number: (0-10): ");
+                    System.out.print("\t\tEnter the program number: (0-18): ");
                     choice = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException input) {
                     System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-10)!\u001B[0m");
