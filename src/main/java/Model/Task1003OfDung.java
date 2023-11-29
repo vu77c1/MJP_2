@@ -38,7 +38,7 @@ public class Task1003OfDung {
     }
 
     public static void displayMenu() {
-        System.out.println(String.format("| %-50s |", "============= Tast 1002 Of Dung Menu ============="));
+        System.out.println(String.format("| %-50s |", "============= Tast 1003 Of Dung Menu ============="));
         System.out.println(String.format("| %-50s |", "--------------------------------------------------"));
         System.out.println(String.format("| %-50s |", "0. Exit program"));
         System.out.println(String.format("| %-50s |", "1. List details of distribution officer"));
