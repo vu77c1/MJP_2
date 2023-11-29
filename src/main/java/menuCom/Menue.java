@@ -17,7 +17,7 @@ public class Menue {
 		 Scanner scanner = new Scanner(System.in);
 		 public static boolean checkSpecialCharacter(String str) {
 			        // Kiểm tra xem chuỗi có chứa ký tự đặc biệt hay không
-			        return str.matches("^[a-z0-9 ]{0,255}$");
+			        return str.matches("^[a-zA-Z0-9 ]{0,255}$");
 			    }
 		 public static void checkString(String s) {
 				  int numberLeng;
@@ -105,12 +105,12 @@ public class Menue {
 				  result = CommissionDao.getInstant().selectAllCommissions();
 				  // kiem tra du lieu nhap co ton tai trong data khong
 				  for (Commission commission : result) {
-						   if (c.getPrecintName().equalsIgnoreCase(commission.getPrecintName()) == true
-						                         && c.getCityName().equalsIgnoreCase(
+						   if (c.getPrecintName().trim().equalsIgnoreCase(commission.getPrecintName()) == true
+						                         && c.getCityName().trim().equalsIgnoreCase(
 						                                               commission.getCityName()) == true
-						                         && c.getProvinceName().equalsIgnoreCase(
-						                                               commission.getProvinceName()) == true &&
-						                                               c.getOfficerId()==(commission.getOfficerId())) {
+						                         && c.getProvinceName().trim().equalsIgnoreCase(
+						                                               commission.getProvinceName()) == true 
+						                                               ) {
 								    check = 1;
 								    break;
 						   }
@@ -152,20 +152,17 @@ public class Menue {
 						   System.out.println("Input province name: ");
 						   String province_name = scanner.nextLine();
 						   checkString(province_name);
-						   System.out.println("Input officer id: ");
-						   String officerId = scanner.nextLine();
-						   String id1 = officerId.substring(officerId.indexOf("_") + 1);
-						   Integer officer_ID=Integer.valueOf(id1);
+						  
 						   // check ID officer_ID
-						   int checkIdOff = checkExistOfficerID(officerId);
-						   if (checkIdOff==1) {
+//						   int checkIdOff = checkExistOfficerID(officerId);
+//						   if (checkIdOff==1) {
 								    // tao doi tuong moi tu ban phim
-								    Commission commissionNew = new Commission(id, precint_name, city_name, province_name,officer_ID);
+								    Commission commissionNew = new Commission(id, precint_name, city_name, province_name);
 								    CommissionDao.getInstant().update(commissionNew);
 								    System.out.println("Update Success");
-						   }else {
-								    System.out.println("ID officer no exist");
-						   }
+//						   }else {
+//								    System.out.println("ID officer no exist");
+//						   }
 						   break;
 				  }
 
@@ -180,8 +177,8 @@ public class Menue {
 				  int n = Integer.parseInt(String.valueOf(input_int()));
 				  switch (n) {
 				  case 0:
-						   CommissionDao commissionDao1 = new CommissionDao();
-						   commissionDao1.printlnOffice(commissionDao1.selectAllOfficer());
+//						   CommissionDao commissionDao1 = new CommissionDao();
+//						   commissionDao1.printlnOffice(commissionDao1.selectAllOfficer());
 						   break;
 				  case 1:
 						   System.out.println("Connecting...");
@@ -202,20 +199,16 @@ public class Menue {
 						   System.out.println("Input province name: ");
 						   String province_name = scanner.nextLine();
 						   checkString(province_name);
-						   System.out.println("Input officer id: ");
-						   String officerId = scanner.nextLine();
-						   String id = officerId.substring(officerId.indexOf("_") + 1);
-						   Integer officer_ID=Integer.valueOf(id);
+						  
 						   System.out.println("Please...");
 						   // tao doi tuong moi tu ban phim
-						   Commission commissionNew = new Commission(precint_name, city_name, province_name,officer_ID);
-						   Commission commissionCheck = new Commission(precint_name, city_name, province_name,officer_ID);
+						   Commission commissionCheck = new Commission(precint_name, city_name, province_name);
 						   check = checkExistCommission(commissionCheck);// ham checkExistCommission() kiem tra
 						                                                 // ton tai cua doi tuoi commission
 						   if (check == 1) {
 								    System.out.println("Exist data!!");
 						   } else {
-								    CommissionDao.getInstant().insert(commissionNew);
+								    CommissionDao.getInstant().insert(commissionCheck);
 								    CommissionDao commissionInsert = new CommissionDao();
 								    commissionInsert.printlnCommissions(commissionInsert.selectAllCommissions());
 						   }

@@ -16,6 +16,7 @@ import Model.CitizenManager;
 import Model.CitizenObjectManager;
 import Model.HouseManager;
 import Model.PriorityObjectManager;
+import dao.CommissionDao;
 import menuCom.Menue;
 
 public class MainManager {
@@ -172,7 +173,8 @@ public class MainManager {
                     }
                     break;
                 case 11:
-                    System.out.println("Thống kê");
+               		  System.out.println("Thống kê");
+               		  CommissionDao.getInstant().fineHouseHoleNotReceived();
                     break;
                 case 0:
                     System.out.println("Close program.....");
