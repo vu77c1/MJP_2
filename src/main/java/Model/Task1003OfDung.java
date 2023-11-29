@@ -54,15 +54,6 @@ public class Task1003OfDung {
         System.out.println("Enter end date (yyyy/MM/dd):");
         String endDate = checkValidDate();
 
-//        String sql = "SELECT o.name, d.amount_received, od.date_distribution, od.address_distribution \n" +
-//                "from Officer as o \n" +
-//                "LEFT JOIN OfficerDistribution as od\n" +
-//                "on o.id = od.officer_id\n" +
-//                "LEFT JOIN Distribution as d\n" +
-//                "on d.id = od.distribution_id\n" +
-//                "WHERE od.date_distribution BETWEEN '" + startDate +  "' AND '" + endDate +  "'\n" +
-//                "OR od.address_distribution is null";
-
         String sql = "SELECT o.name, SUM(d.amount_received) AS total_amount, d.date_received, od.address_distribution\n" +
                 "FROM Officer AS o \n" +
                 "LEFT JOIN OfficerDistribution AS od ON o.id = od.officer_id\n" +
