@@ -320,6 +320,11 @@ public class MainManager {
             }
             while (choice == -1);
             switch (choice){
+                case 0:
+                    System.out.println("\t\t\tTrở về màn hình chính");
+                    waitForEnter();
+                    MainManager.main(new String[]{});
+                    break;
                 case 1:
                     break;
                 case 2:
@@ -363,11 +368,6 @@ public class MainManager {
                 case 18:
                     System.out.println("\t\t\tLiệt kê xem hộ dân X (X nhập từ bàn phím) đã nhận bao nhiêu lần quà từ tất cả các đợt ủng hộ và tổng giá trị quà nhận được của các đợt ủng hộ đó.\n");
                     statsCountSumAmount(con);
-                    break;
-                case 0:
-                    System.out.println("\t\t\tTrở về màn hình chính");
-                    waitForEnter();
-                    MainManager.main(new String[]{});
                     break;
                 default:
                     System.out.println("\t\t\t\u001B[31mChức năng không hợp lệ. Vui lòng chọn lại.\u001B[0m");

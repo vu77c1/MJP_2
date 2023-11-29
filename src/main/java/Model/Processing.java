@@ -5,7 +5,6 @@ import Common.InputValidator;
 
 import java.sql.*;
 import java.time.LocalDate;
-import java.time.YearMonth;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
@@ -14,7 +13,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Processing {
-    private static Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
     public static Connection con = DBConnect.connectDatabase();
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     public static void waitForEnter() {
@@ -34,28 +33,33 @@ public class Processing {
     }
 
     public static boolean isIDAlreadyExists(Connection con, int id, String tableName) {
-        String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE id = ?) THEN 1 ELSE 0 END";
         boolean idExist = false;
+        try {
+            // Validate the tableName to ensure it comes from a trusted source
+            // You may use a whitelist or other validation methods depending on your requirements
 
-        try (PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, id);
-            try (ResultSet rs = stmt.executeQuery()) {
-                if (rs.next()) {
-                    idExist = rs.getInt(1) == 1;
+            // Assuming tableName is a valid identifier
+            String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE id = ?) THEN 1 ELSE 0 END";
+            try (PreparedStatement stmt = con.prepareStatement(sql)) {
+                stmt.setInt(1, id);
+                try (ResultSet rs = stmt.executeQuery()) {
+                    if (rs.next()) {
+                        idExist = rs.getInt(1) == 1;
+                    }
                 }
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
             System.out.println("\t\t\t\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
-
         return idExist;
     }
+
 
     //	Nhap CCCD Va Validate
     public static String inputIdentityCard() {
         String identity;
-        boolean check = true;
+        boolean check;
         do {
             System.out.print("\t\t\tNhập vào số CCCD: ");
             identity = sc.nextLine().trim().replaceAll("\\s+", "");
@@ -85,7 +89,7 @@ public class Processing {
     //	Nhap Address Va Validate
     public static String inputAddress(Scanner sc) {
         String address;
-        boolean check = true;
+        boolean check;
         do {
             System.out.print("\t\t\tNhập vào địa chỉ ");
             address = sc.nextLine().trim().replaceAll("\\s+", " ");
@@ -109,7 +113,7 @@ public class Processing {
     //	Nhap Ho Va Ten Va Validate
     public static String inputFullName(Scanner sc) {
         String fullName;
-        boolean check = true;
+        boolean check;
         do {
             System.out.print("\t\t\tNhập vào họ và tên: ");
             fullName = sc.nextLine().trim().replaceAll("\\s+", " ");
@@ -139,7 +143,7 @@ public class Processing {
     //	Nhap So Dien Thoai Va Validate
     public static String inputPhone(Scanner sc) {
         String phone;
-        boolean check = true;
+        boolean check;
         do {
             System.out.print("\t\t\tNhập vào số điện thoại:");
             phone = sc.nextLine().trim().replaceAll("\\s+", "");
@@ -149,7 +153,7 @@ public class Processing {
                     check = true;
                 } else if (phone.charAt(0) != '0') {
                     check = false;
-                    System.out.println("\t\t\t\u001B[31mERROR: Số điện thoại nên bắt đầu bằng \'0\'!!!\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mERROR: Số điện thoại nên bắt đầu bằng '0'!!!\u001B[0m");
                 } else if (Processing.isSpecialCharacter(phone)) {
                     check = false;
                     System.out.println("\t\t\t\u001B[31mERROR: Số điện thoại không thể chứa các ký tự khác số!!!\u001B[0m");
@@ -171,6 +175,7 @@ public class Processing {
             Integer.parseInt(number);
             return true;
         } catch (Exception e) {
+            System.out.println("\t\t\t\u001B[31m Vui lòng nhập vào một số nguyên hợp lệ\u001B[0m");
         }
         return false;
     }
@@ -187,7 +192,7 @@ public class Processing {
     //	Kiem Tra Ky Tu Dac Biet
     public static boolean isSpecialCharacter(String ch) {
         for (int i = 0; i < ch.length(); i++) {
-            if (Pattern.matches("[@#$%^&*!?<>+=()_`~?;.\\\"]", ch.charAt(i) + "")) {
+            if (Pattern.matches("[@#$%^&*!?<>+=()_`~;.\\\"]", ch.charAt(i) + "")) {
                 return true;
             }
         }
