@@ -178,57 +178,6 @@ public class MainManager {
         }
         return n;
     }
-    public static void handleDonateDetailManager(Connection con) {
-        int choice = -1;
-        do{
-            System.out.println();
-            System.out.println("\t\tQuản lý danh sách chi tiết ủng hộ");
-            System.out.println("\t\t\t1. Hiển thị danh sách chi tiết ủng hộ");
-            System.out.println("\t\t\t2. Thêm thông tin chi tiết ủng hộ");
-            System.out.println("\t\t\t3. Sửa thông tin chi tiết ủng hộ");
-            System.out.println("\t\t\t4. Xóa thông tin ủng hộ");
-            System.out.println("\t\t\t0. Trở về menu chính");
-            System.out.println();
-            System.out.println("\t\tWhat do you want to choose?");
-
-
-            do {
-                try
-                {
-                    System.out.print("\t\t\tNhập vào số của chương trình: (0-4): ");
-                    choice = Integer.parseInt(sc.nextLine());
-                }
-                catch (NumberFormatException input)
-                {
-                    System.out.println("\t\t\t\u001B[31mKý tự nhập vào không hợp lệ!\n\t\t\tVui lòng nhập lại (0-4)!\u001B[0m");
-                }
-            }
-            while (choice == -1);
-            switch (choice) {
-                case 0:
-                    System.out.println("\t\t\tTrở về màn hình chính");
-                    waitForEnter();
-                    MainManager.main(new String[]{});
-                    break;
-                case 1:
-                    printDonateDetail(con);
-                    break;
-                case 2:
-                    addDonateDetail(con);
-                    break;
-                case 3:
-                    updateDonateDetail(con);
-                    break;
-                case 4:
-                    deleteDonateDetail(con);
-                    break;
-                default:
-                    System.out.println("\t\t\t\u001B[31mChức năng không hợp lệ. Vui lòng chọn lại.\u001B[0m");
-                    waitForEnter();
-            }
-        }
-        while (choice >=0 && choice <=4);
-    }
 
     public static void handleDistributionManager() {
         DistributionManager distributionManager=new DistributionManager();
