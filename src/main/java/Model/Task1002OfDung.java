@@ -13,6 +13,10 @@ public class Task1002OfDung {
     private static Connection connection = DBConnect.connectDatabase();
 
     public static void main(String[] args) throws SQLException {
+        Task1002OfDung.getTask1002OfDung();
+    }
+
+    public static void getTask1002OfDung() throws SQLException {
         displayMenu();
         int choice = 0;
         do {

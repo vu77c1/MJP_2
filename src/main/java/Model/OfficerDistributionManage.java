@@ -15,6 +15,10 @@ public class OfficerDistributionManage {
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) throws SQLException {
+        OfficerDistributionManage.getOfficerDistributionManage();
+    }
+
+    public static void getOfficerDistributionManage() throws SQLException {
         displayMenu();
         int choice = 0;
         do {

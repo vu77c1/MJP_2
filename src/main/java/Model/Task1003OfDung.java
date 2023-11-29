@@ -14,6 +14,10 @@ public class Task1003OfDung {
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) throws SQLException {
+        Task1003OfDung.getTask1003OfDung();
+    }
+
+    public static void getTask1003OfDung() throws SQLException {
         displayMenu();
         int choice = 0;
         do {

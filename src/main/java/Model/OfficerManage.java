@@ -11,38 +11,6 @@ public class OfficerManage {
     private static Connection connection = DBConnect.connectDatabase();
     public static void main(String[] args) throws SQLException {
         OfficerManage.getOfficerManage();
-//        displayMenu();
-//        int choice = 0;
-//        do {
-//            System.out.println("Enter your choice...");
-//            choice = checkInputInt();
-//
-//            switch (choice) {
-//                case 0:
-//                    connection.close();
-//                    System.out.println("\u001B[36m* Notification: Program is closed. Thank you for using our program!\u001B[0m");
-//                    break;
-//                case 1:
-//                    OfficerManage.addNewOfficer();
-//                    displayMenu();
-//                    break;
-//                case 2:
-//                    OfficerManage.updateOfficerTable();
-//                    displayMenu();
-//                    break;
-//                case 3:
-//                    OfficerManage.deleteOfficer();
-//                    displayMenu();
-//                    break;
-//                case 4:
-//                    OfficerManage.displayOfficerTable();
-//                    displayMenu();
-//                    break;
-//                default:
-//                    System.out.println("\u001B[31m* Warning: Input is invalid. Please try again!\u001B[0m");
-//                    break;
-//            }
-//        } while (choice != 0);
     }
 
     public static void getOfficerManage() throws SQLException {
