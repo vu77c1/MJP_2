@@ -5,6 +5,8 @@ import Common.DBConnect;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class OfficerManage {
     private static Scanner sc = new Scanner(System.in);
@@ -90,14 +92,19 @@ public class OfficerManage {
         int maxLengthPhoneNumber = 11;
         String phoneNumber = "";
         boolean isCheckStringLength1 = false;
+        boolean isCheckInputType = false;
         do {
             System.out.println("Input phone number:");
             phoneNumber = sc.next();
             isCheckStringLength1 = validateStringLength(phoneNumber, maxLengthPhoneNumber);
+            isCheckInputType = checkValidInputStringPhoneNumber(phoneNumber);
             if (isCheckStringLength1 == false) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 11 characters. Please try again!\u001B[0m");
             }
-        } while (isCheckStringLength1 == false);
+            if (isCheckInputType == false) {
+                System.out.println("\u001B[31m* Warning: Please enter 0-9\u001B[0m");
+            }
+        } while (isCheckStringLength1 == false || isCheckInputType == false);
 
         int maxLengthAddress = 255;
         String address = "";
@@ -471,5 +478,14 @@ public class OfficerManage {
             }
         }
         return count > 0;
+    }
+
+    // create method valid input String phone nummber (0-9)
+    private static boolean checkValidInputStringPhoneNumber(String input) {
+        String regex = "^[0-9]+$";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(input);
+
+        return matcher.matches();
     }
 }
