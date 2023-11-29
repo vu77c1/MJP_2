@@ -101,7 +101,8 @@ public class MainManager {
                     System.out.println("Citizen management");
 
                     ProcessPriorityDecision1 p = new ProcessPriorityDecision1();
-                    p.processPriorityDecision(sc,con);
+                   // p.processPriorityDecision(sc,con);
+                    p.checkHouse(con);
 
 
                     break;
@@ -130,9 +131,9 @@ public class MainManager {
 
 
     public static void handleDistributionManager() {
-        DistributionManager distributionManager=new DistributionManager();
+        DistributionManager distributionManager = new DistributionManager();
         int choice = -1;
-        do{
+        do {
 
             System.out.println("\t\t\tManage distribution lists");
             System.out.println("\t\t\t1. Show distribution list");
@@ -145,21 +146,18 @@ public class MainManager {
 
 
             do {
-                try
-                {
+                try {
                     System.out.print("\t\t\tEnter the program number: (0-4): ");
                     choice = Integer.parseInt(sc.nextLine());
-                }
-                catch (NumberFormatException input)
-                {
-                    System.out.println("\u001B[31mInvalid character entered!\nPlease re-enter (0-4)!\u001B[0m");
+                } catch (NumberFormatException input) {
+                    System.out.println("\t\t\t\u001B[31mInvalid character entered!\n\t\t\tPlease re-enter (0-4)!\u001B[0m");
                 }
             }
             while (choice == -1);
             switch (choice) {
                 case 0:
                     System.out.println("\t\t\tReturn to the main screen");
-                    waitForEnter();
+                    // waitForEnter();
                     main(new String[]{});
                     break;
                 case 1:
@@ -176,11 +174,11 @@ public class MainManager {
                     distributionManager.deleteDistribution();
                     break;
                 default:
-                    System.out.println("\u001B[31mInvalid function. Please re-enter.\u001B[0m");
-                    waitForEnter();
+                    System.out.println("\t\t\t\u001B[31mInvalid function. Please re-enter.\u001B[0m\n");
+
             }
         }
-        while (choice >=0 && choice <=4);
+        while (choice!=0);
     }
 
 
