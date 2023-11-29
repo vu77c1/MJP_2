@@ -3,10 +3,10 @@ package Model;
 import Common.InputValidator;
 import Common.JDBCQuery;
 
-import java.sql.ResultSet;
-import java.sql.ResultSetMetaData;
-import java.sql.SQLException;
+import java.sql.*;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
 
 public class PriorityObjectManager {
     //Lay tat ca thong tin PriorityObject trong databse khong truyen tham so
@@ -158,7 +158,7 @@ public class PriorityObjectManager {
 
     //hien thi danh sach PriorityObject
     public void displayPriorityObjects(ArrayList<PriorityObject> priorityObjects) {
-        System.out.println("\t\t\tID\tObject Type");
+        System.out.println("\t\t\t\u001B[1mID\tOBJECT_TYPE\u001B[0m");
 
         for (PriorityObject priorityObject : priorityObjects) {
             System.out.println("\t\t\t" + priorityObject.getId() + "\t" + priorityObject.getObjectType());
@@ -188,99 +188,6 @@ public class PriorityObjectManager {
         return exists;
     }
 
-    //'- Hiển thị thông tin các hộ dân liên quan đến đối tượng ưu tiên X (X nhập từ bàn phím)
-    public   ResultSet searchByPriorityObject()
-    {
-        ResultSet rs=null;
-        try {
-            JDBCQuery.openConnection();
-            String sql= """
-                    SELECT cz.name,cz.identity_card,FORMAT (cz.date_of_birth, 'dd-MM-yyyy') as date_of_birth,cz.phone_number,cz.address,
-                                                CASE  WHEN cz.sex = 1  THEN 'Nam' WHEN cz.sex = 0 THEN 'Nữ' ELSE '' END AS sex, po.object_type,
-                                                CASE  WHEN cz.is_household_lord=1 THEN 'Chu ho' END as is_household_lord
-                                                FROM Citizen as cz
-                                                JOIN House as h on cz.house_id=h.id
-                                                JOIN PriorityObject as po on h.priority_object_id=po.id
-                                                WHERE cz.is_household_lord=1
-                    """;
-            rs = JDBCQuery.executeSelectQuery(sql);
 
-
-        }
-        catch (Exception exception)
-        {
-            exception.printStackTrace();
-
-        }
-        finally {
-            //JDBCQuery.closeConnection();
-
-        }
-        return rs;
-    }
-    public void printSearchByPriorityObject() {
-        System.out.println("List citizens who are household lords");
-        printResultSet(searchByPriorityObject());
-
-        System.out.println("Search by Priority Object");
-        String name = InputValidator.validateStringPriorityObject("Enter object type: ");
-        try {
-            ResultSet rs = searchByPriorityObject();
-
-            // Check if the ResultSet is not null
-            if (rs != null) {
-                // Get metadata to retrieve column names
-                ResultSetMetaData metaData = rs.getMetaData();
-                int columnCount = metaData.getColumnCount();
-
-                // Print column headers
-                for (int i = 1; i <= columnCount; i++) {
-                    System.out.printf("%-25s", metaData.getColumnLabel(i));
-                }
-                System.out.println();
-
-                // Print data
-                while (rs.next()) {
-                    // Check if the object_type contains the specified substring
-                    if (rs.getString("object_type").toLowerCase().contains(name.toLowerCase())) {
-                        for (int i = 1; i <= columnCount; i++) {
-                            System.out.printf("%-25s", rs.getString(i));
-                        }
-                        System.out.println();
-                    }
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-
-    public void printResultSet(ResultSet rs) {
-        try {
-            // Check if the ResultSet is not null
-            if (rs != null) {
-                // Get metadata to retrieve column names
-                ResultSetMetaData metaData = rs.getMetaData();
-                int columnCount = metaData.getColumnCount();
-
-                // Print column headers
-                for (int i = 1; i <= columnCount; i++) {
-                    System.out.printf("%-25s", metaData.getColumnLabel(i));
-                }
-                System.out.println();
-
-                // Print data
-                while (rs.next()) {
-                    for (int i = 1; i <= columnCount; i++) {
-                        System.out.printf("%-25s", rs.getString(i));
-                    }
-                    System.out.println();
-                }
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
 
 }

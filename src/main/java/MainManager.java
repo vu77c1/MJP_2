@@ -1,5 +1,9 @@
 import Common.InputValidator;
+import Common.JDBCQuery;
+import Common.JdbcConfig;
 import Model.CitizenObjectManager;
+import Model.CitizenReport;
+import Model.DistributionReport;
 import Model.PriorityObjectManager;
 
 import java.util.Scanner;
@@ -166,9 +170,13 @@ public class MainManager {
 
                     break;
                 case 11:
-                    System.out.println("Thống kê");
-                    PriorityObjectManager priorityObjectManager=new PriorityObjectManager();
-                    priorityObjectManager.printSearchByPriorityObject();
+                   // System.out.println("Thống kê");
+                    //CitizenReport citizenReport=new CitizenReport();
+                  //  citizenReport.printSearchByCitizenObject();
+                 //  System.out.println("List the top 5 households with the most priority beneficiaries");
+                 //   citizenReport.printCitizenObjectTop5();
+                    DistributionReport distributionReport=new DistributionReport();
+                    distributionReport.printDistributionReport();
 
                     break;
                 case 0:
