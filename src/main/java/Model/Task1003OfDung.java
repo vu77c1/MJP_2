@@ -13,7 +13,6 @@ public class Task1003OfDung {
     private static Connection connection = DBConnect.connectDatabase();
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-
     public static void main(String[] args) throws SQLException {
         displayMenu();
         int choice = 0;
@@ -48,6 +47,7 @@ public class Task1003OfDung {
     public static void listDetailsDistributionOfficer() throws SQLException {
         Statement st = connection.createStatement();
 
+        // Each batch of statistics is a month, enter the start date and end date as one batch
         System.out.println("Enter start date (yyyy/MM/dd):");
         String startDate = checkValidDate();
 
