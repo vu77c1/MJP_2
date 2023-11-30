@@ -1,11 +1,15 @@
 package Model;
 
 import Common.InputValidator;
+import Common.InputValidatorKhue;
 import Common.JDBCQuery;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
+
+import static Common.JdbcConfig.connection;
 
 public class CitizenObjectManager {
     //Lay tat ca thong tin CitizenObject trong databse khong truyen tham so
@@ -186,4 +190,5 @@ public class CitizenObjectManager {
         }
         return exists;
     }
+
 }

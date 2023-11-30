@@ -47,7 +47,7 @@ public class RepresentativeManager {
                     case 3:
                         // Xóa người đại diện
                         int representativeIdToDelete = InputValidatorKhue.validateIntInput("Input representative ID you need to delete: ");
-                        representativeManager.updateRepresentativeidForDonateDetail(representativeIdToDelete);
+                        representativeManager.deleteRepresentativeidForDonateDetail(representativeIdToDelete);
                         representativeManager.deleteRepresentative(representativeIdToDelete);
                         break;
                     case 4:
