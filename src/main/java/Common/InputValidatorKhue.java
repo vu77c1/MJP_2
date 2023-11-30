@@ -25,9 +25,8 @@ public class InputValidatorKhue {
 
         return userInput;
     }
-
-    //kiem tra input dau vao PriorityObject
-    public static String validateString(String prompt) {
+//kiem tra input dau vao PriorityObject
+    public static String validateStringRepresentative(String prompt) {
         String userInput = "";
         boolean isValid = false;
 
@@ -54,7 +53,7 @@ public class InputValidatorKhue {
         return userInput;
     }
 
-    public static String validateStringNumber(String prompt) {
+    public static String validateStringCompany(String prompt) {
         String userInput = "";
         boolean isValid = false;
 
@@ -65,12 +64,7 @@ public class InputValidatorKhue {
                 if (userInput.length() <= 255) {
 
                     if (!containsSpecialCharacter(userInput)) {
-                        if (isNumericString(userInput)) {
-                            isValid = true;
-                        } else {
-                            System.out.println("\t\t\tNo type from 0 to 9");
-                        }
-
+                        isValid = true;
                     } else {
                         System.out.println("\t\t\tThe string does not contain any special characters.");
                     }
@@ -86,16 +80,10 @@ public class InputValidatorKhue {
         return userInput;
     }
 
-
     //ham kiểm tra kí tự đặc biệt
     private static boolean containsSpecialCharacter(String str) {
         // Sử dụng biểu thức chính quy để kiểm tra xem chuỗi có chứa ký tự đặc biệt không
         return str.matches(".*[!@#$%^&*()_+{}|\"<>?].*");
-    }
-
-    // Kiểm tra kí tự 0-9
-    private static boolean isNumericString(String inputString) {
-        return inputString.matches("\\d+");
     }
 
     public static double validateDoubleInput(String prompt) {
@@ -123,14 +111,8 @@ public class InputValidatorKhue {
             try {
                 System.out.print(prompt);
                 userInput = Integer.parseInt(scanner.nextLine());
-                if (userInput > 0) {
-                    isValid = true;
-                } else {
-                    isValid = false;
-                    System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
-                }
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
+                System.out.println("Error: Please enter a valid integer");
             }
         } while (!isValid);
 
