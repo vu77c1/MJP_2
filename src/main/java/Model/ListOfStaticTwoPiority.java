@@ -27,7 +27,7 @@ public class ListOfStaticTwoPiority {
         try {
             st =connection.createStatement();
             System.out.println();
-            System.out.println("Hộ khẩu có 2 đối tượng ưu tiên trở lên");
+            System.out.println("Household is donate two:");
             rs = st.executeQuery("""
                     SELECT  name, is_household_lord FROM (SELECT dbo.Citizen.name, is_household_lord FROM (SELECT Count(dbo.Citizen.id) AS total, house_id FROM\s
                     Citizen Join dbo.CitizenObject CO on Citizen.citizen_object_id = CO.id\s
@@ -42,7 +42,7 @@ public class ListOfStaticTwoPiority {
             InputValidatorKhue.waitForEnter();
         }catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+            System.out.println("Error in the database connection process");
         }finally {
             if(rs!=null){
                 rs.close();
