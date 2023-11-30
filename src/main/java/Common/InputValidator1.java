@@ -5,8 +5,28 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
-public class InputValidatorKhue {
+public class InputValidator1 {
     private static Scanner scanner = new Scanner(System.in);
+
+    public static Date validateDateInput(String prompt) {
+        Date date = null;
+        boolean isValid = false;
+
+        do {
+            try {
+                System.out.print(prompt);
+                String dateString = scanner.nextLine().trim();
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                dateFormat.setLenient(false);
+                date = dateFormat.parse(dateString);
+                isValid = true;
+            } catch (ParseException ex) {
+                System.out.println("\u001B[31m\t\t\tError: Please enter a valid date in the format 'yyyy/MM/dd'.\u001B[0m");
+            }
+        } while (!isValid);
+
+        return date;
+    }
 
     public static String validateStringInput(String prompt) {
         String userInput = "";
@@ -19,15 +39,14 @@ public class InputValidatorKhue {
             if (!userInput.isEmpty()) {
                 isValid = true;
             } else {
-                System.out.println("Error: Input cannot be empty.");
+                System.out.println("\u001B[31mError: Input cannot be empty.\u001B[0m");
             }
         } while (!isValid);
 
         return userInput;
     }
-
     //kiem tra input dau vao PriorityObject
-    public static String validateString(String prompt) {
+    public static String validateStringPriorityObject(String prompt) {
         String userInput = "";
         boolean isValid = false;
 
@@ -40,21 +59,20 @@ public class InputValidatorKhue {
                     if (!containsSpecialCharacter(userInput)) {
                         isValid = true;
                     } else {
-                        System.out.println("\t\t\tThe string does not contain any special characters.");
+                        System.out.println("\u001B[31m\t\t\tThe string does not contain any special characters.\u001B[0m");
                     }
                 } else {
-                    System.out.println("\t\t\tDo not exceed 255 characters");
+                    System.out.println("\u001B[31m\t\t\tDo not exceed 255 characters\u001B[0m");
                 }
             } else {
-                System.out.println("\t\t\tError: Input cannot be empty.");
+                System.out.println("\u001B[31m\t\t\tError: Input cannot be empty.\u001B[0m");
             }
 
         } while (!isValid);
 
         return userInput;
     }
-
-    public static String validateStringNumber(String prompt) {
+    public static String validateStringCitizenObject(String prompt) {
         String userInput = "";
         boolean isValid = false;
 
@@ -65,20 +83,15 @@ public class InputValidatorKhue {
                 if (userInput.length() <= 255) {
 
                     if (!containsSpecialCharacter(userInput)) {
-                        if (isNumericString(userInput)) {
-                            isValid = true;
-                        } else {
-                            System.out.println("\t\t\tNo type from 0 to 9");
-                        }
-
+                        isValid = true;
                     } else {
-                        System.out.println("\t\t\tThe string does not contain any special characters.");
+                        System.out.println("\u001B[31m\t\t\tThe string does not contain any special characters.\u001B[0m");
                     }
                 } else {
-                    System.out.println("\t\t\tDo not exceed 255 characters");
+                    System.out.println("\u001B[31m\t\t\tDo not exceed 255 characters\u001B[0m");
                 }
             } else {
-                System.out.println("\t\t\tError: Input cannot be empty.");
+                System.out.println("\u001B[31m\t\t\tError: Input cannot be empty.\u001B[0m");
             }
 
         } while (!isValid);
@@ -86,29 +99,23 @@ public class InputValidatorKhue {
         return userInput;
     }
 
-
     //ham kiểm tra kí tự đặc biệt
     private static boolean containsSpecialCharacter(String str) {
         // Sử dụng biểu thức chính quy để kiểm tra xem chuỗi có chứa ký tự đặc biệt không
         return str.matches(".*[!@#$%^&*()_+{}|\"<>?].*");
     }
 
-    // Kiểm tra kí tự 0-9
-    private static boolean isNumericString(String inputString) {
-        return inputString.matches("\\d+");
-    }
-
-    public static double validateDoubleInput(String prompt) {
+    public static double validateFloatInput(String prompt) {
         double userInput = 0.0;
         boolean isValid = false;
 
         do {
             try {
                 System.out.print(prompt);
-                userInput = Double.parseDouble(scanner.nextLine());
+                userInput = Float.parseFloat(scanner.nextLine());
                 isValid = true;
             } catch (NumberFormatException ex) {
-                System.out.println("Error: Please enter a valid double.");
+                System.out.println("\t\t\t\u001B[31mError: Please enter a valid float.\u001B[0m");
             }
         } while (!isValid);
 
@@ -123,32 +130,31 @@ public class InputValidatorKhue {
             try {
                 System.out.print(prompt);
                 userInput = Integer.parseInt(scanner.nextLine());
-                if (userInput > 0) {
+                if (userInput>0){
                     isValid = true;
-                } else {
-                    isValid = false;
-                    System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
+                }else {
+                    System.out.println("\t\t\tPlease enter again. Value > 0");
                 }
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
             }
         } while (!isValid);
 
         return userInput;
     }
 
-    public static void closeScanner() {
-        scanner.close();
+    public static boolean isIntMoreThan0(double a) {
+        boolean isValid = false;
+//        a = scanner.nextInt();
+        if (a > 0) {
+            isValid = true;
+        }
+        return isValid;
     }
 
-    public static void waitForEnter() {
-        while (true) {
-            System.out.println("\u001B[32mNhấn 'Enter' để quay lại menu...\u001B[0m");
-            String input = scanner.nextLine();
-            if (input.isEmpty()) {
-                // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
-                break;
-            }
+    public static void closeScanner() {
+        if (scanner != null) {
+            scanner.close();
         }
     }
 

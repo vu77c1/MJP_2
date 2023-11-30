@@ -1,16 +1,24 @@
 package Model;
 
 import Common.InputValidator;
+<<<<<<< HEAD
 import Common.InputValidatorKhue;
+=======
+>>>>>>> 5ba1ee1f7e8fb04bd14b58ca86f6be34ff575aee
 import Common.JDBCQuery;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
+<<<<<<< HEAD
 import java.sql.Statement;
 import java.util.ArrayList;
 
 import static Common.JdbcConfig.connection;
 
+=======
+import java.util.ArrayList;
+
+>>>>>>> 5ba1ee1f7e8fb04bd14b58ca86f6be34ff575aee
 public class CitizenObjectManager {
     //Lay tat ca thong tin CitizenObject trong databse khong truyen tham so
     public ArrayList<CitizenObject> getCitizenObject() {
@@ -190,5 +198,8 @@ public class CitizenObjectManager {
         }
         return exists;
     }
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5ba1ee1f7e8fb04bd14b58ca86f6be34ff575aee
 }
