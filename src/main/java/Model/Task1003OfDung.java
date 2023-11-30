@@ -59,7 +59,7 @@ public class Task1003OfDung {
             System.out.println("Enter start date (yyyy/MM/dd):");
             startDate = checkValidDate();
             if (!isValidDateFormat(startDate)) {
-                System.out.println("\u001B[31m* Warning: Please enter follow format (yyyy/MM/dd).\u001B[0m ");
+                System.out.println("\u001B[31m* Warning: Please enter according to format (yyyy/MM/dd).\u001B[0m ");
             }
         } while (!isValidDateFormat(startDate));
 
@@ -70,7 +70,7 @@ public class Task1003OfDung {
             if (!checkDateInput(startDate,endDate)) {
                 System.out.println("\u001B[31m* Warning: End date must be after Start date.\u001B[0m");
             } else if (!isValidDateFormat(endDate)) {
-                System.out.println("\u001B[31m* Warning: Please enter follow format (yyyy/MM/dd).\u001B[0m ");
+                System.out.println("\u001B[31m* Warning: Please enter according to format (yyyy/MM/dd).\u001B[0m ");
             }
         } while (!checkDateInput(startDate,endDate) || !isValidDateFormat(endDate));
 
