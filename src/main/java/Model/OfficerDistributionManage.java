@@ -111,7 +111,7 @@ public class OfficerDistributionManage {
             System.out.println("Enter date distribution (yyyy/MM/dd):");
             dateDistribution = checkValidDate();
             if (!isValidDateFormat(dateDistribution)) {
-                System.out.println("\u001B[31m* Warning: Please enter follow format (yyyy/MM/dd).\u001B[0m ");
+                System.out.println("\u001B[31m* Warning: Please enter according to format (yyyy/MM/dd).\u001B[0m ");
             }
         } while (!isValidDateFormat(dateDistribution));
 
@@ -367,7 +367,7 @@ public class OfficerDistributionManage {
             System.out.println("Enter new date distribution (yyyy/MM/dd):");
             newDateDistribution = checkValidDate();
             if (!isValidDateFormat(newDateDistribution)) {
-                System.out.println("\u001B[31m* Warning: Please enter follow format (yyyy/MM/dd).\u001B[0m ");
+                System.out.println("\u001B[31m* Warning: Please enter according to format (yyyy/MM/dd).\u001B[0m ");
             }
         } while (!isValidDateFormat(newDateDistribution));
 
