@@ -122,6 +122,7 @@ public class MainManager {
                                 break;
                             case 0:
                                 System.out.println("\t\t\tExiting Priority Object Management...");
+                                choose = 0;
                                 break;
                             default:
                                 System.out.println("\t\t\tInvalid choice. Please enter a valid option.");

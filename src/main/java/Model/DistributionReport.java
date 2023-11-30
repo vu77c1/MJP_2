@@ -18,8 +18,8 @@ public class DistributionReport {
             JDBCQuery.openConnection();
             String sql = """
                     WITH B AS (
-                        SELECT commission_id, SUM(amount_received) as total_amount_received  FROM Distribution st
-                        WHERE st.household_id is not null AND MONTH(st.date_received)=? AND YEAR(st.date_received)=?
+                        SELECT commission_id, SUM(amount_distribution) as total_amount_received  FROM Distribution st
+                        WHERE st.household_id is not null AND MONTH(st.date_distribution)=? AND YEAR(st.date_distribution)=?
                         GROUP BY commission_id
                                         
                     ),
@@ -74,12 +74,12 @@ public class DistributionReport {
             int year;
             do {
                 year=  InputValidator.validateIntInput("Enter Year: ");
-                if (year>0)
+                if (year>0&&Integer.toString(year).length()==4)
                 {
                     check=true;
                 }
                 else {
-                    System.out.println("Error year not <=0");
+                    System.out.println("Error year not <=0 and length=4 char....");
                     check=false;
                 }
 
