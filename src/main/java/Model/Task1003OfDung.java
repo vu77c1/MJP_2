@@ -54,19 +54,25 @@ public class Task1003OfDung {
         Statement st = connection.createStatement();
 
         // Each batch of statistics is a month, enter the start date and end date as one batch
-        System.out.println("Enter start date (yyyy/MM/dd):");
-        String startDate = checkValidDate();
+        String startDate = "";
+        do {
+            System.out.println("Enter start date (yyyy/MM/dd):");
+            startDate = checkValidDate();
+            if (!isValidDateFormat(startDate)) {
+                System.out.println("\u001B[31m* Warning: Please enter follow format (yyyy/MM/dd).\u001B[0m ");
+            }
+        } while (!isValidDateFormat(startDate));
 
-        boolean isValid = false;
         String endDate = "";
         do {
             System.out.println("Enter end date (yyyy/MM/dd):");
             endDate = checkValidDate();
-            isValid = checkDateInput(startDate,endDate);
-            if (isValid == false) {
+            if (!checkDateInput(startDate,endDate)) {
                 System.out.println("\u001B[31m* Warning: End date must be after Start date.\u001B[0m");
+            } else if (!isValidDateFormat(endDate)) {
+                System.out.println("\u001B[31m* Warning: Please enter follow format (yyyy/MM/dd).\u001B[0m ");
             }
-        } while (isValid == false);
+        } while (!checkDateInput(startDate,endDate) || !isValidDateFormat(endDate));
 
         String sql = "SELECT o.name, SUM(d.amount_received) AS total_amount, d.date_received, od.address_distribution\n" +
                 "FROM Officer AS o \n" +
@@ -129,6 +135,17 @@ public class Task1003OfDung {
             }
         }
         return checkDate;
+    }
+
+    private static boolean isValidDateFormat(String dateStr) {
+        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy/MM/dd");
+        dateFormat1.setLenient(false);
+        try {
+            Date date = dateFormat1.parse(dateStr);
+            return dateStr.equals(dateFormat1.format(date));
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
     // create method check input Int
