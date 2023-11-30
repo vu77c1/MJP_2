@@ -11,7 +11,7 @@ import static Model.DistributionManager.printDistribution;
 import static Model.Processing.*;
 
 public class DonateDetailManager {
-    private  static final Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
 
     public static void handleDonateDetailManager(Connection con) {
         int choice = -1;
@@ -25,14 +25,13 @@ public class DonateDetailManager {
             System.out.println("\t\t\t0. Return to main menu");
             System.out.println();
             System.out.println("\t\tWhat do you want to choose?");
-
-
             do {
                 try {
-                    System.out.print("\t\t\tEnter function number: (0-4): ");
-                    choice = sc.nextInt();
+                    //System.out.print("\t\t\tEnter function number: (0-4): ");
+                    choice = Processing.validateIntInput("\t\t\tEnter function number: (0-4): ");
                 } catch (NumberFormatException input) {
                     System.out.println("\t\t\t\u001B[31mThe entered character is not valid!\n\t\t\tPlease input again: (0-4)!\u001B[0m");
+                    waitForEnter();
                 }
             } while (choice == -1);
             switch (choice) {
@@ -63,15 +62,16 @@ public class DonateDetailManager {
                 default:
                     System.out.println("\t\t\t\u001B[31mFunction is invalid. Please select again.\u001B[0m");
                     waitForEnter();
+                    choice = -1;
             }
-        } while (choice >= 0 && choice <= 4);
+        } while (choice != 0);
     }
 
     public static void printDonateDetail(Connection con) {
         try {
             if (countRecords(con, "DonateDetail") > 0) {
                 System.out.println();
-                System.out.println("========================================================== DONATION LIST ============================================================");
+                System.out.println("=========================================================== DONATION LIST ===========================================================");
                 System.out.println("._______.____________________.____________________.____________________.________________________.______________________.____________.");
                 System.out.println("│   ID  │   Amount of money  │   Donation Date    │    Commune/Ward    │      Representative    │      Company name    │   Officer  │");
                 System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
@@ -104,7 +104,7 @@ public class DonateDetailManager {
                     System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
                     System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
                 }
-                System.out.println("================================================================= LIST ENDED ========================================================");
+                System.out.println("===========================================================   LIST ENDED  ===========================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
             }
@@ -140,7 +140,7 @@ public class DonateDetailManager {
                 if (countRecords(con, "DonateDetail") > 0) {
                     while (resultSet.next()) {
                         System.out.println();
-                        System.out.println("========================================================== DONATION LIST ============================================================");
+                        System.out.println("=========================================================== DONATION LIST ===========================================================");
                         System.out.println("._______.____________________.____________________.____________________.________________________.______________________.____________.");
                         System.out.println("│   ID  │   Amount of money  │   Donation Date    │    Commune/Ward    │      Representative    │      Company name    │   Officer  │");
                         System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
@@ -153,7 +153,7 @@ public class DonateDetailManager {
                         System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
                         System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
                     }
-                    System.out.println("================================================================= LIST ENDED ========================================================");
+                    System.out.println("===========================================================   LIST ENDED  ===========================================================");
                 } else {
                     System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
                 }
@@ -219,29 +219,26 @@ public class DonateDetailManager {
 //			Kiem Tra Su Ton Tai Cua record, Neu Ton Tai Thi Tien Hanh Xoa
             if (Processing.isIDAlreadyExists(con, identity, tableName)) {
                 String choice;
-                System.out.print("\t\t\tAre you sure you want to delete (Y/N)?");
-                // Consume the newline character left in the buffer
-                sc.nextLine();
+                System.out.print("\t\t\tAre you sure you want to delete (Y/N)? ");
                 do {
-                    choice = sc.nextLine().trim();
-                    if (!("Y".equalsIgnoreCase(choice) || "N".equalsIgnoreCase(choice))) {
+                    choice = sc.nextLine().trim().toLowerCase();  // Convert to lowercase
+
+                    if ("y".equalsIgnoreCase(choice)) {
+                        // Delete the record
+                        String sqlDelete = "DELETE FROM DonateDetail WHERE ID=?";
+                        pstmt = con.prepareStatement(sqlDelete);
+                        pstmt.setInt(1, identity);
+                        if (pstmt.executeUpdate() != 0) {
+                            System.out.println("\t\t\t\u001B[32mDeleted successfully!!!\u001B[0m");
+                            waitForEnter();
+                        }
+                    } else if ("n".equalsIgnoreCase(choice)) {
+                        System.out.println("\t\t\t\u001B[31mINFO: No results were deleted!!!\u001B[0m");
+                        waitForEnter();
+                    } else {
                         System.out.print("\t\t\tInvalid choice. Please enter (Y/N): ");
                     }
-                } while (!("Y".equalsIgnoreCase(choice) || "N".equalsIgnoreCase(choice)));
-
-                if ("Y".equalsIgnoreCase(choice)) {
-                    // Delete the record
-                    String sqlDelete = "DELETE FROM DonateDetail WHERE ID=?";
-                    pstmt = con.prepareStatement(sqlDelete);
-                    pstmt.setInt(1, identity);
-                    if (pstmt.executeUpdate() != 0) {
-                        System.out.println("\t\t\t\u001B[32mDeleted successfully!!!\u001B[0m");
-                        waitForEnter();
-                    }
-                } else {
-                    System.out.println("\t\t\t\u001B[31mINFO: No results were deleted!!!\u001B[0m");
-                    waitForEnter();
-                }
+                } while (!"y".equalsIgnoreCase(choice) && !"n".equalsIgnoreCase(choice));
             } else {
                 System.out.println("\t\t\t\u001B[31mThe result does not exist in the Database!!!\u001B[0m");
                 waitForEnter();
@@ -259,6 +256,7 @@ public class DonateDetailManager {
 
     //	Chuc Nang Cap Nhat Thong Tin Khach Hang
     public static void updateDonateDetail(Connection con) {
+
         System.out.println();
         System.out.print("\t\t\t\u001B[31mYou are about to edit a record for a sponsor's donation.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\n\t\t\t(For related tables please refer to the menu \"Representative Management\" và \" Commission Management\")\n\u001B[0m");
         waitForEnter();
@@ -269,10 +267,10 @@ public class DonateDetailManager {
         waitForEnter();
         System.out.println();
         PreparedStatement pstmt = null;
-//		Kiem Tra id Da Co Trong Bang Khang Hang Hay Chua? Neu Co Thi Tien Hanh Update
+        //Kiem Tra id Da Co Trong Bang Khang Hang Hay Chua? Neu Co Thi Tien Hanh Update
         if (Processing.isIDAlreadyExists(con, identity, "DonateDetail")) {
             int choice;
-//			Hien Thi Menu Update
+            //Hien Thi Menu Update
             do {
                 System.out.println("\t\t\t+-----------------------------------+");
                 System.out.println("\t\t\t│ Which item do you want to update? │");
@@ -288,11 +286,11 @@ public class DonateDetailManager {
             } while (choice == -1);
 
             switch (choice) {
-//			Update Số tiền
                 case 0:
                     System.out.println("\t\t\tBack to menu");
                     handleDonateDetailManager(con);
                     break;
+                //Update Số tiền
                 case 1:
                     double newAmount = InputValidator.validateDoubleInput("\t\t\tEnter amount: ");
                     String sql1 = "UPDATE DonateDetail SET amount =? WHERE id =?";
@@ -312,11 +310,13 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.print("\t\t\tDo you want to continue editing (Y/N)?");
-                            String c = sc.nextLine();
-                            if ("Y".equalsIgnoreCase(c)) {
+                            System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
+                            String c = sc.next();
+                            sc.nextLine(); // Consume the newline character
+
+                            if ("Y".equalsIgnoreCase(c) || "y".equalsIgnoreCase(c)) {
                                 updateDonateDetail(con);
-                            } else if ("N".equalsIgnoreCase(c)) {
+                            } else if ("N".equalsIgnoreCase(c) || "n".equalsIgnoreCase(c)) {
                                 break;
                             } else {
                                 System.out.println("\t\t\t\u001B[31mThe input selection is incorrect, please re-enter!!!\u001B[0m");
@@ -325,7 +325,7 @@ public class DonateDetailManager {
                         waitForEnter();
                     }
                     break;
-//			Update ngày ủng hộ
+                //Update ngày ủng hộ
                 case 2:
                     String sql2 = "UPDATE DonateDetail SET donate_date =? WHERE id =?";
                     LocalDate newDonateDate = Processing.validateDateInput("\t\t\tEnter a new receipt date (in dd/MM/yyyy format): ");
@@ -345,8 +345,10 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.print("\t\t\tDo you want to continue editing (Y/N)?");
-                            String c = sc.nextLine();
+                            System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
+                            String c = sc.next();
+                            sc.nextLine(); // Consume the newline character
+
                             if ("Y".equalsIgnoreCase(c)) {
                                 updateDonateDetail(con);
                             } else if ("N".equalsIgnoreCase(c)) {
@@ -358,7 +360,7 @@ public class DonateDetailManager {
                         waitForEnter();
                     }
                     break;
-//			Update ID Ủy ban
+                //Update ID Ủy ban
                 case 3:
                     System.out.println("\t\t\tEnter the Commission ID: ");
                     int newCommissionId = inputID(sc, "Commission", "id");
@@ -379,8 +381,10 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.print("\t\t\tDo you want to continue editing (Y/N)?");
-                            String c = sc.nextLine();
+                            System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
+                            String c = sc.next();
+                            sc.nextLine(); // Consume the newline character
+
                             if ("Y".equalsIgnoreCase(c)) {
                                 updateDonateDetail(con);
                             } else if ("N".equalsIgnoreCase(c)) {
@@ -392,7 +396,7 @@ public class DonateDetailManager {
                         waitForEnter();
                     }
                     break;
-//			Update ID nguoi dai dien
+                //Update ID nguoi dai dien
                 case 4:
                     System.out.println("\t\t\tEnter the representative's ID: ");
                     int newRepresentativeId = inputID(sc, "Representative", "id");
@@ -413,8 +417,10 @@ public class DonateDetailManager {
                             System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
                         }
                         do {
-                            System.out.print("\t\t\tDo you want to continue editing (Y/N)?");
-                            String c = sc.nextLine();
+                            System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
+                            String c = sc.next();
+                            sc.nextLine(); // Consume the newline character
+
                             if ("Y".equalsIgnoreCase(c)) {
                                 updateDonateDetail(con);
                             } else if ("N".equalsIgnoreCase(c)) {
@@ -458,8 +464,10 @@ public class DonateDetailManager {
                         }
                     }
                     do {
-                        System.out.print("\t\t\tDo you want to continue editing (Y/N)?");
-                        String c = sc.nextLine();
+                        System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
+                        String c = sc.next();
+                        sc.nextLine(); // Consume the newline character
+
                         if ("Y".equalsIgnoreCase(c)) {
                             updateDonateDetail(con);
                         } else if ("N".equalsIgnoreCase(c)) {
@@ -513,7 +521,7 @@ public class DonateDetailManager {
                     System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", ID, companyName, precintName, Stats);
                     System.out.println("│_______│________________________│________________________│________________________│");
                 }
-                System.out.println("===================================== LIST ENDED ===================================");
+                System.out.println("==================================  LIST ENDED   ==================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
             }
@@ -566,7 +574,7 @@ public class DonateDetailManager {
                         System.out.println("│_______│________________________│________________________│________________________│");
                         i++;
                     }
-                    System.out.println("===================================== LIST ENDED ===================================");
+                    System.out.println("==================================   LIST ENDED   =================================");
                 } else {
                     System.out.println("\t\t\t\u001B[31mThere have been no donations yet\u001B[0m");
                 }
@@ -608,7 +616,7 @@ public class DonateDetailManager {
 
             if (countRecords(con, "DonateDetail") > 0) {
                 System.out.println();
-                System.out.println("================================================================ LIST OF HOUSEHOLDS ===========================================================");
+                System.out.println("================================================================ LIST OF HOUSEHOLDS =========================================================");
                 System.out.println("._______.________________________.________________________.________________________.___________________________.____________._______________.");
                 System.out.println("│   ID  │  Household Lord's Name │         Address        │     Citizen Objects    │     Household Objects     │    COUNT   │      SUM      │");
                 System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
@@ -625,7 +633,7 @@ public class DonateDetailManager {
                         System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │ %-25s │ %-10s │ %-13s │%n", houseID, citizenName, citizenAddress, typeNameObject, objectType, SL, TS);
                         System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
                     }
-                    System.out.println("================================================================ LIST ENDED =================================================================");
+                    System.out.println("============================================================     LIST ENDED     ============================================================");
                 }
             } else {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
@@ -638,7 +646,7 @@ public class DonateDetailManager {
 
 
     public static void displayAndSaveDistribution(Connection connection) {
-//        LocalDate userInputDate = Processing.validateDateInput("Nhập vào đợt ủng hộ: ");
+        //LocalDate userInputDate = Processing.validateDateInput("Nhập vào đợt ủng hộ: ");
         String userInputMonthYear = Processing.validateMonthYearInput("\t\t\tEnter the donation phase (MM/yyyy): ");
 
         // Assuming userInputMonthYear is a String in the format "MM/yyyy"
@@ -695,20 +703,6 @@ public class DonateDetailManager {
                  ORDER BY allocated_amount DESC;
                         """;
         try (PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
-/*
-            // Assuming userInputDate is a LocalDate
-            LocalDate thirtyDaysAgo = userInputDate.minusDays(30);
-
-            // Convert LocalDate to java.sql.Date
-            Date userInputSqlDate = Date.valueOf(userInputDate);
-            Date thirtyDaysAgoSqlDate = Date.valueOf(thirtyDaysAgo);
-
-            // Use in preparedStatement
-            preparedStatement.setDate(2, userInputSqlDate);
-            preparedStatement.setDate(1, thirtyDaysAgoSqlDate);
- Assuming userInputDate is a LocalDate
- Create a LocalDate for the first day of the input month
-*/
 
             LocalDate userInputDate = LocalDate.of(inputYear, inputMonth, 1);
             LocalDate thirtyDaysAgo = userInputDate.plusDays(30);
@@ -725,7 +719,7 @@ public class DonateDetailManager {
             ResultSet resultSet = preparedStatement.executeQuery();
             if (countRecords(con, "Distribution") > 0) {
                 System.out.println();
-                System.out.println("==================================================== LIST OF HOUSEHOLDS ================================================");
+                System.out.println("================================================== LIST OF HOUSEHOLDS ==================================================");
                 System.out.println("._______._____________________________________.___________._____________________________________.______________________.");
                 System.out.println("│  ID   │        Household Lord's Name        │Commission │             Commune/Ward            │    Amount of money   │");
                 System.out.println("│_______│_____________________________________│___________│_____________________________________│______________________│");
@@ -738,7 +732,7 @@ public class DonateDetailManager {
                     System.out.printf("│ %-5S │ %-35s │ %-9s │ %-35s │ %-20s │%n", householdId, householdLordName, commissionId, precintName, allocatedAmount);
                     System.out.println("│_______│_____________________________________│___________│_____________________________________│______________________│");
                 }
-                System.out.println("===================================================== LIST ENDED =======================================================");
+                System.out.println("==================================================     LIST ENDED     ==================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31m No data available yet!!!\u001B[0m");
             }
