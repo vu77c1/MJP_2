@@ -32,7 +32,27 @@ public class Processing {
             }
         }
     }
+    public static int validateIntInput(String prompt) {
+        int userInput = 0;
+        boolean isValid = false;
 
+        do {
+            try {
+                System.out.print(prompt);
+                userInput = Integer.parseInt(sc.nextLine());
+                if (userInput >= 0) {
+                    isValid = true;
+                } else {
+                    isValid = false;
+                    System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
+            }
+        } while (!isValid);
+
+        return userInput;
+    }
     public static boolean isIDAlreadyExists(Connection con, int id, String tableName) {
         boolean idExist = false;
         try {
@@ -54,16 +74,6 @@ public class Processing {
             System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database!\u001B[0m");
         }
         return idExist;
-    }
-    //	Kiem Tra Kieu Du Lieu So Nguyen
-    public static boolean isNumber(String number) {
-        try {
-            Integer.parseInt(number);
-            return true;
-        } catch (Exception e) {
-            System.out.println("\t\t\t\u001B[31mPlease enter a valid integer\u001B[0m");
-        }
-        return false;
     }
 
     public static boolean isFloatNumber(String number) {
@@ -182,11 +192,5 @@ public class Processing {
         } while (!isValid);
 
         return userInput;
-    }
-
-    public static void closeScanner() {
-        if (sc != null) {
-            sc.close();
-        }
     }
 }

@@ -179,63 +179,98 @@ public class HouseManager {
                 switch (choice) {
                     case 1:
                         // Thêm hộ dân
-                        System.out.print("Input commission ID  which can be referenced in the commission table: ");
-                        int commissionId = Integer.parseInt(scanner.nextLine());
-                        System.out.print("Input priority object ID which can be referenced in the priority object table: ");
-                        int priorityObjectId = Integer.parseInt(scanner.nextLine());
+                        boolean validAddInput = false;
+                        int commissionId = 0;
+                        int priorityObjectId = 0;
 
-                        if (!HouseManager.isValidCommissionId(connection, commissionId)) {
-                            System.out.println("Commission ID is invalid.");
-                            break;
-                        }
+                        do {
+                            try {
+                                System.out.print("Input commission ID which can be referenced in the commission table: ");
+                                commissionId = Integer.parseInt(scanner.nextLine());
 
-                        if (!HouseManager.isValidPriorityObjectId(connection, priorityObjectId)) {
-                            System.out.println("Priority Object ID is invalid.");
-                            break;
-                        }
+                                System.out.print("Input priority object ID which can be referenced in the priority object table: ");
+                                priorityObjectId = Integer.parseInt(scanner.nextLine());
+
+                                if (!HouseManager.isValidCommissionId(connection, commissionId)) {
+                                    System.out.println("Commission ID is invalid.");
+                                } else if (!HouseManager.isValidPriorityObjectId(connection, priorityObjectId)) {
+                                    System.out.println("Priority Object ID is invalid.");
+                                } else {
+                                    validAddInput = true;
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Please enter a valid number.");
+                            } catch (SQLException ex) {
+                                System.out.println("SQL error: " + ex.getMessage());
+                            }
+                        } while (!validAddInput);
 
                         houseManager.addHouse(commissionId, priorityObjectId);
                         break;
 
                     case 2:
                         // Xóa hộ dân
-                        System.out.print("Input house ID: ");
-                        int houseIdToDelete = Integer.parseInt(scanner.nextLine());
+                        boolean validDeleteInput = false;
+                        int houseIdToDelete = 0;
 
-                        if (!HouseManager.isValidHouseId(connection, houseIdToDelete)) {
-                            System.out.println("Invalid house ID.");
-                            break;
-                        }
+                        do {
+                            try {
+                                System.out.print("Input house ID: ");
+                                houseIdToDelete = Integer.parseInt(scanner.nextLine());
+
+                                if (!HouseManager.isValidHouseId(connection, houseIdToDelete)) {
+                                    System.out.println("Invalid house ID.");
+                                } else {
+                                    validDeleteInput = true;
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Please enter a valid number.");
+                            } catch (SQLException ex) {
+                                System.out.println("SQL error: " + ex.getMessage());
+                            }
+                        } while (!validDeleteInput);
 
                         houseManager.deleteHouse(houseIdToDelete);
-                        System.out.println("Household has ID " + houseIdToDelete + " has been deleted successfully.");
+                        System.out.println("Household with ID " + houseIdToDelete + " has been deleted successfully.");
                         break;
+
                     case 3:
                         // Sửa thông tin hộ dân
-                        System.out.print("Nhập ID hộ dân cần sửa: ");
-                        int houseIdToUpdate = Integer.parseInt(scanner.nextLine());
-                        System.out.print("Nhập commission ID mới: ");
-                        int newCommissionId = Integer.parseInt(scanner.nextLine());
-                        System.out.print("Nhập priority object ID mới: ");
-                        int newPriorityObjectId = Integer.parseInt(scanner.nextLine());
+                        boolean validUpdateInput = false;
+                        int houseIdToUpdate = 0;
+                        int newCommissionId = 0;
+                        int newPriorityObjectId = 0;
 
-                        if (!HouseManager.isValidHouseId(connection, houseIdToUpdate)) {
-                            System.out.println("Invalid house ID.");
-                            break;
-                        }
+                        do {
+                            try {
+                                System.out.print("Input house ID to update: ");
+                                houseIdToUpdate = Integer.parseInt(scanner.nextLine());
 
-                        if (!HouseManager.isValidCommissionId(connection, newCommissionId)) {
-                            System.out.println("The new Commission ID is invalid.");
-                            break;
-                        }
+                                System.out.print("Input new commission ID: ");
+                                newCommissionId = Integer.parseInt(scanner.nextLine());
 
-                        if (!HouseManager.isValidPriorityObjectId(connection, newPriorityObjectId)) {
-                            System.out.println("The new Priority Object ID is invalid.");
-                            break;
-                        }
+                                System.out.print("Input new priority object ID: ");
+                                newPriorityObjectId = Integer.parseInt(scanner.nextLine());
+
+                                if (!HouseManager.isValidHouseId(connection, houseIdToUpdate)) {
+                                    System.out.println("Invalid house ID.");
+                                } else if (!HouseManager.isValidCommissionId(connection, newCommissionId)) {
+                                    System.out.println("The new Commission ID is invalid.");
+                                } else if (!HouseManager.isValidPriorityObjectId(connection, newPriorityObjectId)) {
+                                    System.out.println("The new Priority Object ID is invalid.");
+                                } else {
+                                    validUpdateInput = true;
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Please enter a valid number.");
+                            } catch (SQLException ex) {
+                                System.out.println("SQL error: " + ex.getMessage());
+                            }
+                        } while (!validUpdateInput);
 
                         houseManager.updateHouse(houseIdToUpdate, newCommissionId, newPriorityObjectId);
                         break;
+
                     case 4:
                         // Hiển thị thông tin tất cả các hộ dân
                         try {
@@ -244,13 +279,16 @@ public class HouseManager {
                             System.out.println("SQL error: " + ex.getMessage());
                         }
                         break;
+
                     case 0:
                         // Thoát khỏi menu
                         System.out.println("Exiting...");
                         return;
+
                     default:
                         System.out.println("Invalid selection.");
                         break;
+
                 }
             } catch (NumberFormatException e) {
                 System.out.println("Please enter a number.");

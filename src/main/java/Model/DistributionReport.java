@@ -18,28 +18,27 @@ public class DistributionReport {
             JDBCQuery.openConnection();
             String sql = """
                     WITH B AS (
-                        SELECT commission_id, SUM(amount_received) as total_amount_received  FROM Distribution st
-                        WHERE st.household_id is not null AND MONTH(st.date_received)=? AND YEAR(st.date_received)=?
-                        GROUP BY commission_id
-                                        
-                    ),
-                     A AS(
-                        SELECT commission_id,  SUM(amount) as total_amount  FROM DonateDetail dn LEFT JOIN Commission c on dn.commission_id=c.id GROUP BY commission_id
-                    )
-                    SELECT
-                        A.commission_id,
-                        C.precint_name,
-                        C.city_name,
-                        C.province_name,
-                        A.total_amount,
-                        ISNULL(B.total_amount_received, 0) AS total_amount_received,
-                        A.total_amount - ISNULL(B.total_amount_received, 0) AS remaining_amount
-                    FROM
-                        A
-                    LEFT JOIN
-                        B ON A.commission_id = B.commission_id
-                    LEFT JOIN Commission C ON C.id=A.commission_id
-                            """;
+                                            SELECT commission_id, SUM(amount_distribution) as total_amount_received  FROM Distribution st
+                                            WHERE st.household_id is not null AND MONTH(st.date_distribution)=? AND YEAR(st.date_distribution)=?
+                                            GROUP BY commission_id
+                                                          
+                                        ),
+                                         A AS(
+                                            SELECT commission_id,  SUM(amount) as total_amount  FROM DonateDetail dn LEFT JOIN Commission c on dn.commission_id=c.id GROUP BY commission_id
+                                        )
+                                        SELECT
+                                            A.commission_id,
+                                            C.precint_name,
+                                            C.city_name,
+                                            C.province_name,
+                                            A.total_amount,
+                                            ISNULL(B.total_amount_received, 0) AS total_amount_received,
+                                            A.total_amount - ISNULL(B.total_amount_received, 0) AS remaining_amount
+                                        FROM
+                                            A
+                                        LEFT JOIN
+                                            B ON A.commission_id = B.commission_id
+                                        LEFT JOIN Commission C ON C.id=A.commission_id                            """;
             Object[] params = {month, year};
             rs = JDBCQuery.executeSelectQuery(sql, params);
 
@@ -74,14 +73,15 @@ public class DistributionReport {
             int year;
             do {
                 year=  InputValidator.validateIntInput("Enter Year: ");
-                if (year>0)
+                if (year>0&&Integer.toString(year).length()==4)
                 {
                     check=true;
                 }
                 else {
-                    System.out.println("Error year not <=0");
+                    System.out.println("Error year not <=0 and length=4 char....");
                     check=false;
                 }
+
 
             }
             while (!check);

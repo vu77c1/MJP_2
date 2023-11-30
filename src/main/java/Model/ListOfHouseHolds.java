@@ -25,7 +25,7 @@ public class ListOfHouseHolds {
         ResultSet rs = null;
         try {
             st =connection.createStatement();
-            int id = InputValidatorKhue.validateIntInput("Nhập ID cần tìm: ");
+            int id = InputValidatorKhue.validateIntInput("Input ID");
             rs = st.executeQuery("SELECT dbo.Citizen.id, name, is_household_lord, house_id, amount_received From \n" +
                     "House Left Join dbo.Distribution DB on House.id = DB.household_id\n" +
                     "\t  Right Join dbo.Citizen on House.id = Citizen.house_id Where Citizen.id =" + id);
@@ -36,16 +36,16 @@ public class ListOfHouseHolds {
                     int amountReceived = rs.getInt("amount_received");
                     sum += amountReceived;
                 };
-                System.out.println("Số lần được ủng hộ của hộ dân có ID là " + id + ": " + num);
-                System.out.println("Tổng số tiền được ủng hộ của hộ dân có ID là "+ id +":" + sum);
+                System.out.println("Number donated: " + num);
+                System.out.println("Sum money donated "+ id +":" + sum);
             }else {
-                System.out.println("Hộ dân có ID là"+ id +"chưa được ủng hộ lần nào");
+                System.out.println("Not Donate");
             }
 
             InputValidatorKhue.waitForEnter();
         }catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+            System.out.println("Error in the database connection process");
         }finally {
             if(rs!=null){
                 rs.close();
