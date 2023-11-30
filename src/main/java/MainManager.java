@@ -29,7 +29,7 @@ public class MainManager {
 
         } while (!"0".equalsIgnoreCase(String.valueOf(n)));
 
-        sc.close();
+//        sc.close();
 
     }
 
@@ -64,7 +64,7 @@ public class MainManager {
                     System.out.print("\t\t\tPlease choose....");
                     m = Integer.parseInt(sc.nextLine());
                 } catch (NumberFormatException e) {
-                    System.out.println("Invalid input. Please enter a valid integer.");
+                    System.out.println("\t\t\tInvalid input. Please enter a valid integer.");
                 }
             } while (m == -1);
 
@@ -153,7 +153,7 @@ public class MainManager {
 
                 case 9:
                     CitizenManager citizenManager = new CitizenManager(DBConnect.connectDatabase());
-                    System.out.println("Citizen Manage");
+                    System.out.println("\t\t\tCitizen Manage");
                     citizenManager.handleCitizenManagement(citizenManager, sc);
                     break;
                 case 10:
@@ -197,7 +197,7 @@ public class MainManager {
                     Statistics(DBConnect.connectDatabase());
                     break;
                 case 0:
-                    System.out.println("Close program.....");
+                    System.out.println("\t\t\tClose program.....");
                     break;
 
             }
@@ -315,7 +315,7 @@ public class MainManager {
                     break;
                 case 5:
                     DonateManage1 donateManage1 = new DonateManage1();
-                    donateManage1.TopVlaue(connection);
+                    donateManage1.topValue(connection);
                     break;
                 case 6:
                     DonateManage1 donateManage2 = new DonateManage1();
@@ -338,11 +338,11 @@ public class MainManager {
                     top5Wards();
                     break;
                 case 11:
-                    System.out.println("Statistics of wards that have not been donated");
+                    System.out.println("\t\t\tStatistics of wards that have not been donated");
                     statisticsOfWards();
                     break;
                 case 12:
-                    System.out.println("List households that have not been supported in cash");
+                    System.out.println("\t\t\tList households that have not been supported in cash");
                    Menue.inputPhase();
 
                     break;

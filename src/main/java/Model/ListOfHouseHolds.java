@@ -26,14 +26,14 @@ public class ListOfHouseHolds {
         try {
             st =connection.createStatement();
             int id = InputValidatorKhue.validateIntInput("Input ID");
-            rs = st.executeQuery("SELECT dbo.Citizen.id, name, is_household_lord, house_id, amount_received From \n" +
+            rs = st.executeQuery("SELECT dbo.Citizen.id, name, is_household_lord, house_id, amount_distribution From \n" +
                     "House Left Join dbo.Distribution DB on House.id = DB.household_id\n" +
                     "\t  Right Join dbo.Citizen on House.id = Citizen.house_id Where Citizen.id =" + id);
             if(rs!=null){
                 int sum = 0, num = 0;
                 while (rs.next())
                 {   num +=1;
-                    int amountReceived = rs.getInt("amount_received");
+                    int amountReceived = rs.getInt("amount_distribution");
                     sum += amountReceived;
                 };
                 System.out.println("Number donated: " + num);

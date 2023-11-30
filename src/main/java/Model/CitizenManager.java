@@ -652,7 +652,7 @@ public class CitizenManager {
 
         do {
             try {
-                System.out.println("Citizen Management : ");
+                System.out.println("\t\tCitizen Management : ");
                 System.out.println("\t\t\t0. Exit");
                 System.out.println("\t\t\t1. Add");
                 System.out.println("\t\t\t2. Delete");

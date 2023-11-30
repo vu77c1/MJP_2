@@ -165,12 +165,13 @@ public class HouseManager {
         int choice;
 
         do {
-            System.out.println("House Management :");
-            System.out.println("1. Add");
-            System.out.println("2. Delete");
-            System.out.println("3. Update");
-            System.out.println("4. Display");
-            System.out.println("0. Exit ");
+            System.out.println("\t\tHouse Management :");
+            System.out.println("\t\t\t0. Exit");
+            System.out.println("\t\t\t1. Add");
+            System.out.println("\t\t\t2. Delete");
+            System.out.println("\t\t\t3. Update");
+            System.out.println("\t\t\t4. Display");
+            System.out.print("\t\t\tPlease choose: ");
 
             try {
                 System.out.print("Please choose: ");

@@ -13,7 +13,7 @@ import java.util.ArrayList;
 import java.util.Scanner;
 
 
-import static Model.Processing.*;
+import static Model.Processing1.*;
 
 public class DistributionManager {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT);
@@ -25,10 +25,10 @@ public class DistributionManager {
         try {
             System.out.println("\t\t\t***************************************************** DISTRIBUTION LIST *********************************************************************");
             System.out.println("\t\t\t._______.______________________________________.____________________._________________._______________________________________________________");
-            System.out.println("\t\t\t│   ID       │ CommissionID │                Commission Name           │    ID Household    │ Amount received          │  date_received  │ ");
-            System.out.println("\t\t\t│____________│______________│__________________________________________│____________________│__________________________│_________________│  ");
+            System.out.println("\t\t\t│   ID       │ CommissionID │                Commission Name           │    ID Household    │  Amount Distribution     │  Date Distribution  │ ");
+            System.out.println("\t\t\t│____________│______________│__________________________________________│____________________│__________________________│_____________________│  ");
             Statement statement = con.createStatement();
-            ResultSet resultSet = statement.executeQuery("SELECT Distribution.id,commission_id, precint_name, city_name,province_name, household_id, amount_received, date_received  FROM Distribution Join dbo.Commission C on C.id= Distribution.commission_id");
+            ResultSet resultSet = statement.executeQuery("SELECT Distribution.id,commission_id, precint_name, city_name,province_name, household_id, amount_distribution, date_distribution  FROM Distribution Join dbo.Commission C on C.id= Distribution.commission_id");
             while (resultSet.next())
             {
 //                String ID = resultSet.getString("id");
@@ -38,12 +38,12 @@ public class DistributionManager {
 //                String province_name = resultSet.getString("province_name");
 //                String household_id = resultSet.getString("household_id");
 //                Float amount_received = resultSet.getFloat("amount_received");
-                LocalDate date_received = resultSet.getDate("date_received").toLocalDate();
+                LocalDate date_distribution = resultSet.getDate("date_distribution").toLocalDate();
 
-                System.out.printf("\t\t\t│%-11S │%-13s │  %-39s │ %-18s │ %-24s │%-16s │ \n", resultSet.getString("id"),resultSet.getString("commission_id"),
+                System.out.printf("\t\t\t│%-11S │%-13s │  %-39s │ %-18s │ %-24s │ %-19s │ \n", resultSet.getString("id"),resultSet.getString("commission_id"),
                         resultSet.getString("precint_name")+" - " +resultSet.getString("city_name")+" - "+resultSet.getString("province_name"),
-                        resultSet.getString("household_id"), formatFloatingPoint(resultSet.getFloat("amount_received")),dateFormat.format(date_received));
-                System.out.println("\t\t\t│____________│______________│__________________________________________│____________________│__________________________│_________________│");
+                        resultSet.getString("household_id"), formatFloatingPoint(resultSet.getFloat("amount_distribution")),dateFormat.format(date_distribution));
+                System.out.println("\t\t\t│____________│______________│__________________________________________│____________________│__________________________│_____________________│");
             }
             System.out.println();
             System.out.println("\t\t\t***************************************************************** LIST END ******************************************************************");
@@ -74,7 +74,7 @@ public class DistributionManager {
                         infoList.add(new Distribution(
                                 rs.getInt("id"),
                                 rs.getInt("commission_id"),rs.getInt("household_id"),
-                                rs.getFloat("amount_received"),rs.getDate("date_received")
+                                rs.getFloat("amount_distribution"),rs.getDate("date_distribution")
                         ));
                     }
                 } catch (SQLException ex) {
@@ -103,7 +103,7 @@ public class DistributionManager {
                         infoList.add(new Distribution(
                                 rs.getInt("id"),
                                 rs.getInt("commission_id"),rs.getInt("household_id"),
-                                rs.getFloat("amount_received"),rs.getDate("date_received")
+                                rs.getFloat("amount_distribution"),rs.getDate("date_distribution")
                         ));
                     }
                 } catch (SQLException ex) {
@@ -166,7 +166,7 @@ public class DistributionManager {
 
             Distribution di = inputDistribution();
             JDBCQuery1.openConnection();
-            String sql = "insert into Distribution (commission_id, household_id, amount_received, date_received) values (?,?,?,?)";
+            String sql = "insert into Distribution (commission_id, household_id, amount_distribution, date_distribution) values (?,?,?,?)";
 
             Object[] prams = {di.getCommissionId(), di.getHouseholdID(),di.getAmountReceived(),di.getDateReceived()};
             int rs = JDBCQuery1.executeUpdateQuery(sql, prams);
@@ -228,7 +228,7 @@ public class DistributionManager {
 
                     JDBCQuery1.openConnection();
 
-                    String sql = "UPDATE Distribution SET commission_id = ?, household_id = ?,amount_received = ?,date_received = ? WHERE id =?;";
+                    String sql = "UPDATE Distribution SET commission_id = ?, household_id = ?,amount_distribution = ?,date_distribution = ? WHERE id =?;";
                     Object[] prams = {comid, houseid, amount, datereceived,id};
 
                     int rowsAffected = JDBCQuery1.executeUpdateQuery(sql, prams);
