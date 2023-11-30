@@ -230,8 +230,8 @@ public class RepresentativeManager {
     }
 
     // Xét giá trị representative_id về null trong bảng DonateDetail
-    public void updateRepresentativeidForDonateDetail(int id) throws SQLException{
-        String query ="UPDATE DonateDetail set representative_id = Null WHERE representative_id ="+ id;
+    public void deleteRepresentativeidForDonateDetail(int id) throws SQLException{
+        String query ="DELETE FROM DonateDetail WHERE representative_id ="+ id;
         try (PreparedStatement statement =connection.prepareStatement(query)){
             statement.executeUpdate();
         } finally {
