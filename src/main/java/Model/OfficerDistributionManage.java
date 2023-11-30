@@ -106,8 +106,14 @@ public class OfficerDistributionManage {
         } while (isExistOfficerDistributionID == false);
 
         // add date distribution
-        System.out.println("Enter date distribution (yyyy/MM/dd):");
-        String dateDistribution = checkValidDate();
+        String dateDistribution = "";
+        do {
+            System.out.println("Enter date distribution (yyyy/MM/dd):");
+            dateDistribution = checkValidDate();
+            if (!isValidDateFormat(dateDistribution)) {
+                System.out.println("\u001B[31m* Warning: Please enter follow format (yyyy/MM/dd).\u001B[0m ");
+            }
+        } while (!isValidDateFormat(dateDistribution));
 
         // add address distribution
         int maxLengthAddress = 255;
@@ -139,6 +145,17 @@ public class OfficerDistributionManage {
     // create Validate for String:
     private static boolean validateStringLength(String input, int maxLength) {
         return input.length() <= maxLength;
+    }
+
+    private static boolean isValidDateFormat(String dateStr) {
+        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy/MM/dd");
+        dateFormat1.setLenient(false);
+        try {
+            Date date = dateFormat1.parse(dateStr);
+            return dateStr.equals(dateFormat1.format(date));
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
     // check existence of Officer id
@@ -334,21 +351,25 @@ public class OfficerDistributionManage {
         String sql = "UPDATE OfficerDistribution SET date_distribution = ? WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
 
-        boolean isCheckExistODId = false;
         int id = 0;
         do {
             System.out.println("Enter the id you want to edit:");
             id = checkInputInt();
-            isCheckExistODId = checkOfficerDistributionIdExistence(id);
-            if (isCheckExistODId == false) {
+            if (!checkOfficerDistributionIdExistence(id)) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
             }
-        } while (isCheckExistODId == false);
+        } while (!checkOfficerDistributionIdExistence(id));
         System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
         displayOfficerDistributionTableById(id);
 
-        System.out.println("Enter new date distribution (yyyy/MM/dd):");
-        String newDateDistribution = checkValidDate();
+        String newDateDistribution = "";
+        do {
+            System.out.println("Enter new date distribution (yyyy/MM/dd):");
+            newDateDistribution = checkValidDate();
+            if (!isValidDateFormat(newDateDistribution)) {
+                System.out.println("\u001B[31m* Warning: Please enter follow format (yyyy/MM/dd).\u001B[0m ");
+            }
+        } while (!isValidDateFormat(newDateDistribution));
 
         pstm.setString(1, newDateDistribution);
         pstm.setInt(2, id);
@@ -524,4 +545,5 @@ public class OfficerDistributionManage {
         // Format the floating-point number with desired precision
         return String.format("%.0f", value);
     }
+
 }
