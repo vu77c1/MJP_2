@@ -5,6 +5,8 @@ import Common.DBConnect;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Scanner;
 
@@ -55,8 +57,16 @@ public class Task1003OfDung {
         System.out.println("Enter start date (yyyy/MM/dd):");
         String startDate = checkValidDate();
 
-        System.out.println("Enter end date (yyyy/MM/dd):");
-        String endDate = checkValidDate();
+        boolean isValid = false;
+        String endDate = "";
+        do {
+            System.out.println("Enter end date (yyyy/MM/dd):");
+            endDate = checkValidDate();
+            isValid = checkDateInput(startDate,endDate);
+            if (isValid == false) {
+                System.out.println("\u001B[31m* Warning: End date must be after Start date.\u001B[0m");
+            }
+        } while (isValid == false);
 
         String sql = "SELECT o.name, SUM(d.amount_received) AS total_amount, d.date_received, od.address_distribution\n" +
                 "FROM Officer AS o \n" +
@@ -88,6 +98,20 @@ public class Task1003OfDung {
     private static String formatFloatingPoint(float value) {
         // Format the floating-point number with desired precision
         return String.format("%.0f", value);
+    }
+
+    private static boolean checkDateInput(String startDate, String endDate) {
+        boolean isValid = false;
+        try {
+            Date start = dateFormat.parse(startDate);
+            Date end = dateFormat.parse(endDate);
+            if (start.before(end)) {
+                isValid = true;
+            }
+        } catch (ParseException e) {
+            System.out.println(e.toString());
+        }
+        return isValid;
     }
 
     private static String checkValidDate() {
