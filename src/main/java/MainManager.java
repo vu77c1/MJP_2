@@ -153,7 +153,7 @@ public class MainManager {
 
                 case 9:
                     CitizenManager citizenManager = new CitizenManager(DBConnect.connectDatabase());
-                    System.out.println("\t\t\tCitizen Manage");
+                    System.out.println("\t\tCitizen Manage");
                     citizenManager.handleCitizenManagement(citizenManager, sc);
                     break;
                 case 10:
