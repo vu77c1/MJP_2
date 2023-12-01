@@ -6,7 +6,7 @@ import java.sql.SQLException;
 import java.util.Scanner;
 
 public class DBConnect {
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
     public static Connection connectDatabase() {
         final String JDBC_DRIVER = JdbcConfig.JDBC_DRIVER;
         final String DB_URL = JdbcConfig.JDBC_URL;
@@ -17,18 +17,17 @@ public class DBConnect {
         try {
             Class.forName(JDBC_DRIVER);
             con = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-//            System.out.println("\u001B[32mDatabase Connected\u001B[0m");
-             System.out.println();
+            //System.out.println("\u001B[32mDatabase Connected\u001B[0m");
+            System.out.println();
         } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
+            System.out.println("\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
         }
         return con;
     }
-    public static void disconnectDatabase(Connection con)
-    {
+    public static Connection disconnectDatabase() {
+        Connection con = DBConnect.connectDatabase();
         if (con != null) {
             try {
-                scanner.close();
                 con.close();
                 System.out.println("\u001B[32mDatabase connection closed.\u001B[0m");
             } catch (SQLException e) {
@@ -36,5 +35,6 @@ public class DBConnect {
                 // Handle the exception as needed
             }
         }
+        return con;
     }
 }

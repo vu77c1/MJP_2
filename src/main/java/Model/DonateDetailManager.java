@@ -99,7 +99,12 @@ public class DonateDetailManager {
                     LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
                     String precint_name = resultSet.getString("precint_name");
                     String representative_name = resultSet.getString("representative_name");
-                    String company_name = resultSet.getString("company_name");
+                    String company_name;
+                    if (resultSet.getString("company_name") == null){
+                        company_name = "(Individual)";
+                    } else {
+                        company_name = resultSet.getString("company_name");
+                    }
                     String name = resultSet.getString("name");
                     System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
                     System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
@@ -148,7 +153,12 @@ public class DonateDetailManager {
                         LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
                         String precint_name = resultSet.getString("precint_name");
                         String representative_name = resultSet.getString("representative_name");
-                        String company_name = resultSet.getString("company_name");
+                        String company_name ;
+                        if (resultSet.getString("company_name") == null){
+                            company_name = "(Individual)";
+                        } else {
+                            company_name = resultSet.getString("company_name");
+                        }
                         String name = resultSet.getString("name");
                         System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
                         System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
