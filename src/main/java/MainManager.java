@@ -343,7 +343,7 @@ public class MainManager {
                     break;
                 case 12:
                     System.out.println("\t\t\tList households that have not been supported in cash");
-                   Menue.inputPhase();
+                    Menue.inputPhase();
 
                     break;
                 case 13:
