@@ -16,12 +16,12 @@ public class InputValidator1 {
             try {
                 System.out.print(prompt);
                 String dateString = scanner.nextLine().trim();
-                SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy/MM/dd");
                 dateFormat.setLenient(false);
                 date = dateFormat.parse(dateString);
                 isValid = true;
             } catch (ParseException ex) {
-                System.out.println("\u001B[31m\t\t\tError: Please enter a valid date in the format 'dd/MM/yyyy'.\u001B[0m");
+                System.out.println("\u001B[31m\t\t\tError: Please enter a valid date in the format 'yyyy/MM/dd'.\u001B[0m");
             }
         } while (!isValid);
 
@@ -45,7 +45,7 @@ public class InputValidator1 {
 
         return userInput;
     }
-//kiem tra input dau vao PriorityObject
+    //kiem tra input dau vao PriorityObject
     public static String validateStringPriorityObject(String prompt) {
         String userInput = "";
         boolean isValid = false;
@@ -105,17 +105,17 @@ public class InputValidator1 {
         return str.matches(".*[!@#$%^&*()_+{}|\"<>?].*");
     }
 
-    public static double validateDoubleInput(String prompt) {
+    public static double validateFloatInput(String prompt) {
         double userInput = 0.0;
         boolean isValid = false;
 
         do {
             try {
                 System.out.print(prompt);
-                userInput = Double.parseDouble(scanner.nextLine());
+                userInput = Float.parseFloat(scanner.nextLine());
                 isValid = true;
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mError: Please enter a valid double.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31mError: Please enter a valid float.\u001B[0m");
             }
         } while (!isValid);
 
@@ -130,17 +130,26 @@ public class InputValidator1 {
             try {
                 System.out.print(prompt);
                 userInput = Integer.parseInt(scanner.nextLine());
-                if
-                (userInput>0){ isValid =true; }
-                else
-                { System.out.println("\t\t\tPlease enter again"); }
-
+                if (userInput>0){
+                    isValid = true;
+                }else {
+                    System.out.println("\t\t\tPlease enter again. Value > 0");
+                }
             } catch (NumberFormatException ex) {
-                System.out.println("\u001B[31mError: Please enter a valid integer.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
             }
         } while (!isValid);
 
         return userInput;
+    }
+
+    public static boolean isIntMoreThan0(double a) {
+        boolean isValid = false;
+//        a = scanner.nextInt();
+        if (a > 0) {
+            isValid = true;
+        }
+        return isValid;
     }
 
     public static void closeScanner() {
