@@ -505,65 +505,6 @@ public class DonateDetailManager {
         }
     }
 
-    public static void statsCountSumAmount(Connection con) {
-        System.out.println("\t\t\tNhập ID của hộ dân (X): ");
-        int householdId = Processing.inputID(sc, "House", "id");
-        String SQL_QUERY_STATS_BY_HOUSEHOLD = """
-                    SELECT
-                        House.id,
-                        Citizen.name,
-                        Citizen.address,
-                        CO.type_name_object,
-                        PriorityObject.object_type,
-                        COUNT(Distribution.amount_distribution) AS SL,
-                        SUM(Distribution.amount_distribution) AS TS
-                    FROM
-                        House
-                        LEFT JOIN Citizen ON House.id = Citizen.house_id
-                        LEFT JOIN dbo.CitizenObject CO ON CO.id = Citizen.citizen_object_id
-                        LEFT JOIN PriorityObject ON House.priority_object_id = PriorityObject.id
-                        LEFT JOIN Distribution ON House.id = Distribution.household_id
-                    WHERE
-                        House.id = ? AND Citizen.is_household_lord = 1
-                    GROUP BY
-                        House.id, Citizen.name, Citizen.address, CO.type_name_object, PriorityObject.object_type
-                    ORDER BY
-                        TS DESC;
-                """;
-        try (PreparedStatement preparedStatement = con.prepareStatement(SQL_QUERY_STATS_BY_HOUSEHOLD)) {
-            preparedStatement.setInt(1, householdId);
-
-            if (countRecords(con, "DonateDetail") > 0) {
-                System.out.println();
-                System.out.println("================================================================ LIST OF HOUSEHOLDS =========================================================");
-                System.out.println("._______.________________________.________________________.________________________.___________________________.____________._______________.");
-                System.out.println("│   ID  │  Household Lord's Name │         Address        │     Citizen Objects    │     Household Objects     │    COUNT   │      SUM      │");
-                System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
-
-                try (ResultSet resultSet = preparedStatement.executeQuery()) {
-                    while (resultSet.next()) {
-                        int houseID = resultSet.getInt("id");
-                        String citizenName = resultSet.getString("name");
-                        String citizenAddress = resultSet.getString("address");
-                        String typeNameObject = resultSet.getString("type_name_object");
-                        String objectType = resultSet.getString("object_type");
-                        int SL = resultSet.getInt("SL"); // Corrected column name
-                        String TS = String.format("%.0f", resultSet.getDouble("TS"));
-                        System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │ %-25s │ %-10s │ %-13s │%n", houseID, citizenName, citizenAddress, typeNameObject, objectType, SL, TS);
-                        System.out.println("│_______│________________________│________________________│________________________│___________________________│____________│_______________│");
-                    }
-                    System.out.println("============================================================     LIST ENDED     ============================================================");
-                }
-            } else {
-                System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
-            }
-            waitForEnter();
-        } catch (SQLException e) {
-            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
-        }
-    }
-
-
     public static void displayAndSaveDistribution(Connection connection) {
         //LocalDate userInputDate = Processing.validateDateInput("Nhập vào đợt ủng hộ: ");
         String userInputMonthYear = Processing.validateMonthYearInput("\t\t\tEnter the donation phase (MM/yyyy): ");
