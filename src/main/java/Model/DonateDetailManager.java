@@ -27,7 +27,6 @@ public class DonateDetailManager {
             System.out.println("\t\tWhat do you want to choose?");
             do {
                 try {
-                    //System.out.print("\t\t\tEnter function number: (0-4): ");
                     choice = Processing.validateIntInput("\t\t\tEnter function number: (0-4): ");
                 } catch (NumberFormatException input) {
                     System.out.println("\t\t\t\u001B[31mThe entered character is not valid!\n\t\t\tPlease input again: (0-4)!\u001B[0m");
@@ -92,7 +91,9 @@ public class DonateDetailManager {
                                 LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
                                 LEFT JOIN dbo.Distribution D on C.id = D.commission_id
                                 LEFT JOIN dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
-                                LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id""");
+                                LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id
+                                GROUP BY C.precint_name, dbo.DonateDetail.id,amount,donate_date,representative_name,company_name,O.name
+                                ORDER BY dbo.DonateDetail.id DESC""");
                 while (resultSet.next()) {
                     String ID = resultSet.getString("id");
                     String amount = String.format("%.0f", resultSet.getDouble("amount"));
@@ -100,7 +101,7 @@ public class DonateDetailManager {
                     String precint_name = resultSet.getString("precint_name");
                     String representative_name = resultSet.getString("representative_name");
                     String company_name;
-                    if (resultSet.getString("company_name") == null){
+                    if (resultSet.getString("company_name") == null) {
                         company_name = "(Individual)";
                     } else {
                         company_name = resultSet.getString("company_name");
@@ -138,7 +139,8 @@ public class DonateDetailManager {
                         LEFT JOIN dbo.Distribution D on C.id = D.commission_id
                         Left Join dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
                         LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id
-                WHERE DonateDetail.id = ?""";
+                WHERE DonateDetail.id = ?
+                GROUP BY C.precint_name, dbo.DonateDetail.id,amount,donate_date,representative_name,company_name,O.name""";
         try (PreparedStatement selectStatement = con.prepareStatement(selectQuery)) {
             selectStatement.setInt(1, ID);
             try (ResultSet resultSet = selectStatement.executeQuery()) {
@@ -153,8 +155,8 @@ public class DonateDetailManager {
                         LocalDate donate_date = resultSet.getDate("donate_date").toLocalDate();
                         String precint_name = resultSet.getString("precint_name");
                         String representative_name = resultSet.getString("representative_name");
-                        String company_name ;
-                        if (resultSet.getString("company_name") == null){
+                        String company_name;
+                        if (resultSet.getString("company_name") == null) {
                             company_name = "(Individual)";
                         } else {
                             company_name = resultSet.getString("company_name");
@@ -179,7 +181,9 @@ public class DonateDetailManager {
             System.out.println("\t\t\t=== Add Donationer Information ===");
             System.out.print("\t\t\t\u001B[31mYou are about to add a record for a sponsor's donation.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\n\t\t\t(For related tables please refer to the menu \"Representative Management\" và \"Commission Management\")\n  \u001B[0m");
             waitForEnter();
+            String checkQuery = "SELECT * FROM DonateDetail WHERE representative_id = ? AND commission_id = ? AND donate_date = ?";
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
+            String updateQuery = "UPDATE DonateDetail SET amount = amount + ? WHERE representative_id =? AND commission_id = ? and donate_date = ?";
             System.out.println("\t\t\tID of the representative supporter (individual or corporate representative) (Refer to menu\"Representative Management\")");
             int representativeId = Processing.inputID(sc, "Representative", "id");
             System.out.println("\t\t\tID of the commune/ward receiving donation (Refer to the menu \"Commission Management\")");
@@ -199,14 +203,36 @@ public class DonateDetailManager {
                     amount = Double.parseDouble(input);
                 }
             } while (!isFloatNumber(input));
-            PreparedStatement insertStatement = con.prepareStatement(insertQuery);
-            insertStatement.setInt(1, representativeId);
-            insertStatement.setInt(2, commissionId);
-            insertStatement.setDate(3, Date.valueOf(donateDate));
-            insertStatement.setDouble(4, amount);
-            // Execute the query
-            insertStatement.executeUpdate();
-            System.out.println("\t\t\t\u001B[32mDonationer has been added to the database.\u001B[0m");
+            // Check if a record with the specified representative_id, commission_id, and donate_date already exists
+            PreparedStatement checkStatement = con.prepareStatement(checkQuery);
+            checkStatement.setInt(1, representativeId);
+            checkStatement.setInt(2, commissionId);
+            checkStatement.setDate(3, Date.valueOf(donateDate));
+            ResultSet resultSet = checkStatement.executeQuery();
+            if (resultSet.next()) {
+                // A record already exists, so update it
+
+                PreparedStatement updateStatement = con.prepareStatement(updateQuery);
+                updateStatement.setDouble(1, amount);
+                updateStatement.setInt(2, representativeId);
+                updateStatement.setInt(3, commissionId);
+                updateStatement.setDate(4, Date.valueOf(donateDate));
+
+                // Execute the update query
+                updateStatement.executeUpdate();
+                System.out.println("\t\t\t\u001B[32mDonationer has been updatated to the database.\u001B[0m");
+            } else {
+                // No record found, so insert a new record
+                PreparedStatement insertStatement = con.prepareStatement(insertQuery);
+                insertStatement.setInt(1, representativeId);
+                insertStatement.setInt(2, commissionId);
+                insertStatement.setDate(3, Date.valueOf(donateDate));
+                insertStatement.setDouble(4, amount);
+
+                // Execute the insert query
+                insertStatement.executeUpdate();
+                System.out.println("\t\t\t\u001B[32mNew Donationer has been added to the database.\u001B[0m");
+            }
             waitForEnter();
         } catch (SQLException e) {
             System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
@@ -277,7 +303,7 @@ public class DonateDetailManager {
         waitForEnter();
         System.out.println();
         PreparedStatement pstmt = null;
-        //Kiem Tra id Da Co Trong Bang Khang Hang Hay Chua? Neu Co Thi Tien Hanh Update
+        //Kiem Tra id Da Co Trong Bang DonateDetail Hay Chua? Neu Co Thi Tien Hanh Update
         if (Processing.isIDAlreadyExists(con, identity, "DonateDetail")) {
             int choice;
             //Hien Thi Menu Update
@@ -285,7 +311,7 @@ public class DonateDetailManager {
                 System.out.println("\t\t\t+-----------------------------------+");
                 System.out.println("\t\t\t│ Which item do you want to update? │");
                 System.out.println("\t\t\t+-----------------------------------+");
-                System.out.printf("\t\t\t│ %-34s|\n\t\t\t│ %-34s│ \n\t\t\t│ %-34s│ \n\t\t\t│ %-34s│\n\t\t\t│ %-34s│ \n\t\t\t│ %-34s│\n", "1. Amount of money", "2. Donation Date", "3. Commission", "4. Representative", "5. All", "0. Return to the Management menu");
+                System.out.printf("\t\t\t│ %-34s|\n\t\t\t│ %-34s│\n\t\t\t│ %-34s│\n", "1. Amount of money", "2. Donation Date", "0. Return to the Management menu");
                 System.out.println("\t\t\t+-----------------------------------+");
                 System.out.println("\t\t\tFrom Update Menu, Your Choice: ");
                 choice = InputValidator.validateIntInput("\t\t\tPlease Choice: ");
@@ -370,124 +396,7 @@ public class DonateDetailManager {
                         waitForEnter();
                     }
                     break;
-                //Update ID Ủy ban
-                case 3:
-                    System.out.println("\t\t\tEnter the Commission ID: ");
-                    int newCommissionId = inputID(sc, "Commission", "id");
-                    String sql3 = "UPDATE DonateDetail SET commission_id =? WHERE id =?";
-                    try {
-                        pstmt = con.prepareStatement(sql3);
-                        pstmt.setInt(1, newCommissionId);
-                        pstmt.setInt(2, identity);
-                        pstmt.executeUpdate();
-                        System.out.println("\t\t\t\u001B[32mUpdated Commission successful!!!\u001B[0m");
-                        waitForEnter();
-                    } catch (Exception e) {
-                        System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
-                    } finally {
-                        try {
-                            if (pstmt != null) pstmt.close();
-                        } catch (SQLException se2) {
-                            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
-                        }
-                        do {
-                            System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
-                            String c = sc.next();
-                            sc.nextLine(); // Consume the newline character
 
-                            if ("Y".equalsIgnoreCase(c)) {
-                                updateDonateDetail(con);
-                            } else if ("N".equalsIgnoreCase(c)) {
-                                break;
-                            } else {
-                                System.out.println("\t\t\t\u001B[31mThe input selection is incorrect, please re-enter!!!\u001B[0m");
-                            }
-                        } while (true);
-                        waitForEnter();
-                    }
-                    break;
-                //Update ID nguoi dai dien
-                case 4:
-                    System.out.println("\t\t\tEnter the representative's ID: ");
-                    int newRepresentativeId = inputID(sc, "Representative", "id");
-                    String sql4 = "UPDATE DonateDetail SET representative_id =? WHERE id =?";
-                    try {
-                        pstmt = con.prepareStatement(sql4);
-                        pstmt.setInt(1, newRepresentativeId);
-                        pstmt.setInt(2, identity);
-                        pstmt.executeUpdate();
-                        System.out.println("\t\t\t\u001B[32mSuccessfully updated the representative!!!\u001B[0m");
-                        waitForEnter();
-                    } catch (Exception e) {
-                        System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
-                    } finally {
-                        try {
-                            if (pstmt != null) pstmt.close();
-                        } catch (SQLException se2) {
-                            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
-                        }
-                        do {
-                            System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
-                            String c = sc.next();
-                            sc.nextLine(); // Consume the newline character
-
-                            if ("Y".equalsIgnoreCase(c)) {
-                                updateDonateDetail(con);
-                            } else if ("N".equalsIgnoreCase(c)) {
-                                break;
-                            } else {
-                                System.out.println("\t\t\t\u001B[31mThe input selection is incorrect, please re-enter!!!\u001B[0m");
-                            }
-                        } while (true);
-                        waitForEnter();
-                    }
-                    break;
-                //Update toàn bộ theo ID
-                case 5:
-                    System.out.print("\t\t\tEnter amount: ");
-                    double newAmountAll = sc.nextDouble();
-                    sc.nextLine(); // Consume the newline character
-                    LocalDate newDonateDateAll = Processing.validateDateInput("\t\t\tEnter a new receipt date (in dd/MM/yyyy format): ");
-                    System.out.println("\t\t\tEnter the Commission ID: ");
-                    int newCommissionIdAll = inputID(sc, "Commission", "id");
-                    System.out.println("\t\t\tEnter the representative's ID: ");
-                    int newRepresentativeIdAll = inputID(sc, "Representative", "id");
-                    String combinedSql = "UPDATE DonateDetail SET amount =?, donate_date =?, commission_id =?, representative_id =? WHERE id =?";
-
-                    try {
-                        pstmt = con.prepareStatement(combinedSql);
-                        pstmt.setDouble(1, newAmountAll);
-                        pstmt.setDate(2, Date.valueOf(newDonateDateAll));
-                        pstmt.setInt(3, newCommissionIdAll);
-                        pstmt.setInt(4, newRepresentativeIdAll);
-                        pstmt.setInt(5, identity);
-                        pstmt.executeUpdate();
-                        System.out.println("\t\t\t\u001B[32mUpdated by ID " + identity + " successfully!!!\u001B[0m");
-                        waitForEnter();
-                    } catch (Exception e) {
-                        System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
-                    } finally {
-                        try {
-                            if (pstmt != null) pstmt.close();
-                        } catch (SQLException se2) {
-                            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
-                        }
-                    }
-                    do {
-                        System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
-                        String c = sc.next();
-                        sc.nextLine(); // Consume the newline character
-
-                        if ("Y".equalsIgnoreCase(c)) {
-                            updateDonateDetail(con);
-                        } else if ("N".equalsIgnoreCase(c)) {
-                            break;
-                        } else {
-                            System.out.println("\t\t\t\u001B[31mThe input selection is incorrect, please re-enter!!!\u001B[0m");
-                        }
-                    } while (true);
-                    waitForEnter();
-                    break;
             }
         } else {
             System.out.println("\t\t\t\u001B[31mNo donation infor found!!!\u001B[0m");
