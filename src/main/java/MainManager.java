@@ -172,12 +172,12 @@ public class MainManager {
                     break;
                 case 11:
                     // System.out.println("Thống kê");
-                    CitizenReport citizenReport = new CitizenReport();
-                    citizenReport.getListCitizenObj();
-                   // System.out.println("List the top 5 households with the most priority beneficiaries");
-                   // citizenReport.selectTop5();
-                   //  DistributionReport distributionReport=new DistributionReport();
-                    //                    distributionReport.printDistributionReport();
+                   // CitizenReport citizenReport = new CitizenReport();
+                    //citizenReport.getListCitizenObj();
+                    // System.out.println("List the top 5 households with the most priority beneficiaries");
+                    // citizenReport.selectTop5();
+                    DistributionReport distributionReport = new DistributionReport();
+                    distributionReport.printDistributionReport();
 
                     break;
                 case 0:
