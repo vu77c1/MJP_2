@@ -91,6 +91,7 @@ public class PriorityObjectManager {
             int rs = JDBCQuery.executeUpdateQuery(sql, prams);
             if (rs > 0) {
                 System.out.println("\t\t\tAdd success!!");
+                displayPriorityObjects(getPriorityObject());
             } else {
                 System.out.println("\t\t\tAdd failed!!");
             }
@@ -105,7 +106,6 @@ public class PriorityObjectManager {
 
     //cap nhat Priority Object
     public void updatePriorityObject() {
-        System.out.println("\t\t\tLIST PRIORITY OBJECT");
         displayPriorityObjects(getPriorityObject());
         int id;
         id = InputValidator.validateIntInput("\t\t\tEnter ID to update: ");
@@ -149,7 +149,6 @@ public class PriorityObjectManager {
 
     //ham xoa  Priority Object theo ID
     public void deletePriorityObject() {
-        System.out.println("\t\t\tLIST PRIORITY OBJECT");
         displayPriorityObjects(getPriorityObject());
         int id;
         id = InputValidator.validateIntInput("\t\t\tEnter ID to delete: ");
@@ -195,6 +194,7 @@ public class PriorityObjectManager {
 
     //hien thi danh sach PriorityObject
     public void displayPriorityObjects(Map<Integer, PriorityObject> priorityObjects) {
+        System.out.println("\t\t\tLIST PRIORITY OBJECT");
         System.out.println("\t\t\t\u001B[1mID\t\tOBJECT_TYPE\u001B[0m");
 
         for (Map.Entry<Integer, PriorityObject> entry : priorityObjects.entrySet()) {
