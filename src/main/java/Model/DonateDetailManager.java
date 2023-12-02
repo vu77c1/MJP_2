@@ -186,10 +186,10 @@ public class DonateDetailManager {
             Map<Integer, DonateDetail> donateDetailMap = getDonateDetail(con);
             if (!donateDetailMap.isEmpty()) {
                 System.out.println();
-                System.out.println("=========================================================== DONATION LIST ===========================================================");
-                System.out.println("┌───────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬────────────┐");
-                System.out.println("│  \u001B[1mSTT\u001B[0m  │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │      \u001B[1mRepresentative\u001B[0m    │      \u001B[1mCompany name\u001B[0m    │   \u001B[1mOfficer\u001B[0m  │");
-                System.out.println("├───────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼────────────┤");
+                System.out.println("============================================================ DONATION LIST ============================================================");
+                System.out.println("┌────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────┐");
+                System.out.println("│   \u001B[1mID\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │   \u001B[1mOfficer\u001B[0m   │");
+                System.out.println("├────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
                 int rowCount = 0;
                 int totalRecords = countRecords(con, "DonateDetail");
                 for (Map.Entry<Integer, DonateDetail> entry : donateDetailMap.entrySet()) {
@@ -202,15 +202,15 @@ public class DonateDetailManager {
                     String companyName = donateDetail.getCompanyName();
                     String officerName = donateDetail.getOfficerName();
 
-                    System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", index, amount, dateFormat.format(donateDate), precintName, representativeName, companyName, officerName);
+                    System.out.printf("│ %-6S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-11s │\n", index, amount, dateFormat.format(donateDate), precintName, representativeName, companyName, officerName);
                     rowCount++;
                     // Print separator line after each record (except the last one)
                     if (rowCount < totalRecords) {
-                        System.out.println("├───────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼────────────┤");
+                        System.out.println("├────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
                     }
                 }
-                System.out.println("└───────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴────────────┘");
-                System.out.println("===========================================================   LIST ENDED  ===========================================================");
+                System.out.println("└────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────┘");
+                System.out.println("============================================================   LIST ENDED  ============================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[0m");
             }
@@ -248,10 +248,10 @@ public class DonateDetailManager {
                     boolean hasNext = resultSet.next();
                     while (hasNext) {
                         System.out.println();
-                        System.out.println("=========================================================== DONATION LIST ===========================================================");
-                        System.out.println("┌───────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬────────────┐");
-                        System.out.println("│   \u001B[1mID\u001B[0m  │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │      \u001B[1mRepresentative\u001B[0m    │      \u001B[1mCompany name\u001B[0m    │   \u001B[1mOfficer\u001B[0m  │");
-                        System.out.println("├───────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼────────────┤");
+                        System.out.println("============================================================ DONATION LIST ============================================================");
+                        System.out.println("┌────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────┐");
+                        System.out.println("│   \u001B[1mID\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │   \u001B[1mOfficer\u001B[0m   │");
+                        System.out.println("├────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
                         String amount = String.format("%.0f", resultSet.getDouble("amount"));
                         LocalDate donate_date = resultSet.getObject("donate_date", LocalDate.class);
                         String precint_name = resultSet.getString("precint_name");
@@ -263,11 +263,11 @@ public class DonateDetailManager {
                             company_name = resultSet.getString("company_name");
                         }
                         String name = resultSet.getString("name");
-                        System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
+                        System.out.printf("│ %-6S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-11s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
                         hasNext = resultSet.next();
                     }
-                    System.out.println("└───────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴────────────┘");
-                    System.out.println("===========================================================   LIST ENDED  ===========================================================");
+                    System.out.println("└────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────┘");
+                    System.out.println("============================================================   LIST ENDED  ============================================================");
                 } else {
                     System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
                 }
@@ -786,14 +786,16 @@ public class DonateDetailManager {
             waitForEnter();
             // Hỏi người dùng có muốn thực hiện INSERT không
             System.out.print("\t\t\t\u001B[32mDo you want to do an INSERT statement? (Y/N): \u001B[0m");
-            String input = sc.nextLine();
+            String input = sc.next();
+            sc.nextLine();
 
             // Nếu người dùng nhập Y, thực hiện lệnh INSERT
             if ("Y".equalsIgnoreCase(input)) {
                 insertIntoDistribution(connection, preparedStatement);
                 System.out.println("\t\t\t\u001B[32mInsert successfully!!!\u001B[0m");
                 System.out.print("\t\t\tWould you like to review the 'PHANPHOI' table (Y/N): ");
-                String print = sc.nextLine();
+                String print = sc.next();
+                sc.next();
                 if ("Y".equalsIgnoreCase(print)) {
                     printDistribution(con);
                     waitForEnter();
