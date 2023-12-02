@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 import static Model.DistributionManager.printDistribution;
 import static Model.Processing.*;
+import static Model.Processing.con;
 
 public class DonateDetailManager {
     private static final Scanner sc = new Scanner(System.in);
@@ -182,10 +183,11 @@ public class DonateDetailManager {
             if (!donateDetailMap.isEmpty()) {
                 System.out.println();
                 System.out.println("=========================================================== DONATION LIST ===========================================================");
-                System.out.println("._______.____________________.____________________.____________________.________________________.______________________.____________.");
-                System.out.println("│  STT  │   Amount of money  │   Donation Date    │    Commune/Ward    │      Representative    │      Company name    │   Officer  │");
-                System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
-
+                System.out.println("┌───────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬────────────┐");
+                System.out.println("│   ID  │   Amount of money  │   Donation Date    │    Commune/Ward    │      Representative    │      Company name    │   Officer  │");
+                System.out.println("├───────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼────────────┤");
+                int rowCount = 0;
+                int totalRecords = countRecords(con, "DonateDetail");
                 for (Map.Entry<Integer, DonateDetail> entry : donateDetailMap.entrySet()) {
                     Integer index = entry.getKey();
                     DonateDetail donateDetail = entry.getValue();
@@ -197,9 +199,13 @@ public class DonateDetailManager {
                     String name = donateDetail.getOfficerName();
 
                     System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", index, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
-                    System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
+                    rowCount++;
+                    // Print separator line after each record (except the last one)
+                    if (rowCount < totalRecords) {
+                        System.out.println("├───────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼────────────┤");
+                    }
                 }
-
+                System.out.println("└───────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴────────────┘");
                 System.out.println("===========================================================   LIST ENDED  ===========================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[0m");
@@ -235,12 +241,13 @@ public class DonateDetailManager {
             selectStatement.setInt(1, ID);
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (countRecords(con, "DonateDetail") > 0) {
-                    while (resultSet.next()) {
+                    boolean hasNext = resultSet.next();
+                    while (hasNext) {
                         System.out.println();
                         System.out.println("=========================================================== DONATION LIST ===========================================================");
-                        System.out.println("._______.____________________.____________________.____________________.________________________.______________________.____________.");
+                        System.out.println("┌───────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬────────────┐");
                         System.out.println("│   ID  │   Amount of money  │   Donation Date    │    Commune/Ward    │      Representative    │      Company name    │   Officer  │");
-                        System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
+                        System.out.println("├───────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼────────────┤");
                         String amount = String.format("%.0f", resultSet.getDouble("amount"));
                         LocalDate donate_date = resultSet.getObject("donate_date", LocalDate.class);
                         String precint_name = resultSet.getString("precint_name");
@@ -253,8 +260,9 @@ public class DonateDetailManager {
                         }
                         String name = resultSet.getString("name");
                         System.out.printf("│ %-5S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-10s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
-                        System.out.println("│_______│____________________│____________________│____________________│________________________│______________________│____________│");
+                        hasNext = resultSet.next();
                     }
+                    System.out.println("└───────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴────────────┘");
                     System.out.println("===========================================================   LIST ENDED  ===========================================================");
                 } else {
                     System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
@@ -269,7 +277,7 @@ public class DonateDetailManager {
     public static void addDonateDetail(Connection con) {
         try {
             System.out.println("\t\t\t=== Add Donationer Information ===");
-            System.out.print("\t\t\t\u001B[31mYou are about to add a record for a sponsor's donation.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\n\t\t\t(For related tables please refer to the menu \"Representative Management\" và \"Commission Management\")\n  \u001B[0m");
+            System.out.print("\t\t\t\u001B[31mYou are about to add a record for a sponsor's donation.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\n\t\t\t(For related tables please refer to the menu \"Representative manage\" và \"Commission manage\")\n  \u001B[0m");
             waitForEnter();
             String checkQuery = "SELECT * FROM DonateDetail WHERE representative_id = ? AND commission_id = ? AND donate_date = ?";
             String insertQuery = "INSERT INTO DonateDetail (representative_id, commission_id, donate_date, amount) VALUES (?, ?, ?, ?)";
@@ -278,38 +286,45 @@ public class DonateDetailManager {
             String representativeName;
             int representativeId;
             do {
-                System.out.print("\t\t\tName of the representative supporter (individual or corporate representative) (Refer to menu\"Representative Management\"): ");
+                System.out.print("\t\t\tPlease provide the name of the Sponsor representative (individual or corporate representative) \n\t\t\t(Refer to menu \"Representative manage\"): ");
                 representativeName = sc.nextLine();
                 representativeId = getRepresentativeIdByName(con, representativeName);
                 if (representativeId == -1) {
-                    System.out.println("\t\t\t\u001B[31mRepresentative not found. Please enter a valid representative name.\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mRepresentative's name not found. Please enter a valid representative name.\u001B[0m");
                 }
             } while (representativeId == -1);
             String precintName;
             int commissionId;
             do {
-                System.out.print("\t\t\tName of the commune/ward receiving donation (Refer to the menu \"Commission Management\"): ");
+                System.out.print("\t\t\tPlease provide the name of the Commune/Ward receiving the donation \n\t\t\t(Refer to the menu \"Commission manage\"): ");
                 precintName = sc.nextLine();
                 commissionId = getCommissionIdByName(con, precintName);
                 if (commissionId == -1) {
-                    System.out.println("\t\t\t\u001B[31mCommission not found. Please enter a valid Commission name.\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mCommune/Ward name not found. Please enter a valid Commune/Ward name.\u001B[0m");
                 }
             } while (commissionId == -1);
             //sc.nextLine(); // Consume the newline character
-            LocalDate donateDate = Processing.validateDateInput("\t\t\tEnter the date of receipt of support (in dd/MM/yyyy format): ");
+            LocalDate donateDate = Processing.validateDateInput("\t\t\tPlease enter the date of receipt of donation (in dd/MM/yyyy format): ");
             double amount = 0;
             String input;
 
             do {
-                System.out.print("\t\t\tEnter the donation amount: ");
+                System.out.print("\t\t\tPlease enter the donation amount (VND): ");
                 input = sc.next();
 
                 if (!isFloatNumber(input)) {
                     System.out.println("\t\t\t\u001B[31mInvalid amount. Please re-enter.\u001B[0m");
                 } else {
-                    amount = Double.parseDouble(input);
+                    // Convert the input to a double only if it's a valid float
+                    double inputValue = Double.parseDouble(input);
+
+                    if (inputValue >= 1000.0) {
+                        amount = inputValue;
+                    } else {
+                        System.out.println("\t\t\t\u001B[31mDonation amount is optional but it must be at least 1000 VND. Please re-enter.\u001B[0m");
+                    }
                 }
-            } while (!isFloatNumber(input));
+            } while (amount == 0);
             // Check if a record with the specified representative_id, commission_id, and donate_date already exists
             PreparedStatement checkStatement = con.prepareStatement(checkQuery);
             checkStatement.setInt(1, representativeId);
@@ -328,7 +343,7 @@ public class DonateDetailManager {
 
                 // Execute the update query
                 updateStatement.executeUpdate();
-                System.out.println("\t\t\t\u001B[32mDonationer has been updatated to the database.\u001B[0m");
+                System.out.println("\t\t\t\u001B[32mDonor has been updated to the database.\u001B[0m");
             } else {
                 // No record found, so insert a new record
                 PreparedStatement insertStatement = con.prepareStatement(insertQuery);
@@ -338,7 +353,7 @@ public class DonateDetailManager {
                 insertStatement.setDouble(4, amount);
                 // Execute the insert query
                 insertStatement.executeUpdate();
-                System.out.println("\t\t\t\u001B[32mNew Donationer has been added to the database.\u001B[0m");
+                System.out.println("\t\t\t\u001B[32mNew Donor has been added to the database.\u001B[0m");
             }
             waitForEnter();
         } catch (SQLException e) {
@@ -349,11 +364,11 @@ public class DonateDetailManager {
     //Xoa Thong Tin Donate
     public static void deleteDonateDetail(Connection con) {
         System.out.println();
-        System.out.print("\t\t\t\u001B[31mYou are about to delete a record for a sponsor's donation.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\n\t\t\t(For related tables please refer to the menu \"Representative Management\" và \"Commission Management\")\n\u001B[0m");
+        System.out.print("\t\t\t\u001B[31mYou are about to delete a record for a sponsor's donation.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\n\t\t\t(For related tables please refer to the menu \"Representative manage\" và \"Commission manage\")\n\u001B[0m");
         waitForEnter();
         printDonateDetail(con);
         int targetIndex;
-        int identity = -1;  // Initialize identity outside the loop
+        int identity = -1;
 
         do {
             System.out.print("\t\t\tPlease input the sequence number of the record you want to delete: ");
@@ -419,7 +434,7 @@ public class DonateDetailManager {
     //	Chuc Nang Cap Nhat Thong Tin Donate
     public static void updateDonateDetail(Connection con) {
         System.out.println();
-        System.out.print("\t\t\t\u001B[31mYou are about to edit a record for a sponsor's donation.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\n\t\t\t(For related tables please refer to the menu \"Representative Management\" và \" Commission Management\")\n\u001B[0m");
+        System.out.print("\t\t\t\u001B[31mYou are about to edit a record for a sponsor's donation.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\n\t\t\t(For related tables please refer to the menu \"Representative manage\" và \"Commission manage\")\n\u001B[0m");
         waitForEnter();
         printDonateDetail(con);
         int targetIndex;
@@ -447,11 +462,11 @@ public class DonateDetailManager {
                     int choice;
                     //Hien Thi Menu Update
                     do {
-                        System.out.println("\t\t\t+-----------------------------------+");
+                        System.out.println("\t\t\t┌───────────────────────────────────┐");
                         System.out.println("\t\t\t│ Which item do you want to update? │");
-                        System.out.println("\t\t\t+-----------------------------------+");
-                        System.out.printf("\t\t\t│ %-34s|\n\t\t\t│ %-34s│\n\t\t\t│ %-34s│\n", "1. Amount of money", "2. Donation Date", "0. Return to the Management menu");
-                        System.out.println("\t\t\t+-----------------------------------+");
+                        System.out.println("\t\t\t├───────────────────────────────────┤");
+                        System.out.printf("\t\t\t│ %-34s│\n\t\t\t│ %-34s│\n\t\t\t│ %-34s│\n", "1. Amount of money", "2. Donation Date", "0. Return to the Management menu");
+                        System.out.println("\t\t\t└───────────────────────────────────┘");
                         System.out.println("\t\t\tFrom Update Menu, Your Choice: ");
                         choice = InputValidator.validateIntInput("\t\t\tPlease Choice: ");
                         if (choice < 0 || choice > 2) {
@@ -509,7 +524,7 @@ public class DonateDetailManager {
                                 pstmt.setDate(1, Date.valueOf(newDonateDate));
                                 pstmt.setInt(2, identity);
                                 pstmt.executeUpdate();
-                                System.out.println("\t\t\t\u001B[32mUpdated Donatation date successful!!!\u001B[0m");
+                                System.out.println("\t\t\t\u001B[32mDonation date successfully updated.!!!\u001B[0m");
                                 waitForEnter();
                             } catch (Exception e) {
                                 System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
@@ -538,7 +553,7 @@ public class DonateDetailManager {
 
                     }
                 } else {
-                    System.out.println("\t\t\t\u001B[31mNo donation infor found!!!\u001B[0m");
+                    System.out.println("\t\t\t\u001B[31mNo donation information found!!!\u001B[0m");
                     waitForEnter();
                 }
             } else {
@@ -551,39 +566,49 @@ public class DonateDetailManager {
         try {
             if (countRecords(con, "DonateDetail") > 0) {
                 System.out.println();
-                System.out.println("================================== DONATION LIST ==================================");
-                System.out.println("._______.________________________.________________________.________________________.");
+                System.out.println("=================================== DONATION LIST ==================================");
+                System.out.println("┌───────┬────────────────────────┬────────────────────────┬────────────────────────┐");
                 System.out.println("│   ID  │         Officer        │       Commission       │  Participations Times  │");
-                System.out.println("│_______│________________________│________________________│________________________│");
+                System.out.println("├───────┼────────────────────────┼────────────────────────┼────────────────────────┤");
                 Statement statement = con.createStatement();
                 ResultSet resultSet = statement.executeQuery("""
-                        SELECT DISTINCT TOP 5
-                            Officer.id,
-                            Officer.name,
-                            Commission.precint_name,
-                            COUNT(OfficerDistribution.officer_id) as Stats
-                        FROM
-                            Officer
-                                LEFT JOIN
-                            dbo.Commission ON Officer.commision_id = Commission.id
-                                LEFT JOIN
-                            dbo.Distribution ON Commission.id = Distribution.commission_id
-                                LEFT JOIN
-                            dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
-                        GROUP BY
-                            Officer.id, Officer.name, Commission.precint_name
-                        ORDER BY
-                            Stats DESC;
-                         """);
-                while (resultSet.next()) {
+                SELECT DISTINCT TOP 5
+                    Officer.id,
+                    Officer.name,
+                    Commission.precint_name,
+                    COUNT(OfficerDistribution.officer_id) as Stats
+                FROM
+                    Officer
+                        LEFT JOIN
+                    dbo.Commission ON Officer.commision_id = Commission.id
+                        LEFT JOIN
+                    dbo.Distribution ON Commission.id = Distribution.commission_id
+                        LEFT JOIN
+                    dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
+                GROUP BY
+                    Officer.id, Officer.name, Commission.precint_name
+                ORDER BY
+                    Stats DESC;
+                 """);
+                boolean hasNext = resultSet.next();
+                while (hasNext) {
                     int ID = resultSet.getInt("id");
                     String companyName = resultSet.getString("name");
-                    String precintName = resultSet.getString("precint_name");
+                    String precinctName = resultSet.getString("precint_name");
                     int Stats = resultSet.getInt("Stats");
-                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", ID, companyName, precintName, Stats);
-                    System.out.println("│_______│________________________│________________________│________________________│");
+
+                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │%n", ID, companyName, precinctName, Stats);
+
+                    hasNext = resultSet.next();
+
+                    // Print separator line after each record (except the last one)
+                    if (hasNext) {
+                        System.out.println("├───────┼────────────────────────┼────────────────────────┼────────────────────────┤");
+                    }
                 }
-                System.out.println("==================================  LIST ENDED   ==================================");
+                // Print the bottom border after the last record
+                System.out.println("└───────┴────────────────────────┴────────────────────────┴────────────────────────┘");
+                System.out.println("==================================   LIST ENDED   ==================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
             }
@@ -620,23 +645,31 @@ public class DonateDetailManager {
             System.out.println("\t\t\tEnter the officer's ID: ");
             int id = Processing.inputID(sc, "Officer", "id");
             selectStatement.setInt(1, id);
-            int i = 1;
+            int i = 0;
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (countRecords(con, "OfficerDistribution") > 0) {
                     System.out.println();
-                    System.out.println("================================== DONATION LIST ==================================");
-                    System.out.println("._______.________________________.________________________.________________________.");
+                    System.out.println("=================================== DONATION LIST ==================================");
+                    System.out.println("┌───────┬────────────────────────┬────────────────────────┬────────────────────────┐");
                     System.out.println("│   ID  │         Officer        │       Commission       │  Participations Times  │");
-                    System.out.println("│_______│________________________│________________________│________________________│");
+                    System.out.println("├───────┼────────────────────────┼────────────────────────┼────────────────────────┤");
+                    int rowCount = 1;
+                    int totalRecords = countRecords(con, "OfficerDistribution");
                     while (resultSet.next()) {
                         String companyName = resultSet.getString("name");
                         String precintName = resultSet.getString("precint_name");
                         int Stats = resultSet.getInt("Stats");
-                        System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", i, companyName, precintName, Stats);
-                        System.out.println("│_______│________________________│________________________│________________________│");
+                        System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", id, companyName, precintName, Stats);
                         i++;
+                        rowCount++;
+                        // Print separator line after each record (except the last one)
+                        if (rowCount < totalRecords) {
+                            System.out.println("├───────┼────────────────────────┼────────────────────────┼────────────────────────┤");
+                        }
+
                     }
-                    System.out.println("==================================   LIST ENDED   =================================");
+                    System.out.println("└───────┴────────────────────────┴────────────────────────┴────────────────────────┘");
+                    System.out.println("==================================   LIST ENDED   ==================================");
                 } else {
                     System.out.println("\t\t\t\u001B[31mThere have been no donations yet\u001B[0m");
                 }
@@ -721,20 +754,26 @@ public class DonateDetailManager {
             // Thực hiện truy vấn và hiển thị kết quả
             ResultSet resultSet = preparedStatement.executeQuery();
             if (countRecords(con, "Distribution") > 0) {
+                boolean hasNext = resultSet.next();
                 System.out.println();
                 System.out.println("================================================== LIST OF HOUSEHOLDS ==================================================");
-                System.out.println("._______._____________________________________.___________._____________________________________.______________________.");
+                System.out.println("┌───────┬─────────────────────────────────────┬───────────┬─────────────────────────────────────┬──────────────────────┐");
                 System.out.println("│  ID   │        Household Lord's Name        │Commission │             Commune/Ward            │    Amount of money   │");
-                System.out.println("│_______│_____________________________________│___________│_____________________________________│______________________│");
-                while (resultSet.next()) {
+                System.out.println("├───────┼─────────────────────────────────────┼───────────┼─────────────────────────────────────┼──────────────────────┤");
+                while (hasNext) {
                     int householdId = resultSet.getInt("household_id");
                     int commissionId = resultSet.getInt("commission_id");
                     String householdLordName = resultSet.getString("household_lord_name");
                     String precintName = resultSet.getString("precint_name");
                     String allocatedAmount = String.format("%.0f", resultSet.getDouble("allocated_amount"));
                     System.out.printf("│ %-5S │ %-35s │ %-9s │ %-35s │ %-20s │%n", householdId, householdLordName, commissionId, precintName, allocatedAmount);
-                    System.out.println("│_______│_____________________________________│___________│_____________________________________│______________________│");
+                    hasNext = resultSet.next();
+                    // Print separator line after each record (except the last one)
+                    if (hasNext) {
+                        System.out.println("├───────┼─────────────────────────────────────┼───────────┼─────────────────────────────────────┼──────────────────────┤");
+                    }
                 }
+                System.out.println("└───────┴─────────────────────────────────────┴───────────┴─────────────────────────────────────┴──────────────────────┘");
                 System.out.println("==================================================     LIST ENDED     ==================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31m No data available yet!!!\u001B[0m");
@@ -755,7 +794,7 @@ public class DonateDetailManager {
                     waitForEnter();
                 }
             } else {
-                System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[31");
+                System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[0m");
             }
             waitForEnter();
         } catch (SQLException e) {
