@@ -11,7 +11,6 @@ import java.util.Scanner;
 
 import static Model.DistributionManager.printDistribution;
 import static Model.Processing.*;
-import static Model.Processing.con;
 
 public class DonateDetailManager {
     private static final Scanner sc = new Scanner(System.in);
@@ -73,24 +72,24 @@ public class DonateDetailManager {
         Map<Integer, DonateDetail> indexObjectMap = new LinkedHashMap<>();
         try {
             String selectQuery = """
-                SELECT distinct
-                    dbo.DonateDetail.id,
-                    amount,
-                    donate_date,
-                    C.precint_name,
-                    representative_name,
-                    COALESCE(company_name, '(Individual)') AS company_name,
-                    O.name,
-                    DonateDetail.commission_id,
-                    DonateDetail.representative_id
-                FROM
-                    DonateDetail
-                        LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id
-                        LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
-                        LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
-                        LEFT JOIN dbo.Distribution D on C.id = D.commission_id
-                        Left Join dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
-                        LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id ORDER BY ID DESC""";
+                    SELECT distinct
+                        dbo.DonateDetail.id,
+                        amount,
+                        donate_date,
+                        C.precint_name,
+                        representative_name,
+                        COALESCE(company_name, '(Individual)') AS company_name,
+                        O.name,
+                        DonateDetail.commission_id,
+                        DonateDetail.representative_id
+                    FROM
+                        DonateDetail
+                            LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id
+                            LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
+                            LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
+                            LEFT JOIN dbo.Distribution D on C.id = D.commission_id
+                            Left Join dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
+                            LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id ORDER BY ID DESC""";
 
             try (PreparedStatement preparedStatement = con.prepareStatement(selectQuery)) {
                 ResultSet rs = preparedStatement.executeQuery();
@@ -128,6 +127,7 @@ public class DonateDetailManager {
         }
         return indexObjectMap;
     }
+
     public static int getCommissionIdByName(Connection con, String commissionName) {
         int commissionId = -1; // Default value if not found
         try {
@@ -144,6 +144,7 @@ public class DonateDetailManager {
         }
         return commissionId;
     }
+
     public static int getRepresentativeIdByName(Connection con, String representativeName) {
         int representativeId = -1; // Default value if not found
         try {
@@ -160,6 +161,7 @@ public class DonateDetailManager {
         }
         return representativeId;
     }
+
     public static int getIdFromIndex(Connection con, int targetIndex) {
         Map<Integer, DonateDetail> indexObjectMap = getDonateDetail(con);
 
@@ -211,12 +213,12 @@ public class DonateDetailManager {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[0m");
             }
             waitForEnter();
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("\t\t\t\u001B[31mThere was an error!\u001B[0m");
         }
     }
+
     public static void printDonateDetailByID(Connection con, int ID) {
         String selectQuery = """
                 SELECT distinct
@@ -381,7 +383,7 @@ public class DonateDetailManager {
             }
             identity = getIdFromIndex(con, targetIndex);
             if (identity != -1) {
-                System.out.println("\t\t\t\u001B[32mFound ID at index " + targetIndex + ": " + identity + "\u001B[0m" );
+                System.out.println("\t\t\t\u001B[32mFound ID at index " + targetIndex + ": " + identity + "\u001B[0m");
                 waitForEnter();
                 printDonateDetailByID(con, identity);
                 System.out.println();
@@ -451,7 +453,7 @@ public class DonateDetailManager {
             }
             identity = getIdFromIndex(con, targetIndex);
             if (identity != -1) {
-                System.out.println("\t\t\t\u001B[32mFound ID at index " + targetIndex + ": " + identity + "\u001B[0m" );
+                System.out.println("\t\t\t\u001B[32mFound ID at index " + targetIndex + ": " + identity + "\u001B[0m");
                 waitForEnter();
                 printDonateDetailByID(con, identity);
                 waitForEnter();
@@ -572,24 +574,24 @@ public class DonateDetailManager {
                 System.out.println("├───────┼────────────────────────┼────────────────────────┼────────────────────────┤");
                 Statement statement = con.createStatement();
                 ResultSet resultSet = statement.executeQuery("""
-                SELECT DISTINCT TOP 5
-                    Officer.id,
-                    Officer.name,
-                    Commission.precint_name,
-                    COUNT(OfficerDistribution.officer_id) as Stats
-                FROM
-                    Officer
-                        LEFT JOIN
-                    dbo.Commission ON Officer.commision_id = Commission.id
-                        LEFT JOIN
-                    dbo.Distribution ON Commission.id = Distribution.commission_id
-                        LEFT JOIN
-                    dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
-                GROUP BY
-                    Officer.id, Officer.name, Commission.precint_name
-                ORDER BY
-                    Stats DESC;
-                 """);
+                        SELECT DISTINCT TOP 5
+                            Officer.id,
+                            Officer.name,
+                            Commission.precint_name,
+                            COUNT(OfficerDistribution.officer_id) as Stats
+                        FROM
+                            Officer
+                                LEFT JOIN
+                            dbo.Commission ON Officer.commision_id = Commission.id
+                                LEFT JOIN
+                            dbo.Distribution ON Commission.id = Distribution.commission_id
+                                LEFT JOIN
+                            dbo.OfficerDistribution ON Distribution.id = OfficerDistribution.distribution_id
+                        GROUP BY
+                            Officer.id, Officer.name, Commission.precint_name
+                        ORDER BY
+                            Stats DESC;
+                         """);
                 boolean hasNext = resultSet.next();
                 while (hasNext) {
                     int ID = resultSet.getInt("id");
