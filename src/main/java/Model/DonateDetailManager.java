@@ -645,7 +645,6 @@ public class DonateDetailManager {
             System.out.println("\t\t\tEnter the officer's ID: ");
             int id = Processing.inputID(sc, "Officer", "id");
             selectStatement.setInt(1, id);
-            int i = 0;
             try (ResultSet resultSet = selectStatement.executeQuery()) {
                 if (countRecords(con, "OfficerDistribution") > 0) {
                     System.out.println();
@@ -660,7 +659,6 @@ public class DonateDetailManager {
                         String precintName = resultSet.getString("precint_name");
                         int Stats = resultSet.getInt("Stats");
                         System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", id, companyName, precintName, Stats);
-                        i++;
                         rowCount++;
                         // Print separator line after each record (except the last one)
                         if (rowCount < totalRecords) {
