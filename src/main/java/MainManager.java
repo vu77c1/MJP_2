@@ -14,6 +14,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import dao.CommissionDao;
 import menuCom.Menue;
@@ -79,10 +81,10 @@ public class MainManager {
         try {
 
             switch (n) {
-                case 1:
-                    HouseManager houseManager = new HouseManager(DBConnect.connectDatabase());
-                    houseManager.handleHouseManagement(houseManager, sc);
-                    break;
+//                case 1:
+//                    HouseManager houseManager = new HouseManager(DBConnect.connectDatabase());
+//                    houseManager.handleHouseManagement(houseManager, sc);
+//                    break;
                 case 2:
 
                     OfficerManage.getOfficerManage();
@@ -208,56 +210,6 @@ public class MainManager {
 
     }
 
-    public static void handleDistributionManager() {
-        DistributionManager distributionManager = new DistributionManager();
-        int choice = -1;
-        do {
-
-            System.out.println("\t\t\tManage distribution lists");
-            System.out.println("\t\t\t1. Show distribution list");
-            System.out.println("\t\t\t2. Add distribution information");
-            System.out.println("\t\t\t3. Update distribution information");
-            System.out.println("\t\t\t4. Delete distribution information");
-            System.out.println("\t\t\t0. Return to menu main");
-            System.out.println();
-            System.out.println("\t\t\tWhat do you want to choose?");
-
-
-            do {
-                try {
-                    System.out.print("\t\t\tEnter the program number: (0-4): ");
-                    choice = Integer.parseInt(sc.nextLine());
-                } catch (NumberFormatException input) {
-                    System.out.println("\t\t\t\u001B[31mInvalid character entered!\n\t\t\tPlease re-enter (0-4)!\u001B[0m");
-                }
-            }
-            while (choice == -1);
-            switch (choice) {
-                case 0:
-                    System.out.println("\t\t\tReturn to the main screen");
-                    // waitForEnter();
-                    main(new String[]{});
-                    break;
-                case 1:
-                    printDistribution(con);
-                    break;
-                case 2:
-
-                    distributionManager.addDistribution();
-                    break;
-                case 3:
-                    distributionManager.updateDistribution();
-                    break;
-                case 4:
-                    distributionManager.deleteDistribution();
-                    break;
-                default:
-                    System.out.println("\t\t\t\u001B[31mInvalid function. Please re-enter.\u001B[0m\n");
-
-            }
-        }
-        while (choice != 0);
-    }
 
     public static void Statistics(Connection connection) throws SQLException {
         int choice = -1;
@@ -295,10 +247,35 @@ public class MainManager {
                 case 1:
 
                     System.out.print("\t\t\tInput the donation phase(MM/yyyy): ");
-                    String donationRound = sc.nextLine();
+                    String donationRound = "";
 
-                    HouseManager houseManager = new HouseManager();
-                    houseManager.displayTop5HouseholdsByDonation(connection, donationRound);
+//                    HouseManager houseManager = new HouseManager();
+
+                    while (true) {
+                        donationRound = sc.nextLine();
+
+                        // Regular expression pattern for MM/yyyy format
+                        String regex = "^(0[1-9]|1[0-2])/[0-9]{4}$";
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(donationRound);
+
+                        if (!matcher.matches()) {
+                            System.out.println("Invalid format! Please enter the donation phase in MM/yyyy format.");
+                        } else {
+                            // Perform additional validation (e.g., negative numbers, zero)
+                            String[] parts = donationRound.split("/");
+                            int month = Integer.parseInt(parts[0]);
+                            int year = Integer.parseInt(parts[1]);
+
+                            if (month <= 0 || year <= 0) {
+                                System.out.println("Please enter a valid month and year (greater than zero).");
+                            } else {
+                                // Input is valid, proceed to call displayTop5HouseholdsByDonation
+//                                houseManager.displayTop5HouseholdsByDonation(connection, donationRound);
+                                break;
+                            }
+                        }
+                    }
                     break;
                 case 2:
                     CitizenManager citizenManager = new CitizenManager();
