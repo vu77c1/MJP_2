@@ -1,9 +1,42 @@
 package Model;
 
+import java.util.ArrayList;
+
 public class House {
     private int id;
     private int commissionId;
     private int priorityObjectId;
+    public ArrayList<House> houses = new ArrayList<>();
+
+    public House(int id, int commissionId, int priorityObjectId, String precintName, String objectType) {
+        this.id = id;
+        this.commissionId = commissionId;
+        this.priorityObjectId = priorityObjectId;
+        this.houses = houses;
+        this.precintName = precintName;
+        this.objectType = objectType;
+    }
+
+    public String getPrecintName() {
+        return precintName;
+    }
+
+    public void setPrecintName(String precintName) {
+        this.precintName = precintName;
+    }
+
+    public String getObjectType() {
+        return objectType;
+    }
+
+    public void setObjectType(String objectType) {
+        this.objectType = objectType;
+    }
+
+
+
+    private String precintName;
+    private String objectType;
 
     // Constructor
     public House(int id, int commissionId, int priorityObjectId) {

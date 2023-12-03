@@ -29,8 +29,8 @@ public class CitizenManager {
         return input.equalsIgnoreCase("true") || input.equalsIgnoreCase("false");
     }
 
-    public static boolean isValidIdentityCard(String cmnd) {
-        return cmnd.matches("\\d{12}");
+    public boolean isValidIdentityCard(String cmnd) {
+        return cmnd.matches("\\d{12}") && !cmnd.matches("0{12}");
     }
 
     public static boolean isValidName(String name) {
@@ -45,7 +45,7 @@ public class CitizenManager {
         }
     }
     public static boolean isValidPhoneNumber(String phoneNumber) {
-        return phoneNumber.matches("\\d{10}");
+        return phoneNumber.matches("\\d{10}") && !phoneNumber.matches("0{10}");
     }
 
     public static boolean isValidAddress(String address) {
@@ -77,6 +77,51 @@ public class CitizenManager {
             return false;
         }
     }
+    public Map<Integer, String> getHouseList() {
+        Map<Integer, String> indexHouseMap = new LinkedHashMap<>();
+
+        try (Connection connection = DBConnect.connectDatabase();
+             PreparedStatement statement = connection.prepareStatement(
+                     "SELECT H.id, CONCAT(C.precint_name, ', ', C.city_name, ', ', C.province_name, ', ', P.object_type) AS house_info, ROW_NUMBER() OVER (ORDER BY H.id) AS row_index " +
+                             "FROM House H " +
+                             "JOIN Commission C ON H.commission_id = C.id " +
+                             "JOIN PriorityObject P ON H.priority_object_id = P.id");
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                indexHouseMap.put(resultSet.getInt("row_index"), resultSet.getString("house_info"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return indexHouseMap;
+    }
+
+
+
+    public Map<Integer, String> getCitizenObjectList() {
+        Map<Integer, String> indexCitizenObjectMap = new LinkedHashMap<>();
+
+        try (Connection connection = DBConnect.connectDatabase();
+             PreparedStatement statement = connection.prepareStatement("SELECT id, type_name_object, coefficient FROM CitizenObject");
+             ResultSet resultSet = statement.executeQuery()) {
+
+            while (resultSet.next()) {
+                int id = resultSet.getInt("id");
+                String typeNameObject = resultSet.getString("type_name_object");
+                int coefficient = resultSet.getInt("coefficient");
+
+                String displayInfo = typeNameObject + " (Coefficient: " + coefficient + ")";
+                indexCitizenObjectMap.put(id, displayInfo);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return indexCitizenObjectMap;
+    }
+
     public Citizen enterCitizenDetailsFromConsole(Scanner scanner) {
         Citizen newCitizen = new Citizen();
 
@@ -91,11 +136,15 @@ public class CitizenManager {
         }
         newCitizen.setName(name);
 
-        System.out.print("IdentityCard  Number : ");
+        System.out.print("IdentityCard Number : ");
         String cmnd = scanner.nextLine();
         while (!isValidIdentityCard(cmnd)) {
-            System.out.println("ID card number is invalid. Please re-enter your ID card number (12 numbers).");
-            System.out.print("IdentityCard  Number: ");
+            if (cmnd.matches("0{12}")) {
+                System.out.println("ID card number cannot consist of 12 zeros. Please re-enter your ID card number.");
+            } else {
+                System.out.println("ID card number is invalid. Please re-enter your ID card number (12 numbers).");
+            }
+            System.out.print("IdentityCard Number: ");
             cmnd = scanner.nextLine();
         }
         newCitizen.setIdentityCard(cmnd);
@@ -133,13 +182,24 @@ public class CitizenManager {
         } while (!isValidAddress(address));
         newCitizen.setAddress(address);
 
-        int houseId = -1;
-        do {
-            System.out.print("House id : ");
-            houseId = Integer.parseInt(scanner.nextLine());
-        } while (!isValidHouseId(houseId));
-        newCitizen.setHouseId(houseId);
+        Map<Integer, String> houseMap = getHouseList();
+        System.out.println("Select House:");
+        for (Map.Entry<Integer, String> entry : houseMap.entrySet()) {
+            System.out.println(entry.getKey() + ". " + entry.getValue());
+        }
 
+        // Nhập index của House từ người dùng
+        int houseIndex = -1;
+        do {
+            System.out.print("House Index: ");
+            houseIndex = Integer.parseInt(scanner.nextLine());
+        } while (!houseMap.containsKey(houseIndex));
+
+        // Lấy ID của House từ danh sách ánh xạ
+        int houseID = houseIndex; // Đây là ID của House được chọn
+
+        // Lưu ID của House cho Citizen
+        newCitizen.setHouseId(houseID);
         String isHouseholdLordInput;
         do {
             System.out.print("Is household lord?  (true/false): ");
@@ -156,12 +216,26 @@ public class CitizenManager {
         boolean sex = Boolean.parseBoolean(sexInput);
         newCitizen.setSex(sex);
 
-        int citizenObjectId = -1;
+        Map<Integer, String> citizenObjectMap = getCitizenObjectList();
+        System.out.println("Select Citizen Object:");
+        for (Map.Entry<Integer, String> entry : citizenObjectMap.entrySet()) {
+            System.out.println(entry.getKey() + ". " + entry.getValue());
+        }
+
+        // Nhập index của Citizen Object từ người dùng
+        int citizenObjectIndex = -1;
         do {
-            System.out.print("Citizen object id : ");
-            citizenObjectId = Integer.parseInt(scanner.nextLine());
-        } while (!isValidCitizenObjectId(citizenObjectId));
-        newCitizen.setCitizenObjectId(citizenObjectId);
+            System.out.print("Citizen Object Index: ");
+            citizenObjectIndex = Integer.parseInt(scanner.nextLine());
+        } while (!citizenObjectMap.containsKey(citizenObjectIndex));
+
+        // Lấy ID của Citizen Object từ danh sách ánh xạ
+        int citizenObjectID = citizenObjectIndex; // Đây là ID của Citizen Object được chọn
+
+        // Lưu ID của Citizen Object cho Citizen
+        newCitizen.setCitizenObjectId(citizenObjectID);
+
+
 
 
         return newCitizen;
@@ -171,6 +245,7 @@ public class CitizenManager {
 
         addCitizen(newCitizen); // Gọi phương thức addCitizen đã viết trước đó
     }
+
 
 
     public void addCitizen(Citizen newCitizen) {
@@ -203,33 +278,9 @@ public class CitizenManager {
         }
     }
 
-    // Phương thức sửa thông tin một Citizen trong cơ sở dữ liệu
-    public void updateCitizenFromConsoleInput(Scanner scanner) {
-        try {
-            System.out.print("Enter the ID of the citizen needing update: ");
-            int citizenId = Integer.parseInt(scanner.nextLine());
 
-            if (!isValidCitizenId(citizenId)) {
-                System.out.println("Invalid ID.");
-                return;
-            }
-
-            Citizen existingCitizen = getSingleCitizenById(citizenId);
-            if (existingCitizen != null) {
-                Citizen updatedCitizen = enterCitizenDetailsFromConsole(scanner);
-                updateCitizen(updatedCitizen);
-                System.out.println("Citizen information has been updated.");
-            } else {
-                System.out.println("Citizen whose ID was not found " + citizenId);
-            }
-        } catch (NumberFormatException e) {
-            System.out.println("Invalid ID.");
-        } catch (SQLException e) {
-            System.out.println("Error updating citizens: " + e.getMessage());
-        }
-    }
     public boolean isValidCitizenId(int citizenId) {
-          return citizenId >= 0 && String.valueOf(citizenId).matches("\\d+");
+        return citizenId >= 0 && String.valueOf(citizenId).matches("\\d+");
     }
     public void updateCitizen(Citizen citizen) throws SQLException {
         String query = "UPDATE Citizen SET name = ?, identity_card = ?, date_of_birth = ?, phone_number = ?, address = ?, house_id = ?, is_household_lord = ?, sex = ?, citizen_object_id = ? WHERE id = ?";
@@ -285,30 +336,100 @@ public class CitizenManager {
         }
         return false;
     }
-    public void deleteCitizen(int citizenId) throws SQLException {
-        if (citizenId <= 0) {
-            System.out.println("Invalid ID.");
-            return;
-        }
+    public void deleteCitizen(Connection connection) throws SQLException {
 
-        // Kiểm tra sự tồn tại của ID trong bảng Citizen
-        if (!isCitizenIdExists(citizenId)) {
-            System.out.println("Citizen with ID " + citizenId + " does not exist.");
-            return;
-        }
 
-        String query = "DELETE FROM Citizen WHERE id = ?";
-        try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, citizenId);
-            int rowsAffected = statement.executeUpdate();
+        LinkedHashMap<Integer, Integer> indexToIdMap = new LinkedHashMap<>();
+        TreeMap<Integer, String> citizenData = new TreeMap<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
-            if (rowsAffected > 0) {
-                System.out.println("Citizen with ID " + citizenId + " has been deleted.");
+        String queryAllCitizens = "SELECT c.id, c.name, c.identity_card, c.date_of_birth, c.phone_number, c.address, c.is_household_lord, c.sex, co.type_name_object FROM Citizen c JOIN CitizenObject co ON c.citizen_object_id = co.id ORDER BY c.id DESC";
+        try (PreparedStatement statementAllCitizens = connection.prepareStatement(queryAllCitizens)) {
+            ResultSet rsAllCitizens = statementAllCitizens.executeQuery();
+
+            int index = 1;
+            while (rsAllCitizens.next()) {
+                int citizenId = rsAllCitizens.getInt("id");
+
+                String citizenInfo = String.format("Index: %d, Name: %s, Identity Card: %s, Date of Birth: %s, Phone Number: %s, Address: %s, Household Lord: %s, Sex: %s, Type: %s",
+                        index,
+                        rsAllCitizens.getString("name"),
+                        rsAllCitizens.getString("identity_card"),
+                        dateFormat.format(rsAllCitizens.getDate("date_of_birth")),
+                        rsAllCitizens.getString("phone_number"),
+                        rsAllCitizens.getString("address"),
+                        rsAllCitizens.getBoolean("is_household_lord"),
+                        rsAllCitizens.getBoolean("sex") ? "Male" : "Female",
+                        rsAllCitizens.getString("type_name_object"));
+
+                citizenData.put(index, citizenInfo);
+                indexToIdMap.put(index, citizenId); // Associate the index with the corresponding citizen ID
+                index++;
+            }
+
+            System.out.println("| Index | Name                   | Identity Card | Date of Birth | Phone Number | Address                | Household Lord | Sex    | Type                  |");
+            System.out.println("| ----- | ---------------------- | ------------- | ------------- | ------------ | ---------------------- | -------------- | ------ | --------------------- |");
+
+            for (Map.Entry<Integer, String> entry : citizenData.entrySet()) {
+                String citizenInfo = entry.getValue();
+                String[] infoParts = citizenInfo.split(", ");
+
+                System.out.printf("| %-6s| %-22s| %-14s| %-14s| %-13s| %-22s| %-15s| %-7s| %-21s|%n",
+                        infoParts[0].split(": ")[1],
+                        infoParts[1].split(": ")[1],
+                        infoParts[2].split(": ")[1],
+                        infoParts[3].split(": ")[1],
+                        infoParts[4].split(": ")[1],
+                        infoParts[5].split(": ")[1],
+                        infoParts[6].split(": ")[1],
+                        infoParts[7].split(": ")[1],
+                        infoParts[8].split(": ")[1]
+                );
+            }
+            Scanner scanner = new Scanner(System.in);
+            int chosenIndex;
+
+            while (true) {
+                System.out.println("Enter the index to delete the citizen: ");
+                String input = scanner.nextLine();
+
+                // Kiểm tra nếu chuỗi nhập vào không phải là số hoặc số âm
+                if (!input.matches("\\d+") || Integer.parseInt(input) <= 0) {
+                    System.out.println("Vui lòng chỉ nhập số dương. Vui lòng nhập lại.");
+                    continue;
+                }
+
+                chosenIndex = Integer.parseInt(input);
+
+                // Kiểm tra xem index có trong danh sách index hiển thị không
+                if (!indexToIdMap.containsKey(chosenIndex)) {
+                    System.out.println("Lựa chọn index không tồn tại. Vui lòng nhập lại.");
+                    continue;
+                }
+
+                break; // Nếu index hợp lệ, thoát khỏi vòng lặp
+            }
+
+            int chosenId = indexToIdMap.getOrDefault(chosenIndex, -1);
+            if (chosenId != -1) {
+                // Perform deletion using chosenId
+                String deleteQuery = "DELETE FROM Citizen WHERE id = ?";
+                try (PreparedStatement deleteStatement = connection.prepareStatement(deleteQuery)) {
+                    deleteStatement.setInt(1, chosenId);
+                    int rowsAffected = deleteStatement.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        System.out.println("Citizen with ID " + chosenId + " has been deleted.");
+                    } else {
+                        System.out.println("No citizen found with ID " + chosenId + ".");
+                    }
+                }
             } else {
-                System.out.println("No citizen found with ID " + citizenId + ".");
+                System.out.println("Invalid index. Please enter a valid index.");
             }
         }
     }
+
 
     // Phương thức lấy danh sách tất cả các Citizen từ cơ sở dữ liệu
     public List<Citizen> getAllCitizens() throws SQLException {
@@ -326,32 +447,37 @@ public class CitizenManager {
         }
         return citizens;
     }
+
     public void displayCitizenTable() {
+        LinkedHashMap<Integer, String> citizenData = new LinkedHashMap<>();
         Statement st = null;
         ResultSet rs = null;
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
         try {
             st = connection.createStatement();
-            String sql = "SELECT c.*, co.type_name_object " +
+            String sql = "SELECT c.*, co.type_name_object, cm.precint_name " +
                     "FROM Citizen c " +
-                    "JOIN CitizenObject co ON c.citizen_object_id = co.id";
+                    "JOIN CitizenObject co ON c.citizen_object_id = co.id " +
+                    "JOIN House h ON c.house_id = h.id " +
+                    "JOIN Commission cm ON h.commission_id = cm.id " +
+                    "ORDER BY c.id DESC"; // Sắp xếp giảm dần theo ID
             rs = st.executeQuery(sql);
 
             System.out.println("=================================== Citizen Table ====================================");
-            System.out.println("| ID    | Name                           | Identity Card   | Date of Birth | Phone Number         | Address                | House ID        | Is Household Lord | Gender |   Name Object |");
+            System.out.println("| Index | Name                           | Identity Card   | Date of Birth | Phone Number         | Address                | Precint Name    | Is Household Lord | Gender |   Name Object |");
             System.out.println("| ----- | ------------------------------ | --------------- | --------------| --------------------- | ---------------------- | --------------- | ----------------- | ------ | ---------------- |");
 
+            int index = 1;
             while (rs.next()) {
-                int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String identityCard = rs.getString("identity_card");
                 String phoneNumber = rs.getString("phone_number");
                 String address = rs.getString("address");
-                int houseId = rs.getInt("house_id");
                 boolean isHouseholdLord = rs.getBoolean("is_household_lord");
                 boolean gender = rs.getBoolean("sex");
                 String typeNameObject = rs.getString("type_name_object");
+                String precintName = rs.getString("precint_name");
 
                 // Định dạng lại ngày tháng từ kiểu Date sang chuỗi theo định dạng dd/MM/yyyy
                 String dateOfBirthString = "";
@@ -368,10 +494,27 @@ public class CitizenManager {
                     typeNameObject = "Nguoi gia";
                 }
 
-                System.out.println(String.format("| %-5s | %-30s | %-15s | %-13s | %-21s | %-24s | %-15s | %-17s | %-6s | %-16s |",
-                        id, name, identityCard, dateOfBirthString, phoneNumber, address, houseId, isHouseholdLord, gender ? "Male" : "Female", typeNameObject));
+                String citizenInfo = String.format("| %-5s | %-30s | %-15s | %-13s | %-21s | %-24s | %-15s | %-17s | %-6s | %-16s |",
+                        index, name, identityCard, dateOfBirthString, phoneNumber, address, precintName, isHouseholdLord, gender ? "Male" : "Female", typeNameObject);
+
+                citizenData.put(index, citizenInfo);
+                index++;
+            }
+
+            // Hiển thị dữ liệu từ LinkedHashMap theo thứ tự giảm dần và cập nhật lại index
+            LinkedHashMap<Integer, String> reversedMap = new LinkedHashMap<>();
+            int reversedIndex = 1;
+
+            for (Map.Entry<Integer, String> entry : citizenData.entrySet()) {
+                reversedMap.put(reversedIndex, entry.getValue());
+                reversedIndex++;
+            }
+
+            for (String citizenInfo : reversedMap.values()) {
+                System.out.println(citizenInfo);
                 System.out.println("| ----- | ------------------------------ | --------------- | --------------| --------------------- | ---------------------- | --------------- | ----------------- | ------ | ---------------- |");
             }
+
         } catch (SQLException e) {
             System.out.println("SQL Error: " + e.getMessage());
         } finally {
@@ -388,6 +531,8 @@ public class CitizenManager {
             }
         }
     }
+
+
 
     // Phương thức tính tuổi từ ngày sinh
     public int calculateAge(Date dateOfBirth) {
@@ -407,46 +552,52 @@ public class CitizenManager {
     }
 
     public void fetchCitizenInfoWithPriorityFactor() {
-        String query = "SELECT h.id AS house_id, hh.name AS household_head_name, " +
+        String query = "SELECT com.precint_name AS precinct_name, hh.name AS household_head_name, " +
                 "SUM(" +
                 "    CASE " +
-                "        WHEN DATEDIFF(YEAR, c.date_of_birth, GETDATE()) <= 8 THEN 1 " +
-                "        WHEN DATEDIFF(YEAR, c.date_of_birth, GETDATE()) >= 60 THEN 1 " +
-                "        ELSE " +
-                "            CASE " +
-                "                WHEN co.type_name_object IN ('Phu nu mang thai', 'Nguoi tan tat','Tre em') THEN 1 " +
-                "                ELSE 0 " +
-                "            END " +
+                "        WHEN co.type_name_object = 'Nguoi khuyet tat' THEN 4 " + // Người khuyết tật có ưu tiên cao nhất
+                "        WHEN co.type_name_object = 'Phu nu mang thai' THEN 3 " + // Phụ nữ mang thai có ưu tiên cao hơn
+                "        WHEN co.type_name_object = 'Tre em' THEN 2 " + // Trẻ em có ưu tiên tiếp theo
+                "        WHEN co.type_name_object = 'Nguoi gia' THEN 1 " + // Người già có ưu tiên cuối cùng trước trường hợp bình thường
+                "        ELSE 0 " + // Trường hợp còn lại (Bình thường)
                 "    END" +
                 ") AS total_priority_factor " +
                 "FROM " +
                 "    House h " +
                 "LEFT JOIN " +
-                "    Citizen c ON h.id = c.house_id " +
+                "    Commission com ON h.commission_id = com.id " +
                 "LEFT JOIN " +
-                "    CitizenObject co ON c.citizen_object_id = co.id " +
+                "    Citizen ci ON h.id = ci.house_id " +
+                "LEFT JOIN " +
+                "    CitizenObject co ON ci.citizen_object_id = co.id " +
                 "LEFT JOIN " +
                 "    Citizen hh ON h.id = hh.house_id AND hh.is_household_lord = 1 " +
                 "WHERE " +
                 "    hh.name IS NOT NULL " +
                 "GROUP BY " +
-                "    h.id, hh.name " +
+                "    com.precint_name, hh.name " +
                 "ORDER BY " +
-                "    total_priority_factor DESC";
+                "    CASE " +
+                "        WHEN MAX(CASE WHEN co.type_name_object = 'Nguoi khuyet tat' THEN 4 ELSE 0 END) > 0 THEN 4 " +
+                "        WHEN MAX(CASE WHEN co.type_name_object = 'Tre em' THEN 2 ELSE 0 END) > 0 THEN 3 " +
+                "        WHEN MAX(CASE WHEN co.type_name_object = 'Phu nu mang thai' THEN 3 ELSE 0 END) > 0 THEN 2 " +
+                "        WHEN MAX(CASE WHEN co.type_name_object = 'Nguoi gia' THEN 1 ELSE 0 END) > 0 THEN 1 " +
+                "        ELSE 0 " +
+                "    END DESC";
 
         try (Statement statement = connection.createStatement();
              ResultSet resultSet = statement.executeQuery(query)) {
 
-            System.out.println("================================== House Priority Factor ==================================");
-            System.out.println("| House ID | Household Head Name     | Total Priority Factor |");
-            System.out.println("|----------|--------------------------|-----------------------|");
+            System.out.println("================================== Precinct Priority Factor ==================================");
+            System.out.println("| Precinct Name | Household Head Name     | Total Priority Factor |");
+            System.out.println("|---------------|--------------------------|-----------------------|");
 
             while (resultSet.next()) {
-                int houseId = resultSet.getInt("house_id");
+                String precinctName = resultSet.getString("precinct_name");
                 String householdHeadName = resultSet.getString("household_head_name");
                 int totalPriorityFactor = resultSet.getInt("total_priority_factor");
 
-                System.out.printf("| %-9s| %-25s| %-22s|%n", houseId, householdHeadName, totalPriorityFactor);
+                System.out.printf("| %-14s| %-25s| %-22s|%n", precinctName, householdHeadName, totalPriorityFactor);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -454,25 +605,121 @@ public class CitizenManager {
     }
 
 
+    public void displayHouseTable() throws SQLException {
+        Statement st = null;
+        ResultSet rs = null;
+        try {
+            st = connection.createStatement();
+            String sql = "SELECT H.id, CONCAT(C.precint_name, ', ', C.city_name, ', ', C.province_name) AS commission_info, P.object_type " +
+                    "FROM House H " +
+                    "INNER JOIN Commission C ON H.commission_id = C.id " +
+                    "INNER JOIN PriorityObject P ON H.priority_object_id = P.id " +
+                    "ORDER BY H.id DESC"; // Sắp xếp theo ID giảm dần
+            rs = st.executeQuery(sql);
 
-    public void processPriorityDecision(Scanner scanner, Connection connection) {
-        System.out.println("Do you want to prioritize approval within a specific house_id? (yes/no)");
-        String decision = scanner.nextLine().toLowerCase();
-
-        if (decision.equals("yes")) {
-            System.out.println("Input house_id to approval:");
-            int houseId = scanner.nextInt();
-            scanner.nextLine(); // Đọc bỏ dòng trống sau khi nhập số
-
-            processPregnantWomanDecision(scanner, connection, houseId);
-            checkHouseBefore(connection, houseId);
-            checkHouseAfter(connection,houseId);
-        } else {
-            // Xử lý logic khi không muốn xét duyệt theo house_id cụ thể
-            System.out.println("There is no need to perform priority review within a specific house_id.");
+            System.out.println("=================================== House Table ====================================");
+            System.out.println(String.format("| %-5s | %-35s | %-20s |", "ID", "Commission Information", "Priority Object Type"));
+            System.out.println(String.format("| %-5s | %-35s | %-20s |", "-----", "-----------------------------------", "---------------------"));
+            int index = 1; // Index bắt đầu từ 1
+            while (rs.next()) {
+                System.out.println(String.format("| %-5s | %-35s | %-20s |",
+                        index, rs.getString("commission_info"), rs.getString("object_type")));
+                System.out.println(String.format("| %-5s | %-35s | %-20s |", "-----", "-----------------------------------", "---------------------"));
+                index++;
+            }
+            System.out.println();
+        } finally {
+            // Đóng ResultSet và Statement sau khi sử dụng xong
+            if (rs != null) {
+                rs.close();
+            }
+            if (st != null) {
+                st.close();
+            }
         }
     }
 
+    public void processPriorityDecision(Scanner scanner, Connection connection) {
+        int rowCount = 0;
+        try {
+            // Hiển thị bảng House trước khi người dùng nhập lựa chọn
+            displayHouseTable();
+
+            System.out.println("Do you want to prioritize approval? (yes/no)");
+            String decision = scanner.nextLine().toLowerCase();
+
+            if (decision.equals("yes")) {
+                int selectedIndex;
+
+                do {
+                    System.out.println("Input the index of the house to approve:");
+                    while (!scanner.hasNextInt()) {
+                        System.out.println("Please enter a valid index number.");
+                        scanner.next(); // Đọc và loại bỏ dữ liệu không hợp lệ
+                    }
+                    selectedIndex = scanner.nextInt();
+                    scanner.nextLine(); // Đọc bỏ dòng trống sau khi nhập số
+
+                    if (selectedIndex <= 0 || selectedIndex > rowCount) {
+                        System.out.println("Please enter a valid index within the displayed range.");
+                    }
+                } while (selectedIndex <= 0 || selectedIndex > rowCount);
+
+                int houseId = mapSelectedIndexToHouseId(selectedIndex, connection);
+                if (houseId != -1) {
+                    processPregnantWomanDecision(scanner, connection, houseId);
+                    checkHouseBefore(connection, houseId);
+                    checkHouseAfter(connection, houseId);
+                } else {
+                    System.out.println("Invalid house index selected. Please select a valid index.");
+                }
+            } else {
+                System.out.println("There is no need to perform priority review within a specific house_id.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public int mapSelectedIndexToHouseId(int selectedIndex, Connection connection) throws SQLException {
+        PreparedStatement statement = null;
+        ResultSet rs = null;
+        int houseId = -1;
+
+        try {
+            String sql = "SELECT H.id " +
+                    "FROM House H " +
+                    "INNER JOIN Commission C ON H.commission_id = C.id " +
+                    "INNER JOIN PriorityObject P ON H.priority_object_id = P.id " +
+                    "ORDER BY H.id DESC";
+
+            statement = connection.prepareStatement(sql, ResultSet.TYPE_SCROLL_INSENSITIVE, ResultSet.CONCUR_READ_ONLY);
+            rs = statement.executeQuery();
+            int rowCount = 0;
+
+            if (rs.last()) {
+                rowCount = rs.getRow();
+                rs.beforeFirst(); // Di chuyển con trỏ về trước hàng đầu tiên
+            }
+
+            if (selectedIndex <= 0 || selectedIndex > rowCount) {
+                return -1; // Trả về -1 nếu index không hợp lệ
+            }
+
+            if (rs.absolute(selectedIndex)) {
+                houseId = rs.getInt("id");
+            }
+        } finally {
+            // Đóng ResultSet và PreparedStatement sau khi sử dụng xong
+            if (rs != null) {
+                rs.close();
+            }
+            if (statement != null) {
+                statement.close();
+            }
+        }
+
+        return houseId;
+    }
     // Hàm xử lý quyết định về phụ nữ mang thai trong house_id
     public void processPregnantWomanDecision(Scanner scanner, Connection connection, int houseId) {
         System.out.println("Remove priority review for pregnant women? (yes/no)");
@@ -647,7 +894,207 @@ public class CitizenManager {
 
         }
     }
-    public static void handleCitizenManagement(CitizenManager citizenManager, Scanner scanner) {
+    public static void displayCitizenInfo( Connection connection) {
+        LinkedHashMap<Integer, Integer> indexToIdMap = new LinkedHashMap<>();
+        TreeMap<Integer, String> citizenData = new TreeMap<>();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        String queryAllCitizens = "SELECT c.id, c.name, c.identity_card, c.date_of_birth, c.phone_number, c.address, c.is_household_lord, c.sex, co.type_name_object FROM Citizen c JOIN CitizenObject co ON c.citizen_object_id = co.id ORDER BY c.id DESC";
+        try (PreparedStatement statementAllCitizens = connection.prepareStatement(queryAllCitizens)) {
+            ResultSet rsAllCitizens = statementAllCitizens.executeQuery();
+
+            int index = 1;
+            while (rsAllCitizens.next()) {
+                int citizenId = rsAllCitizens.getInt("id");
+
+                String citizenInfo = String.format("Index: %d, Name: %s, Identity Card: %s, Date of Birth: %s, Phone Number: %s, Address: %s, Household Lord: %s, Sex: %s, Type: %s",
+                        index,
+                        rsAllCitizens.getString("name"),
+                        rsAllCitizens.getString("identity_card"),
+                        dateFormat.format(rsAllCitizens.getDate("date_of_birth")),
+                        rsAllCitizens.getString("phone_number"),
+                        rsAllCitizens.getString("address"),
+                        rsAllCitizens.getBoolean("is_household_lord"),
+                        rsAllCitizens.getBoolean("sex") ? "Male" : "Female",
+                        rsAllCitizens.getString("type_name_object"));
+
+                citizenData.put(index, citizenInfo);
+                indexToIdMap.put(index, citizenId); // Associate the index with the corresponding citizen ID
+                index++;
+            }
+
+            System.out.println("| Index | Name                   | Identity Card | Date of Birth | Phone Number | Address                | Household Lord | Sex    | Type                  |");
+            System.out.println("| ----- | ---------------------- | ------------- | ------------- | ------------ | ---------------------- | -------------- | ------ | --------------------- |");
+
+            for (Map.Entry<Integer, String> entry : citizenData.entrySet()) {
+                String citizenInfo = entry.getValue();
+                String[] infoParts = citizenInfo.split(", ");
+
+                System.out.printf("| %-6s| %-22s| %-14s| %-14s| %-13s| %-22s| %-15s| %-7s| %-21s|%n",
+                        infoParts[0].split(": ")[1],
+                        infoParts[1].split(": ")[1],
+                        infoParts[2].split(": ")[1],
+                        infoParts[3].split(": ")[1],
+                        infoParts[4].split(": ")[1],
+                        infoParts[5].split(": ")[1],
+                        infoParts[6].split(": ")[1],
+                        infoParts[7].split(": ")[1],
+                        infoParts[8].split(": ")[1]
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+
+
+        // Cho phép người dùng chọn cách cập nhật
+        Scanner scanner = new Scanner(System.in);
+        int chosenId = -1;
+
+        while (true) {
+            System.out.println("Select index to update information: ");
+            String input = scanner.nextLine();
+
+            // Kiểm tra xem chuỗi nhập vào có chứa ký tự đặc biệt hay không
+            if (!input.matches("[a-zA-Z0-9]+")) {
+                System.out.println("Do not enter special characters or spaces. Please re-enter.");
+                continue;
+            }
+
+            // Kiểm tra xem chuỗi nhập vào có phải là số không
+            if (!input.matches("\\d+")) {
+                System.out.println("Please enter numbers only. Please re-enter.");
+                continue;
+            }
+
+            int chosenIndex = Integer.parseInt(input);
+
+            // Kiểm tra xem index có tồn tại trong map không
+            if (indexToIdMap.containsKey(chosenIndex)) {
+                chosenId = indexToIdMap.get(chosenIndex);
+                break; // Nếu có, thoát khỏi vòng lặp
+            } else {
+                System.out.println("Index option does not exist. Please re-enter.");
+            }
+        }
+
+        if (chosenId != -1) {
+            System.out.println("Select update method (1 - phoneNumber, 2 - typeNameObject):");
+            int choice;
+
+            while (true) {
+                String input = scanner.nextLine();
+
+                // Kiểm tra xem chuỗi nhập vào có phải là số không và không âm
+                if (!input.matches("\\d+") || Integer.parseInt(input) <= 0) {
+                    System.out.println("Incorrect input. Please re-enter.");
+                    continue;
+                }
+
+                choice = Integer.parseInt(input);
+                break;
+            }
+
+            if (choice == 1) {
+                updatePhoneNumber(chosenId, connection);
+            } else if (choice == 2) {
+                updateTypeNameObject(chosenId, connection);
+            } else {
+                System.out.println("Invalid selection.");
+            }
+        }
+    }
+
+
+    public static void updatePhoneNumber(int citizenId, Connection connection) {
+        Scanner scanner = new Scanner(System.in);
+
+        String newPhoneNumber;
+        boolean isValid = false;
+
+        do {
+            System.out.println("Enter the new phone number:");
+            newPhoneNumber = scanner.nextLine();
+
+            // Kiểm tra tính hợp lệ của số điện thoại
+            isValid = isValidPhoneNumber(newPhoneNumber);
+        } while (!isValid);
+
+        try {
+            String updateQuery = "UPDATE Citizen SET phone_number = ? WHERE id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+                statement.setString(1, newPhoneNumber);
+                statement.setInt(2, citizenId);
+                int rowsAffected = statement.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    System.out.println("Phone number updated successfully.");
+                } else {
+                    System.out.println("Unable to update the phone number.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public static void updateTypeNameObject(int citizenId, Connection connection) {
+        try {
+            // Display information from the CitizenObject table
+            String query = "SELECT * FROM CitizenObject";
+            try (Statement statement = connection.createStatement()) {
+                ResultSet rs = statement.executeQuery(query);
+
+                // Display information from the CitizenObject table
+                System.out.println("CitizenObject Information:");
+                System.out.println("| Index | Type Name Object |");
+                System.out.println("--------------------------");
+                while (rs.next()) {
+                    int index = rs.getInt("id");
+                    String typeNameObject = rs.getString("type_name_object");
+                    System.out.println("|   " + index + "   |   " + typeNameObject + "   |");
+                }
+
+                Scanner scanner = new Scanner(System.in);
+                System.out.println("Choose an index from the CitizenObject table:");
+                int index = scanner.nextInt();
+
+                // Perform the update on typeNameObject based on the chosen index from the CitizenObject table
+                String updateQuery = "UPDATE Citizen SET citizen_object_id = ? WHERE id = ?";
+                try (PreparedStatement updateStatement = connection.prepareStatement(updateQuery)) {
+                    updateStatement.setInt(1, index);
+                    updateStatement.setInt(2, citizenId);
+                    int rowsAffected = updateStatement.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        System.out.println("typeNameObject updated successfully.");
+                    } else {
+                        System.out.println("Unable to update typeNameObject.");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public boolean isCitizenExists(int citizenId) {
+        boolean exists = false;
+        String query = "SELECT COUNT(*) AS count FROM Citizen WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(query)) {
+            statement.setInt(1, citizenId);
+            ResultSet rs = statement.executeQuery();
+            if (rs.next()) {
+                int count = rs.getInt("count");
+                exists = (count > 0);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return exists;
+    }
+    public void handleCitizenManagement(CitizenManager citizenManager, Scanner scanner) {
         int choice = -1;
 
         do {
@@ -668,14 +1115,12 @@ public class CitizenManager {
                         break;
                     case 2:
                         // Xóa công dân
-                        System.out.print("Input id to delete: ");
-                        int citizenIdToDelete = Integer.parseInt(scanner.nextLine());
-                        citizenManager.deleteCitizen(citizenIdToDelete);
-                        System.out.println("Citizen with ID " + citizenIdToDelete + " deleted.");
+                        citizenManager.deleteCitizen(connection);
                         break;
                     case 3:
                         // Sửa thông tin công dân
-                        citizenManager.updateCitizenFromConsoleInput(scanner);
+
+                       displayCitizenInfo(connection);
                         break;
                     case 4:
                         // Hiển thị thông tin tất cả công dân
@@ -698,4 +1143,6 @@ public class CitizenManager {
 
 
 
+
 }
+

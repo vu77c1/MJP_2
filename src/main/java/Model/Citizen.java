@@ -31,6 +31,19 @@ public class Citizen {
         this.citizenObjectId = citizenObjectId;
     }
 
+    public Citizen(int id, String name, String identityCard, java.sql.Date dateOfBirth, String phoneNumber, String address, int houseId, boolean isHouseholdLord, boolean sex, int citizenObjectId) {
+        this.id = id;
+        this.name = name;
+        this.identityCard = identityCard;
+        this.dateOfBirth = dateOfBirth;
+        this.phoneNumber = phoneNumber;
+        this.address = address;
+        this.houseId = houseId;
+        this.isHouseholdLord = isHouseholdLord;
+        this.sex = sex;
+        this.citizenObjectId = citizenObjectId;
+    }
+
     // Getters and setters for all fields
     // ID
     public int getId() {
