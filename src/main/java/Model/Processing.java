@@ -2,6 +2,7 @@ package Model;
 
 import Common.DBConnect;
 import Common.InputValidator;
+import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -10,7 +11,6 @@ import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.util.regex.Pattern;
 
 public class Processing {
     private static final Scanner sc = new Scanner(System.in);
@@ -21,9 +21,9 @@ public class Processing {
         while (true) {
             try {
                 System.out.print("\t\t\t\u001B[32mPress Enter to continue...\t\u001B[0m");
-                String input = sc.nextLine();
+                String input = sc.nextLine().trim();
                 if (input.isEmpty()) {
-                    // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
+                    // If the trimmed input is empty, exit the loop
                     break;
                 }
             } catch (NoSuchElementException e) {
@@ -32,6 +32,7 @@ public class Processing {
             }
         }
     }
+
     public static int validateIntInput(String prompt) {
         int userInput = 0;
         boolean isValid = false;
@@ -43,11 +44,30 @@ public class Processing {
                 if (userInput >= 0) {
                     isValid = true;
                 } else {
-                    isValid = false;
                     System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
                 }
             } catch (NumberFormatException ex) {
                 System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
+            }
+        } while (!isValid);
+
+        return userInput;
+    }
+    public static double validateDoubleInput(String prompt) {
+        double userInput = 0.0;
+        boolean isValid = false;
+
+        do {
+            try {
+                System.out.print(prompt);
+                userInput = Double.parseDouble(sc.nextLine().trim());
+                if (userInput >= 1000.0 ){
+                    isValid = true;
+                }else {
+                    System.out.println("\t\t\t\u001B[31mInvalid amount. Please re-enter.\u001B[0m");
+                }
+            } catch (NumberFormatException ex) {
+                System.out.println("\t\t\t\u001B[31mInvalid amount. Please re-enter.\u001B[0m");
             }
         } while (!isValid);
 
@@ -60,61 +80,61 @@ public class Processing {
             // You may use a whitelist or other validation methods depending on your requirements
 
             // Assuming tableName is a valid identifier
-            String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE id = ?) THEN 1 ELSE 0 END";
+            String sql = "SELECT COUNT(*) FROM ? WHERE id = ?";
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
-                stmt.setInt(1, id);
+                stmt.setString(1, tableName);
+                stmt.setInt(2, id);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
-                        idExist = rs.getInt(1) == 1;
+                        // Check if the count is greater than 0
+                        idExist = rs.getInt(1) > 0;
                     }
                 }
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database!\u001B[0m");
+            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + "\u001B[0m");
         }
         return idExist;
     }
 
-    public static boolean isFloatNumber(String number) {
-        try {
-            Double.parseDouble(number);
-            return true;
-        } catch (NumberFormatException ex) {
-            //System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
-        }
-        return false;
-    }
-
-    //	Kiem Tra Ky Tu Dac Biet
-    public static boolean isSpecialCharacter(String ch) {
-        for (int i = 0; i < ch.length(); i++) {
-            if (Pattern.matches("[@#$%^&*!?<>+=()_`~;.\\\"]", ch.charAt(i) + "")) {
-                return true;
-            }
-        }
-        return false;
-    }
-
     public static int countRecords(Connection con, String tableName) {
-        String sql = "SELECT COUNT(*) FROM " + tableName;
+        // Validate tableName to prevent SQL injection
+        if (!isValidTableName(con,tableName)) {
+            System.out.println("\t\t\t\u001B[31mInvalid table name: " + tableName + "\u001B[0m");
+            return -1;
+        }
 
-        try (Statement stmt = con.createStatement();
-             ResultSet rs = stmt.executeQuery(sql)) {
+        try {
+            String sql = "SELECT COUNT(*) FROM " + tableName;
+            try (PreparedStatement stmt = con.prepareStatement(sql);
+                 ResultSet rs = stmt.executeQuery()) {
 
-            if (rs.next()) {
-                return rs.getInt(1);
-            } else {
-                return 0;
+                if (rs.next()) {
+                    return rs.getInt(1);
+                } else {
+                    return 0;
+                }
             }
         } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database!\u001B[0m");
+            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + "\u001B[0m");
+            return -1;
         }
-        return -1; // Return an error indicator instead of throwing an exception
     }
 
-    public static int inputID(Scanner sc, String tableName, String columnName) {
+    // Validate table name to prevent SQL injection
+    private static boolean isValidTableName(@NotNull Connection con, String tableName) {
+        try {
+            DatabaseMetaData metaData = con.getMetaData();
+            try (ResultSet tables = metaData.getTables(null, null, tableName, null)) {
+                return tables.next(); // If the result set has at least one row, the table exists
+            }
+        } catch (SQLException e) {
+            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + "\u001B[0m");
+            return false;
+        }
+    }
+
+    public static int inputID(String tableName, String columnName) {
         int ID;
         do {
             ID = InputValidator.validateIntInput("\t\t\tInput ID  (Refer to the menus \"Manage\"): ");
