@@ -1,7 +1,6 @@
 package Model;
 
 import Common.InputValidator;
-import org.jetbrains.annotations.NotNull;
 
 import java.lang.reflect.Method;
 import java.sql.*;
@@ -71,7 +70,7 @@ public class DonateDetailManager {
         while (choice != 0);
     }
 
-public static @NotNull Map<Integer, DonateDetail> getDonateDetail(Connection con) {
+public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
     Map<Integer, DonateDetail> indexObjectMap = new LinkedHashMap<>();
     try {
         String selectQuery = """
