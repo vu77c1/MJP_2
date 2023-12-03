@@ -33,7 +33,7 @@ public class ListOfHouseHolds {
                 int sum = 0, num = 0;
                 while (rs.next())
                 {   num +=1;
-                    int amountReceived = rs.getInt("amount_received");
+                    int amountReceived = rs.getInt("amount_distribution");
                     sum += amountReceived;
                 };
                 System.out.println("Number donated: " + num);
