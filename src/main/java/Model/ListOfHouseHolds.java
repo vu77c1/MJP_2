@@ -2,7 +2,7 @@ package Model;
 
 import Common.DBConnect;
 import Common.InputValidatorKhue;
-import Common.JDBCQuery;
+import Common.JDBCQuery1;
 
 import java.sql.*;
 import java.util.ArrayList;
