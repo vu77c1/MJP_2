@@ -338,7 +338,6 @@ public class CitizenManager {
     }
     public void deleteCitizen(Connection connection) throws SQLException {
 
-
         LinkedHashMap<Integer, Integer> indexToIdMap = new LinkedHashMap<>();
         TreeMap<Integer, String> citizenData = new TreeMap<>();
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
@@ -351,11 +350,14 @@ public class CitizenManager {
             while (rsAllCitizens.next()) {
                 int citizenId = rsAllCitizens.getInt("id");
 
+                String dateOfBirthStr = rsAllCitizens.getString("date_of_birth");
+                String dateOfBirthFormatted = dateOfBirthStr != null ? dateFormat.format(rsAllCitizens.getDate("date_of_birth")) : "N/A";
+
                 String citizenInfo = String.format("Index: %d, Name: %s, Identity Card: %s, Date of Birth: %s, Phone Number: %s, Address: %s, Household Lord: %s, Sex: %s, Type: %s",
                         index,
                         rsAllCitizens.getString("name"),
                         rsAllCitizens.getString("identity_card"),
-                        dateFormat.format(rsAllCitizens.getDate("date_of_birth")),
+                        dateOfBirthFormatted,
                         rsAllCitizens.getString("phone_number"),
                         rsAllCitizens.getString("address"),
                         rsAllCitizens.getBoolean("is_household_lord"),
@@ -386,6 +388,8 @@ public class CitizenManager {
                         infoParts[8].split(": ")[1]
                 );
             }
+
+
             Scanner scanner = new Scanner(System.in);
             int chosenIndex;
 
@@ -907,11 +911,14 @@ public class CitizenManager {
             while (rsAllCitizens.next()) {
                 int citizenId = rsAllCitizens.getInt("id");
 
+                String dateOfBirthStr = rsAllCitizens.getString("date_of_birth");
+                String dateOfBirthFormatted = dateOfBirthStr != null ? dateFormat.format(rsAllCitizens.getDate("date_of_birth")) : "N/A";
+
                 String citizenInfo = String.format("Index: %d, Name: %s, Identity Card: %s, Date of Birth: %s, Phone Number: %s, Address: %s, Household Lord: %s, Sex: %s, Type: %s",
                         index,
                         rsAllCitizens.getString("name"),
                         rsAllCitizens.getString("identity_card"),
-                        dateFormat.format(rsAllCitizens.getDate("date_of_birth")),
+                        dateOfBirthFormatted,
                         rsAllCitizens.getString("phone_number"),
                         rsAllCitizens.getString("address"),
                         rsAllCitizens.getBoolean("is_household_lord"),
@@ -980,7 +987,7 @@ public class CitizenManager {
         }
 
         if (chosenId != -1) {
-            System.out.println("Select update method (1 - phoneNumber, 2 - typeNameObject):");
+            System.out.println("Select update method (1 - phoneNumber, 2 - typeNameObject , 3- IdentityCard):");
             int choice;
 
             while (true) {
@@ -995,17 +1002,52 @@ public class CitizenManager {
                 choice = Integer.parseInt(input);
                 break;
             }
-
             if (choice == 1) {
                 updatePhoneNumber(chosenId, connection);
             } else if (choice == 2) {
                 updateTypeNameObject(chosenId, connection);
+            } else if (choice == 3) {
+                updateIdentityCard(chosenId, connection);
             } else {
                 System.out.println("Invalid selection.");
             }
         }
     }
 
+    public static void updateIdentityCard(int citizenId, Connection connection) {
+        Scanner scanner = new Scanner(System.in);
+        String newIdentityCard;
+
+        while (true) {
+            System.out.println("Enter the new Identity Card: ");
+            newIdentityCard = scanner.nextLine();
+
+            // Validate input
+            if (newIdentityCard.matches("\\d{12}") && !newIdentityCard.matches("0+") && !newIdentityCard.matches(".*\\W+.*") && !newIdentityCard.matches(".*[a-zA-Z]+.*") && !newIdentityCard.matches("-\\d+")) {
+                // Valid input
+                break;
+            } else {
+                System.out.println("Invalid Identity Card. Please enter 12 non-zero digits without special characters, letters, or negative numbers.");
+            }
+        }
+        // Thực hiện cập nhật identity_card trong cơ sở dữ liệu
+        try {
+            String updateQuery = "UPDATE Citizen SET identity_card = ? WHERE id = ?";
+            try (PreparedStatement statement = connection.prepareStatement(updateQuery)) {
+                statement.setString(1, newIdentityCard);
+                statement.setInt(2, citizenId);
+                int rowsAffected = statement.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    System.out.println("Identity Card updated successfully.");
+                } else {
+                    System.out.println("Unable to update the Identity Card.");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     public static void updatePhoneNumber(int citizenId, Connection connection) {
         Scanner scanner = new Scanner(System.in);
