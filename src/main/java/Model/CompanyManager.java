@@ -5,9 +5,7 @@ import Common.InputValidatorKhue;
 import Common.JDBCQuery;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
 
 public class CompanyManager {
     private Connection connection;
@@ -17,16 +15,66 @@ public class CompanyManager {
     public CompanyManager(){
         this.connection= DBConnect.connectDatabase();
     }
+
+    // Trình quản lý bảng Company
+    public void handleCompany(CompanyManager companyManager, Scanner scanner) {
+        System.out.println("Company Management:");
+        System.out.println("1. Display");
+        System.out.println("2. Add");
+        System.out.println("3. Delete");
+        System.out.println("4. Display");
+        System.out.println("0. Exit");
+
+        int choice = -1;
+
+        do {
+            try {
+                System.out.print("Please choose: ");
+                choice = Integer.parseInt(scanner.nextLine());
+                switch (choice) {
+                    case 1:
+                        companyManager.displayCompany();
+                        break;
+                    case 2:
+                        // Thêm đơn vị ủng hộ
+                        companyManager.addCompanyInput(scanner);
+                        break;
+                    case 3:
+                        // Xóa đơn vị ủng hộ
+                        int companyIdToDelete = InputValidatorKhue.validateIntInput("Input company ID you need to delete: ");
+                        companyManager.updatecompanyidForRepresentative(companyIdToDelete);
+                        companyManager.deleteCompany(companyIdToDelete);
+
+                        break;
+                    case 4:
+                        // Sửa đơn vị ủng hộ
+                        companyManager.updateCompanyFromConsoleInput(scanner);
+                        break;
+                    case 0:
+                        // Quay lại menu chính
+                        break;
+                    default:
+                        System.out.println("Not choose.");
+                        break;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please input number.");
+            } catch (SQLException e) {
+                System.out.println("SQL error: " + e.getMessage());
+            }
+        } while (choice != 0);
+    }
+
     public Company inputCompany(Scanner scanner){
         Company newCompany = new Company();
-//      System.out.print("Tên công ty:");
-        String companyName = InputValidatorKhue.validateStringCompany("Tên công ty:");
+        String companyName = InputValidatorKhue.validateString("Name:");
         newCompany.setCompanyName(companyName);
-//        System.out.print("Địa chỉ:");
-        String companyAddrress = InputValidatorKhue.validateStringCompany("Địa chỉ:");
+        String companyAddrress = InputValidatorKhue.validateString("Address:");
         newCompany.setCompanyAddrress(companyAddrress);
         return newCompany;
     }
+
+    //Thêm Company vào cơ sở dữ liệu và trả về companyName
     public String addCompanyInput(Scanner scanner) {
         Company newCompany = inputCompany(scanner);
         addCompany(newCompany);
@@ -42,13 +90,13 @@ public class CompanyManager {
 
             int rowsAffected = preparedStatement.executeUpdate();
             if (rowsAffected > 0) {
-                System.out.println("Đơn vị ủng hộ đã được thêm vào cơ sở dữ liệu.");
+                System.out.println("Add success!!.");
             } else {
-                System.out.println("Không thể thêm đơn vị ủng hộ mới.");
+                System.out.println("Add unsuccess!!");
             }
 
         } catch (SQLException e) {
-            System.out.println("Lỗi khi thêm đơn vị ủng hộ: " + e.getMessage());
+            System.out.println("Error while adding company: " + e.getMessage());
         }
         finally {
             JDBCQuery.closeConnection();
@@ -58,22 +106,26 @@ public class CompanyManager {
     // Phương thức sửa thông tin Company trong cơ sở dữ liệu
     public void updateCompanyFromConsoleInput(Scanner scanner) {
         try {
-            System.out.print("Nhập ID đơn vị ủng hộ cần sửa: ");
-            int companyId = Integer.parseInt(scanner.nextLine());
+            boolean checkCompanyId =false;
+            do {
+                int id = InputValidatorKhue.validateIntInput("Input company ID you need to fix: ");
+                int companyId = getCompanyObject().get(id).getId();
+                Company existingCompany = getSingleCompanyById(companyId);
+                if (existingCompany != null) {
+                    Company updatedCompany = inputCompany(scanner);
+                    updatedCompany.setId(companyId);
+                    updateCompany(updatedCompany);
+                    System.out.println("Update success!!");
+                    checkCompanyId =true;
+                } else {
+                    System.out.println("ID not found: " + companyId);
+                }
+            } while (!checkCompanyId);
 
-            Company existingCompany = getSingleCompanyById(companyId);
-            if (existingCompany != null) {
-                Company updatedCompany = inputCompany(scanner);
-                updatedCompany.setId(companyId);
-                updateCompany(updatedCompany);
-                System.out.println("Thông tin đơn vị ủng hộ đã được cập nhật");
-            } else {
-                System.out.println("Không tìm thấy đơn vị ủng hộ có ID là: " + companyId);
-            }
         } catch (NumberFormatException e){
-            System.out.println("ID không hợp lệ");
+            System.out.println("ID invalid");
         } catch (SQLException e){
-            System.out.println("Lỗi khi cập nhật đơn vị ủng hộ: " +e.getMessage());
+            System.out.println("Error update: " +e.getMessage());
         }finally {
             JDBCQuery.closeConnection();
         }
@@ -93,6 +145,15 @@ public class CompanyManager {
             JDBCQuery.closeConnection();
         }
 
+    }
+
+    public void updatecompanyidForRepresentative(int id) throws SQLException{
+        String query ="UPDATE Representative set company_id = Null WHERE company_id ="+ id;
+        try (PreparedStatement statement =connection.prepareStatement(query)){
+            statement.executeUpdate();
+        } finally {
+            JDBCQuery.closeConnection();
+        }
     }
 
     public Company getSingleCompanyById(int id) throws SQLException {
@@ -130,63 +191,83 @@ public class CompanyManager {
     }
 
     // Phương thức xóa một Company từ cơ sở dữ liệu
-
     public void deleteCompany(int companyId) throws SQLException {
+        int id = getCompanyObject().get(companyId).getId();
         String query = "DELETE FROM Company WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
-            statement.setInt(1, companyId);
+            statement.setInt(1, id);
             statement.executeUpdate();
+            if(statement.executeUpdate()>0){
+                System.out.println("\t\tDelete success!!");
+            } else {
+                System.out.println("\t\t\tDelete failed. No company found with the specified ID.");
+            }
+
         }
         finally {
             JDBCQuery.closeConnection();
         }
     }
+
 
     // Phương thức lấy danh sách tất cả các Company từ cơ sở dữ liệu
-    public List<Company> getAllCompany() throws SQLException {
-        List<Company> companies = new ArrayList<>();
-        String query = "SELECT * FROM Company";
-        try (PreparedStatement statement = connection.prepareStatement(query);
-             ResultSet resultSet = statement.executeQuery()) {
-            while (resultSet.next()) {
-                Company company = new Company();
-                company.setId(resultSet.getInt("id"));
-                company.setCompanyName(resultSet.getString("company_name"));
-                // Thêm các trường thông tin khác tương tự
-                companies.add(company);
+    public Map<Integer, Company> getCompanyObject() {
+        Map<Integer, Company> indexObjectMap = new LinkedHashMap<>();
+        try {
+            JDBCQuery.openConnection();
+            String sql = "SELECT * FROM Company ORDER BY id desc";
+            ResultSet rs = JDBCQuery.executeSelectQuery(sql);
+            if (rs != null) {
+                int index = 1;
+                try {
+                    while (rs.next()) {
+                        Company company = new Company(
+                                rs.getInt("id"),
+                                rs.getString("company_name"),
+                                rs.getString("company_address")
+                        );
+                        indexObjectMap.put(index, company);
+                        index++;
+                    }
+                } catch (SQLException ex) {
+                    ex.printStackTrace();
+                }
             }
-        }
-        finally {
+        } catch (Exception ex2) {
+            ex2.printStackTrace();
+
+        } finally {
             JDBCQuery.closeConnection();
+
         }
-        return companies;
+        return indexObjectMap;
     }
 
+    //Hiển thị bảng Company
     public void displayCompany() throws SQLException {
         Statement st = null;
         ResultSet rs = null;
         try {
             st =connection.createStatement();
             System.out.println();
-            System.out.println("============== DANH SÁCH ĐƠN VỊ ỦNG HỘ ==============");
-            System.out.println("================= DANH SÁCH KẾT THÚC ================");
-            System.out.println("._______.____________________.______________________.");
-            System.out.println("│   ID  │    Tên Đơn vị      │    Địa chỉ đơn vị    │");
-            System.out.println("│_______│____________________│____________________│");
-            rs = st.executeQuery("SELECT * from Company");
+            System.out.println("._______._________________________.______________________________.");
+            System.out.println("│   No  │         Company         │            Address           │");
+            System.out.println("│_______│_________________________│______________________________│");
+            rs = st.executeQuery("SELECT * FROM Company ORDER BY id desc");
+            int index = 1;
             while (rs.next())
             {
                 String id = rs.getString("id");
                 String companyName = rs.getString("company_name");
                 String companyAddress = rs.getString("company_address");
-                System.out.printf("│ %-5S │ %-18s │ %-18s │\n", id, companyName, companyAddress );
-                System.out.println("│_______│____________________│____________________│");
+                System.out.printf("│ %-5S │ %-23s │ %-28s │\n", id, companyName, companyAddress );
+                System.out.println("│_______│_________________________│______________________________│");
+                index ++;
             }
-            System.out.println("================= DANH SÁCH KẾT THÚC ================");
             InputValidatorKhue.waitForEnter();
         }catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
+            System.out.println("Error in the database connection process");
         }finally {
             if(rs!=null){
                 rs.close();
@@ -196,54 +277,5 @@ public class CompanyManager {
             }
         }
     }
-
-    public void handleCompany(CompanyManager companyManager, Scanner scanner) {
-        System.out.println("Quản lý đơn vị ủng hộ - Chọn chức năng:");
-        System.out.println("1. Hiển thị đơn vị ủng hộ");
-        System.out.println("2. Thêm đơn vị ủng hộ");
-        System.out.println("3. Xóa đơn vị ủng hộ");
-        System.out.println("4. Sửa thông tin đơn vị ủng hộ");
-        System.out.println("0. Quay lại menu chính");
-
-        int choice = -1;
-
-        do {
-            try {
-                System.out.print("Vui lòng chọn: ");
-                choice = Integer.parseInt(scanner.nextLine());
-                switch (choice) {
-                    case 1:
-                        companyManager.displayCompany();
-                        break;
-                    case 2:
-                        // Thêm đơn vị ủng hộ
-                        companyManager.addCompanyInput(scanner);
-                        break;
-                    case 3:
-                        // Xóa đơn vị ủng hộ
-                        System.out.print("Nhập ID đơn vị ủng hộ cần xóa: ");
-                        int representativeIdToDelete = Integer.parseInt(scanner.nextLine());
-                        companyManager.deleteCompany(representativeIdToDelete);
-                        System.out.println("Đơn vị ủng hộ có ID " + representativeIdToDelete + " đã được xóa thành công.");
-                        break;
-                    case 4:
-                        // Sửa đơn vị ủng hộ
-                        companyManager.updateCompanyFromConsoleInput(scanner);
-                        break;
-                    case 0:
-                        // Quay lại menu chính
-                        break;
-                    default:
-                        System.out.println("Lựa chọn không hợp lệ.");
-                        break;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Vui lòng nhập số.");
-            } catch (SQLException e) {
-                System.out.println("Lỗi SQL: " + e.getMessage());
-            }
-        } while (choice != 0);
-    }
-
 
 }
