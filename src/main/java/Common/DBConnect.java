@@ -3,10 +3,8 @@ package Common;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
-import java.util.Scanner;
 
 public class DBConnect {
-    private static final Scanner sc = new Scanner(System.in);
     public static Connection connectDatabase() {
         final String JDBC_DRIVER = JdbcConfig.JDBC_DRIVER;
         final String DB_URL = JdbcConfig.JDBC_URL;
@@ -17,8 +15,6 @@ public class DBConnect {
         try {
             Class.forName(JDBC_DRIVER);
             con = DriverManager.getConnection(DB_URL, USERNAME, PASSWORD);
-            //System.out.println("\u001B[32mDatabase Connected\u001B[0m");
-            System.out.println();
         } catch (ClassNotFoundException | SQLException e) {
             System.out.println("\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
         }
