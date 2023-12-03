@@ -14,6 +14,8 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import dao.CommissionDao;
 import menuCom.Menue;
@@ -295,10 +297,35 @@ public class MainManager {
                 case 1:
 
                     System.out.print("\t\t\tInput the donation phase(MM/yyyy): ");
-                    String donationRound = sc.nextLine();
+                    String donationRound = "";
 
                     HouseManager houseManager = new HouseManager();
-                    houseManager.displayTop5HouseholdsByDonation(connection, donationRound);
+
+                    while (true) {
+                        donationRound = sc.nextLine();
+
+                        // Regular expression pattern for MM/yyyy format
+                        String regex = "^(0[1-9]|1[0-2])/[0-9]{4}$";
+                        Pattern pattern = Pattern.compile(regex);
+                        Matcher matcher = pattern.matcher(donationRound);
+
+                        if (!matcher.matches()) {
+                            System.out.println("Invalid format! Please enter the donation phase in MM/yyyy format.");
+                        } else {
+                            // Perform additional validation (e.g., negative numbers, zero)
+                            String[] parts = donationRound.split("/");
+                            int month = Integer.parseInt(parts[0]);
+                            int year = Integer.parseInt(parts[1]);
+
+                            if (month <= 0 || year <= 0) {
+                                System.out.println("Please enter a valid month and year (greater than zero).");
+                            } else {
+                                // Input is valid, proceed to call displayTop5HouseholdsByDonation
+                                houseManager.displayTop5HouseholdsByDonation(connection, donationRound);
+                                break;
+                            }
+                        }
+                    }
                     break;
                 case 2:
                     CitizenManager citizenManager = new CitizenManager();
