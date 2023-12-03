@@ -3,13 +3,13 @@ package dao;
 
 
 import java.sql.Connection;
-import java.sql.Date;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Stack;
 
 import Common.JdbcUtil;
@@ -23,17 +23,27 @@ public class CommissionDao {
 		return new CommissionDao();
 	}
 
+
 	// in doi tuong commission
-	public void printlnCommissions(List<Commission> commissions) {
-		System.out.println(String.format(" %-25s  %-25s  %-25s  %-25s", "ID", "precint_name", "city_name ", "province_name" ));
+	public int printlnCommissions(List<Commission> commissions) {
+		int numberRow=0;
+		System.out.println(String.format(" %-18s  %-20s  %-25s  %-25s", "Index", "precint_name",
+				"city_name ", "province_name"));
 		Stack<Commission> comStack = new Stack<>();
+		int i = 1;
 		for (Commission com : commissions) {
+			com.setIndex(com.getIndex() + i);
 			comStack.add(com);
+			i++;
+			numberRow=com.getIndex();
+
 		}
 		while (!comStack.isEmpty()) {
 			System.out.println(comStack.pop());
 		}
+		return numberRow;
 	}
+
 	// in doi tuong officer
 	public void printlnOffice(List<Officer> officers) {
 		Stack<Officer> comStack = new Stack<>();
@@ -44,6 +54,7 @@ public class CommissionDao {
 			System.out.println(comStack.pop());
 		}
 	}
+
 	//		 lay du lieu Officer
 	public List<Officer> selectAllOfficer() {
 		List<Officer> result = new ArrayList<>();
@@ -63,8 +74,7 @@ public class CommissionDao {
 				String city_name = rs.getString("phone_number");
 				String province_name = rs.getString("address");
 				// tao doi tuong tu cac thuoc tinh o tren
-				Officer officer = new Officer(id, precint_name, city_name,
-						province_name);
+				Officer officer = new Officer(id, precint_name, city_name, province_name);
 				result.add(officer);
 			}
 		} catch (SQLException e) {
@@ -73,7 +83,8 @@ public class CommissionDao {
 		}
 		return result;
 	}
-	//lay thong tin donate theo ngay
+
+	// lay thong tin donate theo ngay
 	public List<String> fineDonateByDate(String a, String b) {
 
 		List<String> result = new ArrayList<>();
@@ -88,13 +99,13 @@ public class CommissionDao {
 					+ "from Representative as RP\r\n"
 					+ "join DonateDetail as DD on RP.id=DD.representative_id\r\n"
 					+ "left join Company as CP on CP.id=RP.id\r\n"
-					+ "where DD.donate_date   BETWEEN '"+a+"' AND '"+b+"'";
+					+ "where DD.donate_date   BETWEEN '" + a + "' AND '" + b + "'";
 			System.out.println("Ban da thuc thi: " + sqlString);
 			ResultSet rs = statement.executeQuery(sqlString);
 //					         // lay tung thuoc tinh cua doi tuong
 			while (rs.next()) {
 				String lists = rs.getString("listDonate");
-				System.out.println("\n"+lists);
+				System.out.println("\n" + lists);
 //
 			}
 		} catch (SQLException e) {
@@ -117,15 +128,16 @@ public class CommissionDao {
 					+ " left join House on Citizen.house_id=House.id\r\n"
 					+ "left join Distribution on House.id=Distribution.household_id\r\n"
 					+ "where Citizen.is_household_lord= 'true' and House.id not IN (select household_id from Distribution ) "
-					+ " and "+ phase + " in ( SELECT MONTH(Distribution.date_distribution)\r\n"
+					+ " and " + phase
+					+ " in ( SELECT MONTH(Distribution.date_distribution)\r\n"
 					+ " from Distribution )";
 //						   System.out.println("Ban da thuc thi: " + sqlString);
 			ResultSet rs = statement.executeQuery(sqlString);
 //					         // lay tung thuoc tinh cua doi tuong
 			while (rs.next()) {
 				String precint_name = rs.getString("NotReceved");
-				System.out.println("\n"+precint_name);
-//								   
+				System.out.println("\n" + precint_name);
+//
 			}
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -153,7 +165,7 @@ public class CommissionDao {
 				String city_name = rs.getString("city_name");
 				String province_name = rs.getString("province_name");
 				// tao doi tuong tu cac thuoc tinh o tren
-				Commission commission = new Commission(id, precint_name, city_name,
+				Commission commission = new Commission(id,precint_name, city_name,
 						province_name);
 				result.add(commission);
 			}
@@ -175,7 +187,7 @@ public class CommissionDao {
 			// b3: thuc hien cau lenh sql
 			String sqlString = "INSERT INTO commission (precint_name, city_name, province_name) VALUES ('"
 					+ com.getPrecintName() + "', '" + com.getCityName() + "', '"
-					+ com.getProvinceName() +"');";
+					+ com.getProvinceName() + "');";
 			System.out.println("Ban da thuc thi: " + sqlString);
 //						   System.out.println("======================\n");
 			rs = statement.executeUpdate(sqlString);
@@ -187,8 +199,8 @@ public class CommissionDao {
 	}
 
 	// xoa data theo id
-	public int delete(String c) {
-		int id = Integer.parseInt(c);
+	public int delete(int c) {
+//				  int id = Integer.parseInt(c);
 		int result = 0;
 		try {
 			// b1: Tao ket noi
@@ -196,7 +208,7 @@ public class CommissionDao {
 			// b2: tao doi tuong statement
 			Statement statement = connection.createStatement();
 			// b3: thuc hien cau lenh sql
-			String sqlString = "delete from Commission where id=" + c;
+			String sqlString = "delete from Commission where id = " + c;
 //						   System.out.println("Ban da thuc thi: " + sqlString);
 			result = statement.executeUpdate(sqlString);
 		} catch (SQLException e) {
@@ -214,10 +226,10 @@ public class CommissionDao {
 			// b2: tao doi tuong statement
 			Statement statement = connection.createStatement();
 			// b3: thuc hien cau lenh sql precint_name, city_name, province_name
-			String sqlString = "update  commission set " + "precint_name = '" + com.getPrecintName()
-					+ "'," + "city_name = '" + com.getCityName() + "',"
-					+ "province_name = '" + com.getProvinceName()
-					+"' where id="+com.getId();
+			String sqlString = "update  commission set " + "precint_name = '"
+					+ com.getPrecintName() + "'," + "city_name = '"
+					+ com.getCityName() + "'," + "province_name = '"
+					+ com.getProvinceName() + "' where id=" + com.getId();
 //						   System.out.println("Ban da thuc thi: " + sqlString);
 			result = statement.executeUpdate(sqlString);
 		} catch (SQLException e) {

@@ -1,18 +1,23 @@
 package menuCom;
 
 
+
 import java.util.ArrayList;
-import java.util.DuplicateFormatFlagsException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
+import java.util.Set;
 
 import Model.Commission;
 import Model.Officer;
 import dao.CommissionDao;
 
 
+
 public class Menue {
     Scanner scanner = new Scanner(System.in);
+    CommissionDao commissionDao = new CommissionDao();
 
     public static boolean checkSpecialCharacter(String str) {
         // Kiểm tra xem chuỗi có chứa ký tự đặc biệt hay không
@@ -56,6 +61,28 @@ public class Menue {
         CommissionDao.getInstant().findHouseHoleNotReceived(phase);
     }
 
+    public static boolean isNumber(String str) {
+        // Kiểm tra xem chuỗi có chứa ký tự đặc biệt hay không
+        return str.matches("^[1-9][0-9]*$");
+    }
+
+    // kiem tra so hang nhap vao
+    public static int checkInputRow(int n) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Input row number: ");
+        String s;
+        do {
+            s = scanner.nextLine();
+            s = s.trim();
+            if (!isNumber(s) || (Integer.parseInt(s) > n)) {
+                System.out.println("Input again: ");
+            }
+
+        } while (!isNumber(s) || (Integer.parseInt(s) > n));
+        return Integer.parseInt(s);
+
+
+    }
 
     //--------------------------------------------------------------------------------------------------------
     public static boolean isDay(String str) {
@@ -90,7 +117,7 @@ public class Menue {
     public static String input_int() {
         String string;
         do {
-            System.out.println("Input number:");
+            System.out.println("Input nember:");
             Scanner sc = new Scanner(System.in);
             string = sc.nextLine();
             // kiem tra co phai la chuoi khong
@@ -173,6 +200,24 @@ public class Menue {
         return check;
     }
 
+    public int findIdCommission(List<Commission> commissions, int row) {
+        int id = 0;
+        int numberRow = 0;
+        int i = 1;
+        Map<Integer, Commission> mapCommission = new HashMap<>();
+        for (Commission commission : commissions) {
+            commission.setIndex(commission.getIndex() + i);
+            i++;
+            numberRow = commission.getIndex();
+            mapCommission.put(numberRow, commission);
+        }
+        Commission commission = mapCommission.get(row);
+//				  System.out.println("id: " + commission.getId());
+        id = commission.getId();
+        return id;
+    }
+
+
     public void menuUpdate(int id) {
 //				  System.out.println("1: Update commission name");
 //				  System.out.println("2: Update city name");
@@ -207,17 +252,11 @@ public class Menue {
                 System.out.println("Input province name: ");
                 String province_name = scanner.nextLine();
                 checkString(province_name);
-
-                // check ID officer_ID
-//						   int checkIdOff = checkExistOfficerID(officerId);
-//						   if (checkIdOff==1) {
-                // tao doi tuong moi tu ban phim
                 Commission commissionNew = new Commission(id, precint_name, city_name, province_name);
                 CommissionDao.getInstant().update(commissionNew);
-                System.out.println("Update Success");
-//						   }else {
-//								    System.out.println("ID officer no exist");
-//						   }
+                System.out.println("Update Success++++++++++++++");
+                Integer sumNumberRecord1 = commissionDao
+                        .printlnCommissions(commissionDao.selectAllCommissions());
                 break;
         }
 
@@ -239,11 +278,11 @@ public class Menue {
                 System.out.println("Connecting...");
 
 //						   System.out.println("id \t\t\tPrecintName \t\t\tCityName \t\t\tProvinceName \t\t\tOfficerId ");
-                CommissionDao commissionDao = new CommissionDao();
+//						   CommissionDao commissionDao = new CommissionDao();
                 commissionDao.printlnCommissions(commissionDao.selectAllCommissions());
                 break;
             case 2:
-
+                commissionDao.printlnCommissions(commissionDao.selectAllCommissions());
                 Integer check = 0;
                 System.out.println("Input precint name: ");
                 String precint_name = scanner.nextLine();
@@ -270,28 +309,24 @@ public class Menue {
                 }
                 break;
             case 3:
-                System.out.println("Input id: ");
-                String idInputString = scanner.nextLine();
-//						   Tao chuoi moi o vi tri: "_" + 1
-                String id2 = idInputString.substring(idInputString.indexOf("_") + 1);
-                int checkId = checkExistCommissionID(idInputString);
-                if (checkId == 1) {
-                    CommissionDao.getInstant().delete(id2);
-                    System.out.println("Delete Success");
-                } else {
-                    System.out.println("Commission no exist");
-                }
+                Integer sumNumberRecord = commissionDao
+                        .printlnCommissions(commissionDao.selectAllCommissions());
+                int inputRow = checkInputRow(sumNumberRecord);
+                Integer commissionID = findIdCommission(commissionDao.selectAllCommissions(),
+                        inputRow);
+                CommissionDao.getInstant().delete(commissionID);
+                System.out.println("Delete Success");
+                commissionDao.printlnCommissions(commissionDao.selectAllCommissions());
                 break;
             case 4:
-                System.out.println("Input id: ");
-                String idUpdate = scanner.nextLine();
-//						   Tao chuoi moi o vi tri: "_" + 1
-                String idUp = idUpdate.substring(idUpdate.indexOf("_") + 1);
-                int checkIdUP = checkExistCommissionID(idUpdate);
-                if (checkIdUP == 1) {
-                    menuUpdate(Integer.parseInt(idUp));
+                Integer sumNumberRecord1 = commissionDao
+                        .printlnCommissions(commissionDao.selectAllCommissions());
+                int inputRow1 = checkInputRow(sumNumberRecord1);
+                Integer commissionID1 = findIdCommission(commissionDao.selectAllCommissions(),
+                        inputRow1);
+//						   System.out.println("================= ");
+                menuUpdate((commissionID1));
 
-                }
                 break;
 
         }
