@@ -1,87 +1,176 @@
 package Model;
 
 import Common.DBConnect;
-import Common.InputValidator;
 
 import java.sql.*;
-import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.time.format.ResolverStyle;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 import java.util.regex.Pattern;
 
 public class Processing {
-    private static final Scanner sc = new Scanner(System.in);
-    public static Connection con = DBConnect.connectDatabase();
+    private static Scanner sc = new Scanner(System.in);
+    private static Connection con = DBConnect.connectDatabase();
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
-
     public static void waitForEnter() {
         while (true) {
-            try {
-                System.out.print("\t\t\t\u001B[32mPress Enter to continue...\t\u001B[0m");
-                String input = sc.nextLine();
-                if (input.isEmpty()) {
-                    // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
-                    break;
-                }
-            } catch (NoSuchElementException e) {
-                // Handle the exception (e.g., print an error message)
-                System.out.print("Error reading input: " + e.getMessage());
+            System.out.println("\u001B[32mNhấn 'Enter' để quay lại menu...\u001B[0m");
+            String input = sc.nextLine();
+
+            if (input.isEmpty()) {
+                // Nếu người dùng nhấn Enter (để trống input), thoát khỏi vòng lặp
+                break;
             }
         }
     }
-    public static int validateIntInput(String prompt) {
-        int userInput = 0;
-        boolean isValid = false;
-
-        do {
-            try {
-                System.out.print(prompt);
-                userInput = Integer.parseInt(sc.nextLine());
-                if (userInput >= 0) {
-                    isValid = true;
-                } else {
-                    isValid = false;
-                    System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
-                }
-            } catch (NumberFormatException ex) {
-                System.out.println("\t\t\t\u001B[31mError: Please enter a valid integer.\u001B[0m");
-            }
-        } while (!isValid);
-
-        return userInput;
-    }
     public static boolean isIDAlreadyExists(Connection con, int id, String tableName) {
+        String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE id = ?) THEN 1 ELSE 0 END";
         boolean idExist = false;
-        try {
-            // Validate the tableName to ensure it comes from a trusted source
-            // You may use a whitelist or other validation methods depending on your requirements
 
-            // Assuming tableName is a valid identifier
-            String sql = "SELECT CASE WHEN EXISTS (SELECT * FROM " + tableName + " WHERE id = ?) THEN 1 ELSE 0 END";
-            try (PreparedStatement stmt = con.prepareStatement(sql)) {
-                stmt.setInt(1, id);
-                try (ResultSet rs = stmt.executeQuery()) {
-                    if (rs.next()) {
-                        idExist = rs.getInt(1) == 1;
-                    }
+        try (PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, id);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    idExist = rs.getInt(1) == 1;
                 }
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database!\u001B[0m");
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
+
         return idExist;
     }
 
+    //	Nhap CCCD Va Validate
+    public static String inputIdentityCard() {
+        String identity;
+        boolean check = true;
+        do {
+            System.out.print(" Nhập vào số CCCD: ");
+            identity = sc.nextLine().trim().replaceAll("\\s+", "");
+            if (!identity.isBlank()) {
+                if (identity.length() == 12 && Processing.isNumber(identity) && identity.charAt(0) != '-'
+                        && (!Processing.isSpecialCharacter(identity))) {
+                    check = true;
+                } else if (identity.charAt(0) == '-') {
+                    System.out.println(" \u001B[31mERROR: CCCD Không thể là số âm !!!\u001B[0m");
+                    check = false;
+                } else if (Processing.isSpecialCharacter(identity)) {
+                    System.out.println("\u001B[31m ERROR: CCCD Không thể chứa ký tự đặc biệt !!!\u001B[0m");
+                    check = false;
+                } else {
+                    System.out.println(" \u001B[31mERROR: CCCD phải bao gồm 12 số!!!\u001B[0m");
+                    check = false;
+                }
+            } else {
+                check = false;
+                System.out.println(" \u001B[31mERROR: Không được bỏ trống, vui lòng nhập lại!!!\u001B[0m");
+            }
+
+        } while (!check);
+        return identity;
+
+    }
+
+
+    //	Nhap Address Va Validate
+    public static String inputAddress(Scanner sc) {
+        String address;
+        boolean check = true;
+        do {
+            System.out.print("Nhập vào địa chỉ ");
+            address = sc.nextLine().trim().replaceAll("\\s+", " ");
+
+            if ((!Processing.isNumber(address)) && !Processing.isSpecialCharacter(address)) {
+                check = true;
+            } else if (Processing.isNumber(address)) {
+                System.out.println(" ERROR: Địa chỉ không thể chỉ chứa số, phải bao gồm cả xã/phường, quận/huyện, tỉnh/thành phố!!!");
+                check = false;
+            } else if (address.length()>255) {
+                System.out.println(" \u001B[31mERROR: Địa chỉ không được quá 255 ký tự!!!\u001B[0m");
+                check = false;
+            } else {
+                System.out.println(" ERROR: Địa chỉ không thể chứa ký tự đặt biệt!!!");
+                check = false;
+            }
+
+        } while (!check);
+        return address;
+    }
+    //	Nhap Ho Va Ten Va Validate
+    public static String inputFullName(Scanner sc) {
+        String fullName;
+        boolean check = true;
+        do {
+            System.out.print(" Nhập vào họ và tên: ");
+            fullName = sc.nextLine().trim().replaceAll("\\s+", " ");
+            if (!fullName.isBlank()) {
+
+                if ((!Processing.isNumber(fullName)) && !Processing.isSpecialCharacter(fullName)) {
+                    check = true;
+                } else if (Processing.isNumber(fullName)) {
+                    System.out.println(" \u001B[31mERROR: Họ và tên không được chứa số!!!\u001B[0m");
+                    check = false;
+                }else if (fullName.length()>255) {
+                    System.out.println(" \u001B[31mERROR: Họ và tên không được quá 255 ký tự!!!\u001B[0m");
+                    check = false;
+                }else {
+                    System.out.println("\u001B[31m ERROR: Họ và tên không thể chứa ký tự đặt biệt!!!\u001B[0m");
+                    check = false;
+                }
+            } else {
+                check = false;
+                System.out.println(" \u001B[31mERROR: Không được bỏ trống, vui lòng nhập lại!!!\u001B[0m");
+            }
+
+        } while (!check);
+        return fullName;
+    }
+
+    //	Nhap So Dien Thoai Va Validate
+    public static String inputPhone(Scanner sc) {
+        String phone;
+        boolean check = true;
+        do {
+            System.out.print("Nhập vào số điện thoại:");
+            phone = sc.nextLine().trim().replaceAll("\\s+", "");
+            if (!phone.isBlank()) {
+                if (phone.length() == 10 && phone.charAt(0) == '0' && Processing.isNumber(phone)
+                        && (!Processing.isSpecialCharacter(phone))) {
+                    check = true;
+                } else if (phone.charAt(0) != '0') {
+                    check = false;
+                    System.out.println("\u001B[31mERROR: Số điện thoại nên bắt đầu bằng \'0\'!!!\u001B[0m");
+                } else if (Processing.isSpecialCharacter(phone)) {
+                    check = false;
+                    System.out.println("\u001B[31mERROR: Số điện thoại không thể chứa các ký tự khác số!!!\u001B[0m");
+                } else {
+                    check = false;
+                    System.out.println("\u001B[31mERROR: Số điện thoại phải bao gồm 10 số!!!\u001B[0m");
+                }
+            } else {
+                check = false;
+                System.out.println("\u001B[31m ERROR: Không được bỏ trống!!!\u001B[0m");
+            }
+        } while (!check);
+        return phone;
+    }
+
+    //	Kiem Tra Kieu Du Lieu So Nguyen
+    public static boolean isNumber(String number) {
+        try {
+            Integer.parseInt(number);
+            return true;
+        } catch (Exception e) {
+        }
+        return false;
+    }
     public static boolean isFloatNumber(String number) {
         try {
             Double.parseDouble(number);
             return true;
-        } catch (NumberFormatException ex) {
-            //System.out.println("\u001B[31mSố tiền không hợp lệ. Vui lòng nhập lại.\u001B[0m");
+        } catch (Exception e) {
         }
         return false;
     }
@@ -89,13 +178,12 @@ public class Processing {
     //	Kiem Tra Ky Tu Dac Biet
     public static boolean isSpecialCharacter(String ch) {
         for (int i = 0; i < ch.length(); i++) {
-            if (Pattern.matches("[@#$%^&*!?<>+=()_`~;.\\\"]", ch.charAt(i) + "")) {
+            if (Pattern.matches("[@#$%^&*!?<>+=()_`~?;.\\\"]", ch.charAt(i) + "")) {
                 return true;
             }
         }
         return false;
     }
-
     public static int countRecords(Connection con, String tableName) {
         String sql = "SELECT COUNT(*) FROM " + tableName;
 
@@ -109,19 +197,19 @@ public class Processing {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database!\u001B[0m");
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
         }
         return -1; // Return an error indicator instead of throwing an exception
     }
-
     public static int inputID(Scanner sc, String tableName, String columnName) {
         int ID;
         do {
-            ID = InputValidator.validateIntInput("\t\t\tInput ID  (Refer to the menus \"Manage\"): ");
-            //System.out.println();
+            System.out.print("Nhập vào ID  (Tham khảo các menu \"Quản lý\"): ");
+            ID = sc.nextInt();
+            System.out.println();
 
             if (checkIDExistence(ID, tableName, columnName)) {
-                System.out.println("\t\t\t\u001B[31mThe ID does not exist in the table " + tableName + ". Please input again.\u001B[0m");
+                System.out.println("\u001B[31mID không tồn tại trong bảng " + tableName + ". Vui lòng nhập lại.\u001B[0m");
             }
         } while (checkIDExistence(ID, tableName, columnName));
         return ID;
@@ -136,61 +224,14 @@ public class Processing {
             }
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database!\u001B[0m");
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database\u001B[0m");
             // Handle the exception according to your needs
             return true; // Return false in case of an exception
         }
     }
-
-    public static LocalDate validateDateInput(String prompt) {
-        LocalDate newDonateDate;
-        String newDonateDateStr;
-        do {
-            System.out.print(prompt);
-            newDonateDateStr = sc.nextLine();
-
-            try {
-                newDonateDate = LocalDate.parse(newDonateDateStr, dateFormat);
-                if (newDonateDate.isAfter(LocalDate.now())) {
-                    System.out.println("\t\t\t\u001B[31mThe date of receiving support must be earlier than the current date!\n\t\t\tYou can't time travel, right?!\u001B[0m");
-                    newDonateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
-                }
-            } catch (DateTimeParseException ex) {
-                System.out.println("\t\t\t\u001B[31m Invalid date entered:  \"" + newDonateDateStr + "\"\u001B[0m");
-                newDonateDate = null; // Cập nhật giá trị donate_date để vòng lặp tiếp tục
-            }
-        } while (newDonateDate == null);
-
-        return newDonateDate;
-    }
-
-    public static String validateMonthYearInput(String message) {
-        Scanner sc = new Scanner(System.in);
-        String userInput;
-        boolean isValid;
-
-        do {
-            System.out.print(message);
-            userInput = sc.nextLine();
-
-            // Validate the input format (MM/yyyy)
-            if (userInput.matches("\\d{2}/\\d{4}")) {
-                String[] parts = userInput.split("/");
-                int month = Integer.parseInt(parts[0]);
-                int year = Integer.parseInt(parts[1]);
-
-                // Validate month (1 to 12) and year (positive)
-                isValid = month >= 1 && month <= 12 && year > 0;
-
-                if (!isValid) {
-                    System.out.println("\u001B[31mMonth must be between 1 and 12 and year must be greater than 0.\u001B[0m");
-                }
-            } else {
-                System.out.println("\u001B[31mInvalid format. Please re-enter in the format MM/yyyy.\u001B[0m");
-                isValid = false;
-            }
-        } while (!isValid);
-
-        return userInput;
+    public static void closeScanner() {
+        if (sc != null) {
+            sc.close();
+        }
     }
 }

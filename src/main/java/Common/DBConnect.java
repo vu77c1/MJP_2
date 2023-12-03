@@ -20,7 +20,7 @@ public class DBConnect {
             //System.out.println("\u001B[32mDatabase Connected\u001B[0m");
             System.out.println();
         } catch (ClassNotFoundException | SQLException e) {
-            System.out.println("\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
+            System.out.println("\u001B[31mCó lỗi trong quá trình kết nối Database: " + e.getMessage() + ".\u001B[0m");
         }
         return con;
     }
