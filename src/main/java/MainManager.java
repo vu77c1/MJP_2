@@ -2,8 +2,8 @@
 import Common.DBConnect;
 import Model.OfficerDistributionManage;
 import Model.OfficerManage;
-import Model.Task1002OfDung;
-import Model.Task1003OfDung;
+import Model.ReportLocalDonateInformation;
+import Model.DetailedReportsToDistributionOfficer;
 
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -263,10 +263,10 @@ public class MainManager {
                 case 9:
                     break;
                 case 10:
-                    Task1002OfDung.top5Wards();
+                    ReportLocalDonateInformation.top5Wards();
                     break;
                 case 11:
-                    Task1002OfDung.statisticsOfWards();
+                    ReportLocalDonateInformation.statisticsOfWards();
                     break;
                 case 12:
                     break;
@@ -277,7 +277,7 @@ public class MainManager {
                 case 14:
                     break;
                 case 15:
-                    Task1003OfDung.listDetailsDistributionOfficer();
+                    DetailedReportsToDistributionOfficer.listDetailsDistributionOfficer();
                     break;
                 case 16:
                     break;

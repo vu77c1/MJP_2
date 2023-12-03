@@ -8,12 +8,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class Task1002OfDung {
+public class ReportLocalDonateInformation {
     private static Scanner sc = new Scanner(System.in);
     private static Connection connection = DBConnect.connectDatabase();
 
     public static void main(String[] args) throws SQLException {
-        Task1002OfDung.getTask1002OfDung();
+        ReportLocalDonateInformation.getTask1002OfDung();
     }
 
     public static void getTask1002OfDung() throws SQLException {
@@ -29,11 +29,11 @@ public class Task1002OfDung {
                     System.out.println("\u001B[36m* Notification: Program is closed. Thank you for using our program!\u001B[0m");
                     break;
                 case 1:
-                    Task1002OfDung.top5Wards();
+                    ReportLocalDonateInformation.top5Wards();
                     displayMenu();
                     break;
                 case 2:
-                    Task1002OfDung.statisticsOfWards();
+                    ReportLocalDonateInformation.statisticsOfWards();
                     displayMenu();
                     break;
                 default:

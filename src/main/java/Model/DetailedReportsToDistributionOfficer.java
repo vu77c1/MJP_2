@@ -5,18 +5,16 @@ import Common.DBConnect;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Scanner;
 
-public class Task1003OfDung {
+public class DetailedReportsToDistributionOfficer {
     private static Scanner sc = new Scanner(System.in);
     private static Connection connection = DBConnect.connectDatabase();
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) throws SQLException {
-        Task1003OfDung.getTask1003OfDung();
+        DetailedReportsToDistributionOfficer.getTask1003OfDung();
     }
 
     public static void getTask1003OfDung() throws SQLException {
@@ -32,7 +30,7 @@ public class Task1003OfDung {
                     System.out.println("\u001B[36m* Notification: Program is closed. Thank you for using our program!\u001B[0m");
                     break;
                 case 1:
-                    Task1003OfDung.listDetailsDistributionOfficer();
+                    DetailedReportsToDistributionOfficer.listDetailsDistributionOfficer();
                     displayMenu();
                     break;
                 default:
