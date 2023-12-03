@@ -71,65 +71,65 @@ public class DonateDetailManager {
         while (choice != 0);
     }
 
-    public static @NotNull Map<Integer, DonateDetail> getDonateDetail(Connection con) {
-        Map<Integer, DonateDetail> indexObjectMap = new LinkedHashMap<>();
-        try {
-            String selectQuery = """
-                    SELECT distinct
-                        dbo.DonateDetail.id,
-                        amount,
-                        donate_date,
-                        C.precint_name,
-                        representative_name,
-                        COALESCE(company_name, '(Individual)') AS company_name,
-                        O.name,
-                        DonateDetail.commission_id,
-                        DonateDetail.representative_id
-                    FROM
-                        DonateDetail
-                            LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id
-                            LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
-                            LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
-                            LEFT JOIN dbo.Distribution D on C.id = D.commission_id
-                            Left Join dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
-                            LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id ORDER BY ID DESC""";
+public static @NotNull Map<Integer, DonateDetail> getDonateDetail(Connection con) {
+    Map<Integer, DonateDetail> indexObjectMap = new LinkedHashMap<>();
+    try {
+        String selectQuery = """
+            SELECT distinct
+                dbo.DonateDetail.id,
+                amount,
+                donate_date,
+                C.precint_name,
+                representative_name,
+                COALESCE(company_name, '(Individual)') AS company_name,
+                O.name,
+                DonateDetail.commission_id,
+                DonateDetail.representative_id
+            FROM
+                DonateDetail
+                LEFT JOIN dbo.Commission C ON DonateDetail.commission_id = C.id
+                LEFT JOIN dbo.Representative R ON R.id = DonateDetail.representative_id
+                LEFT JOIN dbo.Company C2 ON C2.id = R.company_id
+                LEFT JOIN dbo.Distribution D on C.id = D.commission_id
+                Left Join dbo.OfficerDistribution on D.id = OfficerDistribution.distribution_id
+                LEFT JOIN dbo.Officer O ON O.id = OfficerDistribution.officer_id ORDER BY ID DESC
+        """;
+        try (PreparedStatement preparedStatement = con.prepareStatement(selectQuery)) {
+            ResultSet rs = preparedStatement.executeQuery();
+            if (rs != null) {
+                int index = 1;
+                try {
+                    while (rs.next()) {
+                        DonateDetail donateDetail = new DonateDetail(
+                                rs.getInt("id"),
+                                rs.getDouble("amount"),
+                                rs.getObject("donate_date", LocalDate.class),
+                                rs.getInt("commission_id"),
+                                rs.getInt("representative_id"),
+                                rs.getString("precint_name"),
+                                rs.getString("representative_name"),
+                                rs.getString("company_name"),
+                                rs.getString("name")
+                        );
 
-            try (PreparedStatement preparedStatement = con.prepareStatement(selectQuery)) {
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs != null) {
-                    int index = 1;
-                    try {
-                        while (rs.next()) {
-                            DonateDetail donateDetail = new DonateDetail(
-                                    rs.getInt("id"),
-                                    rs.getDouble("amount"),
-                                    rs.getObject("donate_date", LocalDate.class),
-                                    rs.getInt("commission_id"),
-                                    rs.getInt("representative_id"),
-                                    rs.getString("precint_name"),
-                                    rs.getString("representative_name"),
-                                    rs.getString("company_name"),
-                                    rs.getString("name")
-                            );
-
-                            // Check if company name is null
-                            if (rs.getString("company_name") == null) {
-                                donateDetail.setCompanyName("(Individual)");
-                            }
-
-                            indexObjectMap.put(index, donateDetail);
-                            index++;
+                        if (rs.getString("company_name") == null) {
+                            donateDetail.setCompanyName("(Individual)");
                         }
-                    } catch (SQLException ex) {
-                        System.out.println("\t\t\t\u001B[31mThere was an error processing the result set: " + ex.getMessage() + ".\u001B[0m");
+
+                        indexObjectMap.put(index, donateDetail);
+                        index++;
                     }
+                } catch (SQLException ex) {
+                    System.out.println("\u001B[31mThere was an error processing the result set: " + ex.getMessage() + ".\u001B[0m");
                 }
             }
-        } catch (Exception ex) {
-            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + ex.getMessage() + ".\u001B[0m");
         }
-        return indexObjectMap;
+    } catch (Exception ex) {
+        System.out.println("\u001B[31mThere was an error connecting to the Database: " + ex.getMessage() + ".\u001B[0m");
     }
+    return indexObjectMap;
+}
+
 
     public static int getCommissionIdByName(Connection con, String commissionName) {
         int commissionId = -1; // Default value if not found
@@ -185,7 +185,6 @@ public class DonateDetailManager {
         try {
             Map<Integer, DonateDetail> donateDetailMap = getDonateDetail(con);
             if (!donateDetailMap.isEmpty()) {
-                System.out.println();
                 System.out.println("============================================================ \u001B[1mDONATION LIST\u001B[0m ============================================================");
                 System.out.println("┌────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────┐");
                 System.out.println("│   \u001B[1mID\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │   \u001B[1mOfficer\u001B[0m   │");
