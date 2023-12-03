@@ -4,25 +4,26 @@ import Common.InputValidator;
 import Common.JDBCQuery;
 
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 public class PriorityObjectManager {
     //Lay tat ca thong tin PriorityObject trong databse khong truyen tham so
-    public ArrayList<PriorityObject> getPriorityObject() {
-        ArrayList<PriorityObject> infoList = new ArrayList<>();
+    public Map<Integer, PriorityObject> getPriorityObject(String sql) {
+        Map<Integer, PriorityObject> indexObjectMap = new LinkedHashMap<>(); // Sử dụng LinkedHashMap để giữ thứ tự
         try {
             JDBCQuery.openConnection();
-            String sql = "select  * from PriorityObject";
+
             ResultSet rs = JDBCQuery.executeSelectQuery(sql);
             if (rs != null) {
                 try {
+                    int index = 1;
                     while (rs.next()) {
-                        infoList.add(new PriorityObject(
+                        PriorityObject priorityObject = new PriorityObject(
                                 rs.getInt("id"),
                                 rs.getString("object_type")
-                        ));
+                        );
+                        indexObjectMap.put(index, priorityObject);
+                        index++;
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -32,25 +33,30 @@ public class PriorityObjectManager {
             ex2.printStackTrace();
 
         } finally {
-            JDBCQuery.closeConnection();
+            // JDBCQuery.closeConnection();
 
         }
-        return infoList;
+        return indexObjectMap;
     }
 
     //Lay tat ca thong tin PriorityObject trong databse co tham so
-    public ArrayList<PriorityObject> getPriorityObject(String sql) {
-        ArrayList<PriorityObject> infoList = new ArrayList<>();
+    public Map<Integer, PriorityObject> getPriorityObject() {
+        Map<Integer, PriorityObject> indexObjectMap = new LinkedHashMap<>(); // Sử dụng LinkedHashMap để giữ thứ tự
+
         try {
             JDBCQuery.openConnection();
+            String sql = "select  * from PriorityObject order by id desc";
             ResultSet rs = JDBCQuery.executeSelectQuery(sql);
             if (rs != null) {
+                int index = 1;
                 try {
                     while (rs.next()) {
-                        infoList.add(new PriorityObject(
+                        PriorityObject priorityObject = new PriorityObject(
                                 rs.getInt("id"),
                                 rs.getString("object_type")
-                        ));
+                        );
+                        indexObjectMap.put(index, priorityObject);
+                        index++;
                     }
                 } catch (SQLException ex) {
                     ex.printStackTrace();
@@ -63,7 +69,8 @@ public class PriorityObjectManager {
             JDBCQuery.closeConnection();
 
         }
-        return infoList;
+        // Convert Map values (PriorityObjects) to ArrayList
+        return indexObjectMap;
     }
 
     //Nhap du lieu
@@ -84,6 +91,7 @@ public class PriorityObjectManager {
             int rs = JDBCQuery.executeUpdateQuery(sql, prams);
             if (rs > 0) {
                 System.out.println("\t\t\tAdd success!!");
+                displayPriorityObjects(getPriorityObject());
             } else {
                 System.out.println("\t\t\tAdd failed!!");
             }
@@ -98,70 +106,99 @@ public class PriorityObjectManager {
 
     //cap nhat Priority Object
     public void updatePriorityObject() {
+        displayPriorityObjects(getPriorityObject());
         int id;
         id = InputValidator.validateIntInput("\t\t\tEnter ID to update: ");
-        if (isIdExists(id)) {
-            displayPriorityObjects(getPriorityObject("select * from PriorityObject where id=" + id));
-            String type = InputValidator.validateStringPriorityObject("\t\t\tInput Object Type: ");
-            try {
-                JDBCQuery.openConnection();
+        int idPriorityObject = 0;
 
-                String sql = "UPDATE PriorityObject SET object_type = ? WHERE id = ?";
-                Object[] params = {type, id};
-
-                int rowsAffected = JDBCQuery.executeUpdateQuery(sql, params);
-
-                if (rowsAffected > 0) {
-                    System.out.println("\t\t\tUpdate success!!");
-                } else {
-                    System.out.println("\t\t\tUpdate failed. No PriorityObject found with the specified ID.");
+        if (getPriorityObject().containsKey(id)) {
+             idPriorityObject = getPriorityObject().get(id).getId();
+            if (isIdExists(idPriorityObject)) {
+                System.out.println("\t\t\t\u001B[1mID\t\tOBJECT_TYPE\u001B[0m");
+                for (Map.Entry<Integer, PriorityObject> entry : getPriorityObject("select * from PriorityObject where id=" + idPriorityObject).entrySet()) {
+                    System.out.println("\t\t\t" + id + "\t\t" + entry.getValue().getObjectType());
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                JDBCQuery.closeConnection();
-            }
+                String type = InputValidator.validateStringPriorityObject("\t\t\tInput Object Type: ");
+                try {
+                    JDBCQuery.openConnection();
 
-        } else {
-            System.out.println("\t\t\tUpdate failed. The list of PriorityObjects is empty.");
+                    String sql = "UPDATE PriorityObject SET object_type = ? WHERE id = ?";
+                    Object[] params = {type, idPriorityObject};
+
+                    int rowsAffected = JDBCQuery.executeUpdateQuery(sql, params);
+
+                    if (rowsAffected > 0) {
+                        System.out.println("\t\t\tUpdate success!!");
+                    } else {
+                        System.out.println("\t\t\tUpdate failed. No PriorityObject found with the specified ID.");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    JDBCQuery.closeConnection();
+                }
+
+            } else {
+                System.out.println("\t\t\tUpdate failed. The list of PriorityObjects is empty.");
+            }
+        }
+        else {
+            System.out.println("\t\t\tRecord not exist");
         }
     }
 
     //ham xoa  Priority Object theo ID
     public void deletePriorityObject() {
+        displayPriorityObjects(getPriorityObject());
         int id;
         id = InputValidator.validateIntInput("\t\t\tEnter ID to delete: ");
-        if (isIdExists(id)) {
-            try {
-                JDBCQuery.openConnection();
+        int idPriorityObject = 0;
 
-                String sql = "DELETE FROM PriorityObject WHERE id = ?";
-                Object[] params = {id};
-                int rowsAffected = JDBCQuery.executeUpdateQuery(sql, params);
+        if (getPriorityObject().containsKey(id)) {
+            idPriorityObject = getPriorityObject().get(id).getId();
+            if (isIdExists(idPriorityObject)) {
+                try {
+                    JDBCQuery.openConnection();
+                    for (Map.Entry<Integer, PriorityObject> entry : getPriorityObject("select * from PriorityObject where id=" + idPriorityObject).entrySet()) {
+                        System.out.println("\t\t\t" + id + "\t\t" + entry.getValue().getObjectType());
+                    }
+                    String sql = """
+                            BEGIN TRANSACTION;
+                            UPDATE House SET priority_object_id = NULL WHERE priority_object_id = ?;
+                            DELETE FROM PriorityObject WHERE id = ?;
+                            COMMIT;
+                            """;
+                    Object[] params = {idPriorityObject, idPriorityObject};
+                    int rowsAffected = JDBCQuery.executeUpdateQuery(sql, params);
 
-                if (rowsAffected > 0) {
-                    System.out.println("\t\t\tDelete success!!");
-                } else {
-                    System.out.println("\t\t\tDelete failed. No PriorityObject found with the specified ID.");
+                    if (rowsAffected > 0) {
+                        System.out.println("\t\t\tDelete success!!");
+                    } else {
+                        System.out.println("\t\t\tDelete failed. No PriorityObject found with the specified ID.");
+                    }
+                } catch (Exception ex) {
+                    ex.printStackTrace();
+                } finally {
+                    JDBCQuery.closeConnection();
                 }
-            } catch (Exception ex) {
-                ex.printStackTrace();
-            } finally {
-                JDBCQuery.closeConnection();
-            }
 
+            } else {
+                System.out.println("\t\t\tDelete failed. The list of PriorityObjects is empty.");
+            }
         } else {
-            System.out.println("\t\t\tDelete failed. The list of PriorityObjects is empty.");
+            System.out.println("\t\t\tRecord not exist");
         }
+
 
     }
 
     //hien thi danh sach PriorityObject
-    public void displayPriorityObjects(ArrayList<PriorityObject> priorityObjects) {
-        System.out.println("\t\t\t\u001B[1mID\tOBJECT_TYPE\u001B[0m");
+    public void displayPriorityObjects(Map<Integer, PriorityObject> priorityObjects) {
+        System.out.println("\t\t\tLIST PRIORITY OBJECT");
+        System.out.println("\t\t\t\u001B[1mID\t\tOBJECT_TYPE\u001B[0m");
 
-        for (PriorityObject priorityObject : priorityObjects) {
-            System.out.println("\t\t\t" + priorityObject.getId() + "\t" + priorityObject.getObjectType());
+        for (Map.Entry<Integer, PriorityObject> entry : priorityObjects.entrySet()) {
+            System.out.println("\t\t\t" + entry.getKey() + "\t\t" + entry.getValue().getObjectType());
         }
     }
     //Kiem tra PriorityObject co ton tai trong database khong
@@ -187,7 +224,6 @@ public class PriorityObjectManager {
         }
         return exists;
     }
-
 
 
 }

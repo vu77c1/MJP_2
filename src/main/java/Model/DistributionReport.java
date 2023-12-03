@@ -18,27 +18,28 @@ public class DistributionReport {
             JDBCQuery.openConnection();
             String sql = """
                     WITH B AS (
-                                            SELECT commission_id, SUM(amount_distribution) as total_amount_received  FROM Distribution st
-                                            WHERE st.household_id is not null AND MONTH(st.date_distribution)=? AND YEAR(st.date_distribution)=?
-                                            GROUP BY commission_id
-                                                          
-                                        ),
-                                         A AS(
-                                            SELECT commission_id,  SUM(amount) as total_amount  FROM DonateDetail dn LEFT JOIN Commission c on dn.commission_id=c.id GROUP BY commission_id
-                                        )
-                                        SELECT
-                                            A.commission_id,
-                                            C.precint_name,
-                                            C.city_name,
-                                            C.province_name,
-                                            A.total_amount,
-                                            ISNULL(B.total_amount_received, 0) AS total_amount_received,
-                                            A.total_amount - ISNULL(B.total_amount_received, 0) AS remaining_amount
-                                        FROM
-                                            A
-                                        LEFT JOIN
-                                            B ON A.commission_id = B.commission_id
-                                        LEFT JOIN Commission C ON C.id=A.commission_id                            """;
+                        SELECT commission_id, SUM(amount_distribution) as total_amount_received  FROM Distribution st
+                        WHERE st.household_id is not null AND MONTH(st.date_distribution)=? AND YEAR(st.date_distribution)=?
+                        GROUP BY commission_id
+                                        
+                    ),
+                     A AS(
+                        SELECT commission_id,  SUM(amount) as total_amount  FROM DonateDetail dn LEFT JOIN Commission c on dn.commission_id=c.id GROUP BY commission_id
+                    )
+                    SELECT
+                        A.commission_id,
+                        C.precint_name,
+                        C.city_name,
+                        C.province_name,
+                        A.total_amount,
+                        ISNULL(B.total_amount_received, 0) AS total_amount_received,
+                        A.total_amount - ISNULL(B.total_amount_received, 0) AS remaining_amount
+                    FROM
+                        A
+                    LEFT JOIN
+                        B ON A.commission_id = B.commission_id
+                    LEFT JOIN Commission C ON C.id=A.commission_id
+                            """;
             Object[] params = {month, year};
             rs = JDBCQuery.executeSelectQuery(sql, params);
 
@@ -82,7 +83,6 @@ public class DistributionReport {
                     check=false;
                 }
 
-
             }
             while (!check);
             ResultSet rs = getListDistributionReport(month, year);
@@ -93,7 +93,7 @@ public class DistributionReport {
                 int columnCount = metaData.getColumnCount();
 
                 // Print column headers
-                for (int i = 1; i <= columnCount; i++) {
+                for (int i = 2; i <= columnCount; i++) {
                     System.out.printf("\u001B[1m%-25s\u001B[0m", metaData.getColumnLabel(i).toUpperCase());
                 }
                 System.out.println();
@@ -101,7 +101,7 @@ public class DistributionReport {
                 // Print data
                 while (rs.next()) {
                     // Check if the object_type contains the specified substring
-                    for (int i = 1; i <= columnCount; i++) {
+                    for (int i = 2; i <= columnCount; i++) {
                         // Check if the column is a floating-point number and format accordingly
                         if (rs.getMetaData().getColumnType(i) == java.sql.Types.FLOAT ||
                                 rs.getMetaData().getColumnType(i) == java.sql.Types.DOUBLE) {
