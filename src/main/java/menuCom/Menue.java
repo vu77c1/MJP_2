@@ -1,7 +1,6 @@
 package menuCom;
 
 
-
 import java.util.ArrayList;
 import java.util.DuplicateFormatFlagsException;
 import java.util.List;
@@ -10,7 +9,6 @@ import java.util.Scanner;
 import Model.Commission;
 import Model.Officer;
 import dao.CommissionDao;
-
 
 
 public class Menue {
@@ -31,6 +29,7 @@ public class Menue {
             }
         } while (!checkSpecialCharacter(s));
     }
+
     //		 -------------------------------------------------------------------------------------------------
     public static boolean isPhase(String str) {
         // Kiểm tra xem chuỗi có chứa ký tự đặc biệt hay không
@@ -91,7 +90,7 @@ public class Menue {
     public static String input_int() {
         String string;
         do {
-            System.out.println("Input nember:");
+            System.out.println("Input number:");
             Scanner sc = new Scanner(System.in);
             string = sc.nextLine();
             // kiem tra co phai la chuoi khong
