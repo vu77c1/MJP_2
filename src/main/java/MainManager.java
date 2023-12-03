@@ -248,10 +248,10 @@ public class MainManager {
                     distributionManager.addDistribution();
                     break;
                 case 3:
-                    distributionManager.updateDistribution();
+                    distributionManager.updateDistribution(con);
                     break;
                 case 4:
-                    distributionManager.deleteDistribution();
+                    distributionManager.deleteDistribution(con);
                     break;
                 default:
                     System.out.println("\t\t\t\u001B[31mInvalid function. Please re-enter.\u001B[0m\n");
