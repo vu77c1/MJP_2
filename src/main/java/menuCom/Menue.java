@@ -158,29 +158,6 @@ public class Menue {
         return checkId;
     }
 
-    //		 kiem tra su ton tai cua ID
-    public int checkExistOfficerID(String str) {
-        String str2 = "CB";
-        String str1 = str.substring(0, 2);
-        if (!str2.equals(str1)) {
-            return 0;
-        }
-        // cat chuoi tu vi tri thu 3
-        String id = str.substring(str.indexOf("_") + 1);
-        System.out.println("wait...");
-        Integer checkId = 0;
-        List<Officer> officerID = new ArrayList<>();
-        officerID = CommissionDao.getInstant().selectAllOfficer();
-        // kiem tra ton tai
-        for (Officer com : officerID) {
-            if (String.valueOf(com.getId()).equalsIgnoreCase(id)) {
-                checkId = 1;
-                break;
-            }
-        }
-        return checkId;
-    }
-
     //		Kiem tra su ton tai cua doi tuong Commission
     public int checkExistCommission(Commission c) {
         int check = 0;

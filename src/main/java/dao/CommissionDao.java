@@ -56,33 +56,6 @@ public class CommissionDao {
 	}
 
 	//		 lay du lieu Officer
-	public List<Officer> selectAllOfficer() {
-		List<Officer> result = new ArrayList<>();
-		try {
-			// b1: Tao ket noi
-			Connection connection = JdbcUtil.getConnection();
-			// b2: tao doi tuong statement
-			Statement statement = connection.createStatement();
-			// b3: thuc hien cau lenh sql
-			String sqlString = "SELECT * FROM Officer";
-//						   System.out.println("Ban da thuc thi: " + sqlString);
-			ResultSet rs = statement.executeQuery(sqlString);
-			// lay tung thuoc tinh cua doi tuong
-			while (rs.next()) {
-				int id = rs.getInt("id");
-				String precint_name = rs.getString("name");
-				String city_name = rs.getString("phone_number");
-				String province_name = rs.getString("address");
-				// tao doi tuong tu cac thuoc tinh o tren
-				Officer officer = new Officer(id, precint_name, city_name, province_name);
-				result.add(officer);
-			}
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return result;
-	}
 
 	// lay thong tin donate theo ngay
 	public List<String> fineDonateByDate(String a, String b) {
