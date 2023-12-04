@@ -165,11 +165,11 @@ public class Menue {
         result = CommissionDao.getInstant().selectAllCommissions();
         // kiem tra du lieu nhap co ton tai trong data khong
         for (Commission commission : result) {
-            if (c.getPrecintName().trim().equalsIgnoreCase(commission.getPrecintName()) == true
+            if (c.getPrecintName().trim().equalsIgnoreCase(commission.getPrecintName())
                     && c.getCityName().trim().equalsIgnoreCase(
-                    commission.getCityName()) == true
+                    commission.getCityName())
                     && c.getProvinceName().trim().equalsIgnoreCase(
-                    commission.getProvinceName()) == true) {
+                    commission.getProvinceName())) {
                 check = 1;
                 break;
             }
@@ -245,7 +245,7 @@ public class Menue {
         System.out.println("3: Delete a commission");
         System.out.println("4: Update a commission");
         System.out.println("0: Exit");
-        int n = Integer.parseInt(String.valueOf(input_int()));
+        int n = Integer.parseInt(input_int());
         switch (n) {
             case 0:
 //						   CommissionDao commissionDao1 = new CommissionDao();

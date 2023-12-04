@@ -52,7 +52,7 @@ public class InputValidator1 {
                     throw new ParseException("\t\t\tInvalid year format", 0);
                 }
             } catch (ParseException ex) {
-                System.out.println("\t\t\t\u001B[31mtError: Please enter a valid date in the format 'dd/MM/yyyy'.\u001B[0m");
+                System.out.println("\t\t\t\u001B[31mError: Please enter a valid date in the format 'dd/MM/yyyy'.\u001B[0m");
             }
         } while (!isValid);
 
@@ -218,8 +218,10 @@ public class InputValidator1 {
     public static boolean isIntMoreThan0(double a) {
         boolean isValid = false;
 //        a = scanner.nextInt();
-        if (a > 0) {
+        if (a > 0 && a > 100000) {
             isValid = true;
+        }else {
+            System.out.println("\t\t\tThe minimum amount is 100,000 VND");
         }
         return isValid;
     }

@@ -10,7 +10,7 @@ import java.util.List;
 import java.util.Scanner;
 
 public class ListOfHouseHolds {
-    private Connection connection;
+    private final Connection connection;
 
     public ListOfHouseHolds(Connection connection) {
         this.connection = connection;
@@ -35,7 +35,7 @@ public class ListOfHouseHolds {
                 {   num +=1;
                     int amountReceived = rs.getInt("amount_distribution");
                     sum += amountReceived;
-                };
+                }
                 System.out.println("Number donated: " + num);
                 System.out.println("Sum money donated "+ id +":" + sum);
             }else {

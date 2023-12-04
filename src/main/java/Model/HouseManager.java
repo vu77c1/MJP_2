@@ -139,7 +139,7 @@ public class HouseManager {
 
         return priorityObjectId;
     }
-    public static int getIntInputFromUser(Scanner scanner, String message) {
+    public static int getIntInputFromUser(Scanner scanner, String message, int minIndex, int maxIndex) {
         int userInput = 0;
         boolean isValid = false;
 
@@ -149,17 +149,25 @@ public class HouseManager {
                 System.out.println("Please enter a valid integer!");
                 scanner.next(); // Đọc và bỏ qua đầu vào không phải số nguyên
             }
-            userInput = scanner.nextInt();
 
-            if (userInput <= 0) {
-                System.out.println("Number incorrect. Please enter a different number.");
+            if (scanner.hasNextInt()) {
+                userInput = scanner.nextInt();
+
+                if (userInput <= 0 || userInput < minIndex || userInput > maxIndex) {
+                    System.out.println("Invalid input. Please enter a valid number ");
+                } else {
+                    isValid = true;
+                }
             } else {
-                isValid = true;
+                System.out.println("Invalid input. Please enter a valid integer number.");
+                scanner.next();
             }
         }
 
         return userInput;
     }
+
+
     public static boolean isValidHouseData(Connection con, int commissionId, int priorityObjectId) {
         // Kiểm tra tính hợp lệ của dữ liệu hộ dân dựa trên commissionId và priorityObjectId
         if (!isValidCommissionId(con, commissionId)) {
@@ -206,33 +214,43 @@ public class HouseManager {
         }
         return false;
     }
+
     public static void addHouse(Connection con) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("\t\t\t=== Add House Information ===");
         System.out.print("\t\t\t\u001B[31mYou are about to add a record for a household.\n\t\t\tPlease refer to other tables in the database to avoid mistakes!\u001B[0m\n");
+
         // Hiển thị thông tin Commission để người dùng chọn
         displayCommissionList(con);
-        int commissionIndex =  getIntInputFromUser(scanner, "Enter the index of the Commission: "); // Nhận đầu vào từ người dùng
+
+        // Lấy maxCommissionIndex từ cơ sở dữ liệu
+        String countCommissionQuery = "SELECT COUNT(*) AS commission_count FROM Commission";
+        int maxCommissionIndex = getMaxIndexFromDatabase(con, countCommissionQuery);
+
+        int commissionIndex = getIntInputFromUser(con, "Enter the index of the Commission: ", maxCommissionIndex);
         int commissionId = getCommissionIdByIndex(con, commissionIndex); // Lấy commission_id từ index
 
         // Hiển thị thông tin Priority Object để người dùng chọn
         displayPriorityObjectList(con);
-        int priorityObjectIndex = getIntInputFromUser(scanner, "Enter the index of the Priority Object: "); // Nhận đầu vào từ người dùng
+
+        // Lấy maxPriorityObjectIndex từ cơ sở dữ liệu
+        String countPriorityObjectQuery = "SELECT COUNT(*) AS priority_object_count FROM PriorityObject";
+        int maxPriorityObjectIndex = getMaxIndexFromDatabase(con, countPriorityObjectQuery);
+
+        int priorityObjectIndex = getIntInputFromUser(con, "Enter the index of the Priority Object: ", maxPriorityObjectIndex);
         int priorityObjectId = getPriorityObjectIdByIndex(con, priorityObjectIndex); // Lấy priority_object_id từ index
 
         // Thực hiện kiểm tra và thêm dữ liệu
         if (commissionId != -1 && priorityObjectId != -1) {
             // Kiểm tra nếu đã tồn tại dữ liệu với commission_id và priority_object_id tương ứng
-
-                // Thêm dữ liệu mới vào cơ sở dữ liệu
-                insertHouseData(con, commissionId, priorityObjectId);
-                System.out.println("\t\t\t\u001B[32mNew house information has been added to the database.\u001B[0m");
-
+            // Thêm dữ liệu mới vào cơ sở dữ liệu
+            insertHouseData(con, commissionId, priorityObjectId);
+            System.out.println("\t\t\t\u001B[32mNew house information has been added to the database.\u001B[0m");
         } else {
             System.out.println("\t\t\t\u001B[31mInvalid Commission ID or Priority Object ID.\u001B[0m");
         }
-
     }
+
 
     public static void insertHouseData(Connection con, int commissionId, int priorityObjectId) {
         try {
@@ -290,9 +308,12 @@ public class HouseManager {
     }
     // Delete a house from the database by ID
     public void deleteHouse(Connection con) throws SQLException {
-        displayHouseTable();
+        Scanner scanner = new Scanner(System.in);
 
-        int houseIndex = getIntInputFromUser("Enter the index of the house to delete: ");
+        displayHouseTable();
+        String countHouseQuery = "SELECT COUNT(*) AS house_count FROM House";
+        int maxHouseIndex = getMaxIndexFromDatabase(con, countHouseQuery);
+        int houseIndex = getIntInputFromUser(con, "Enter the index of the House ", maxHouseIndex);
         int houseId = getHouseIdByIndex(con, houseIndex);
 
         if (houseId != -1) {
@@ -341,12 +362,17 @@ public class HouseManager {
     // Update house information in the database by ID
     public void updateHouseInfo(Connection con) throws SQLException {
         displayHouseTable();
-        int houseIndex = getIntInputFromUser("Enter the index of the house to update: ");
+        String countHouseQuery = "SELECT COUNT(*) AS house_count FROM House";
+        int maxHouseIndex = getMaxIndexFromDatabase(con, countHouseQuery);
+        int houseIndex = getIntInputFromUser(con, "Enter the index of the House ", maxHouseIndex);
         int houseId = getHouseIdByIndex(con, houseIndex);
         if (houseId != -1) {
             displayPriorityObjectList(con);
-            int priorityObjectIndex = getIntInputFromUser("Enter the index of the Priority Object: ");
-            int priorityObjectId = getPriorityObjectIdByIndex(con, priorityObjectIndex);
+            String countPriorityObjectQuery = "SELECT COUNT(*) AS priority_object_count FROM PriorityObject";
+            int maxPriorityObjectIndex = getMaxIndexFromDatabase(con, countPriorityObjectQuery);
+
+            int priorityObjectIndex = getIntInputFromUser(con, "Enter the index of the Priority Object: ", maxPriorityObjectIndex);
+            int priorityObjectId = getPriorityObjectIdByIndex(con, priorityObjectIndex); // Lấy priority_object_id từ index
             if (priorityObjectId != -1) {
                 updateHouse(houseId, priorityObjectId);
             } else {
@@ -356,7 +382,32 @@ public class HouseManager {
             System.out.println("Invalid House index.");
         }
     }
-    public int getIntInputFromUser(String message) {
+    public static int getMaxIndexFromDatabas(Connection con, String message) {
+        int maxCommissionIndex = 0;
+        int maxPriorityObjectIndex = 0;
+
+        try {
+            // Đoạn mã truy vấn số lượng Commission
+            String countCommissionQuery = "SELECT COUNT(*) AS commission_count FROM Commission";
+            try (Statement statement = con.createStatement();
+                 ResultSet commissionCountResult = statement.executeQuery(countCommissionQuery)) {
+                if (commissionCountResult.next()) {
+                    maxCommissionIndex = commissionCountResult.getInt("commission_count");
+                }
+            }
+
+            // Đoạn mã truy vấn số lượng Priority Object
+            String countPriorityObjectQuery = "SELECT COUNT(*) AS priority_object_count FROM PriorityObject";
+            try (Statement statement = con.createStatement();
+                 ResultSet priorityObjectCountResult = statement.executeQuery(countPriorityObjectQuery)) {
+                if (priorityObjectCountResult.next()) {
+                    maxPriorityObjectIndex = priorityObjectCountResult.getInt("priority_object_count");
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
         Scanner scanner = new Scanner(System.in);
         int userInput;
         do {
@@ -376,6 +427,51 @@ public class HouseManager {
         } while (true);
         return userInput;
     }
+    public static int getMaxIndexFromDatabase(Connection con, String countQuery) {
+        int maxIndex = 0;
+
+        try {
+            Statement statement = con.createStatement();
+            ResultSet countResult = statement.executeQuery(countQuery);
+
+            if (countResult.next()) {
+                maxIndex = countResult.getInt(1); // Lấy giá trị từ cột đầu tiên của kết quả truy vấn
+            }
+
+            countResult.close();
+            statement.close();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return maxIndex;
+    }
+
+    public static int getIntInputFromUser(Connection con, String message, int maxIndex) {
+        Scanner scanner = new Scanner(System.in);
+        int userInput;
+
+        do {
+            try {
+                System.out.print(message);
+                userInput = scanner.nextInt();
+
+                if (userInput <= 0 || userInput > maxIndex) {
+                    throw new IllegalArgumentException("Please enter a valid index between 1 and " + maxIndex + ".");
+                }
+
+                break;
+            } catch (InputMismatchException e) {
+                System.out.println("Invalid input. Please enter an integer.");
+                scanner.nextLine(); // Đọc và loại bỏ input không hợp lệ để tránh lặp vô hạn
+            } catch (IllegalArgumentException e) {
+                System.out.println(e.getMessage());
+            }
+        } while (true);
+
+        return userInput;
+    }
+
     public int getHouseIdByIndex(Connection con, int index) throws SQLException {
         int houseId = -1; // Giá trị mặc định nếu không tìm thấy
 

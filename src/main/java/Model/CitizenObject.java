@@ -4,13 +4,25 @@ public class CitizenObject {
     public CitizenObject() {
     }
 
-    public CitizenObject(int id, String typeNameObject) {
-        this.id = id;
-        this.typeNameObject = typeNameObject;
-    }
 
     private int id;
     private String typeNameObject;
+
+    public CitizenObject(int id, String typeNameObject, int coefficient) {
+        this.id = id;
+        this.typeNameObject = typeNameObject;
+        this.coefficient = coefficient;
+    }
+
+    public int getCoefficient() {
+        return coefficient;
+    }
+
+    public void setCoefficient(int coefficient) {
+        this.coefficient = coefficient;
+    }
+
+    private int coefficient;
     public int getId() {
         return id;
     }

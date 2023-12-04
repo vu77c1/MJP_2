@@ -7,9 +7,9 @@ import java.sql.*;
 import java.util.Scanner;
 
 public class OfficerManager {
-    private static Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
 
-    private static Connection connection = DBConnect.connectDatabase();
+    private static final Connection connection = DBConnect.connectDatabase();
     public static void main(String[] args) throws SQLException {
         displayMenu();
         int choice = 0;
@@ -18,7 +18,7 @@ public class OfficerManager {
                 System.out.println("Enter your choice...");
                 choice = sc.nextInt();
             } catch (Exception e) {
-                System.out.println(e.toString());
+                System.out.println(e);
                 System.out.println("* Warning: Input is incorrect!");
             }
             switch (choice) {
@@ -51,24 +51,24 @@ public class OfficerManager {
 
     // create method display menu of Officer table
     public static void displayMenu() {
-        System.out.println(String.format("| %-25s |", "= Officer Manager Menu ="));
-        System.out.println(String.format("| %-25s |", "-------------------------"));
-        System.out.println(String.format("| %-25s |", "0. Exit program"));
-        System.out.println(String.format("| %-25s |", "1. Add new Officer"));
-        System.out.println(String.format("| %-25s |", "2. Update Officer table"));
-        System.out.println(String.format("| %-25s |", "3. Delete Officer by ID"));
-        System.out.println(String.format("| %-25s |", "4. Display Officer table"));
-        System.out.println(String.format("| %-25s |", "========================="));
+        System.out.printf("| %-25s |%n", "= Officer Manager Menu =");
+        System.out.printf("| %-25s |%n", "-------------------------");
+        System.out.printf("| %-25s |%n", "0. Exit program");
+        System.out.printf("| %-25s |%n", "1. Add new Officer");
+        System.out.printf("| %-25s |%n", "2. Update Officer table");
+        System.out.printf("| %-25s |%n", "3. Delete Officer by ID");
+        System.out.printf("| %-25s |%n", "4. Display Officer table");
+        System.out.printf("| %-25s |%n", "=========================");
     }
 
     public static void displayUpdateMenu() {
-        System.out.println(String.format("| %-30s |", "======== Update Menu ========="));
-        System.out.println(String.format("| %-30s |", "------------------------------"));
-        System.out.println(String.format("| %-30s |", "0. Exit program"));
-        System.out.println(String.format("| %-30s |", "1. Update Officer name"));
-        System.out.println(String.format("| %-30s |", "2. Update Officer phone number"));
-        System.out.println(String.format("| %-30s |", "3. Update Officer address"));
-        System.out.println(String.format("| %-30s |", "=============================="));
+        System.out.printf("| %-30s |%n", "======== Update Menu =========");
+        System.out.printf("| %-30s |%n", "------------------------------");
+        System.out.printf("| %-30s |%n", "0. Exit program");
+        System.out.printf("| %-30s |%n", "1. Update Officer name");
+        System.out.printf("| %-30s |%n", "2. Update Officer phone number");
+        System.out.printf("| %-30s |%n", "3. Update Officer address");
+        System.out.printf("| %-30s |%n", "==============================");
     }
 
     // create method 1: Add new Officer
@@ -208,14 +208,14 @@ public class OfficerManager {
         String sql = "select * from Officer";
         ResultSet rs = st.executeQuery(sql);
         System.out.println("=====================================Officer Table======================================");
-        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "ID", "Name", "Phone number", "Address"));
-        System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "-----", "--------------------", "---------------",
-                    "-----------------------------------"));
+        System.out.printf("| %-5s | %-20s | %-15s | %-35s |%n", "ID", "Name", "Phone number", "Address");
+        System.out.printf("| %-5s | %-20s | %-15s | %-35s |%n", "-----", "--------------------", "---------------",
+                    "-----------------------------------");
         while (rs.next()) {
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", rs.getInt(1), rs.getString(2),
-                    rs.getString(3), rs.getString(4)));
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s |", "-----", "--------------------", "---------------",
-                    "-----------------------------------"));
+            System.out.printf("| %-5s | %-20s | %-15s | %-35s |%n", rs.getInt(1), rs.getString(2),
+                    rs.getString(3), rs.getString(4));
+            System.out.printf("| %-5s | %-20s | %-15s | %-35s |%n", "-----", "--------------------", "---------------",
+                    "-----------------------------------");
         }
         System.out.println();
     }

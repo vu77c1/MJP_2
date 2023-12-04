@@ -10,7 +10,7 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 public class ListOfStaticTwoPiority {
-    private Connection connection;
+    private final Connection connection;
 
     public ListOfStaticTwoPiority(Connection connection) {
         this.connection = connection;
@@ -38,7 +38,7 @@ public class ListOfStaticTwoPiority {
             {
                 String citizenName = rs.getString("name");
                 System.out.println(citizenName);
-            };
+            }
             InputValidatorKhue.waitForEnter();
         }catch (SQLException e) {
             System.out.println(e.getMessage());

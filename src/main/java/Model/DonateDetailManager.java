@@ -184,30 +184,49 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
         try {
             Map<Integer, DonateDetail> donateDetailMap = getDonateDetail(con);
             if (!donateDetailMap.isEmpty()) {
-                System.out.println("============================================================ \u001B[1mDONATION LIST\u001B[0m ============================================================");
-                System.out.println("┌────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────┐");
-                System.out.println("│   \u001B[1mID\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │   \u001B[1mOfficer\u001B[0m   │");
-                System.out.println("├────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
+                System.out.println("============================================================= \u001B[1mDONATION LIST\u001B[0m ============================================================");
+                System.out.println("┌─────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────┐");
+                System.out.println("│   \u001B[1mSTT\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │   \u001B[1mOfficer\u001B[0m   │");
+                System.out.println("├─────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
                 int rowCount = 0;
-                int totalRecords = countRecords(con, "DonateDetail");
                 for (Map.Entry<Integer, DonateDetail> entry : donateDetailMap.entrySet()) {
                     Integer index = entry.getKey();
                     DonateDetail donateDetail = entry.getValue();
                     String amount = String.format("%.0f", donateDetail.getAmount());
                     LocalDate donateDate = donateDetail.getDonateDate();
-                    String precintName = donateDetail.getPrecintName();
-                    String representativeName = donateDetail.getRepresentativeName();
-                    String companyName = donateDetail.getCompanyName();
-                    String officerName = donateDetail.getOfficerName();
+                    String precintName;
+                    if (donateDetail.getPrecintName() == null) {
+                        precintName = "(No Info)";
+                    } else {
+                        precintName = donateDetail.getPrecintName();
+                    }
+                    String representativeName;
+                    if (donateDetail.getRepresentativeName() == null) {
+                        representativeName = "(No Info)";
+                    } else {
+                        representativeName = donateDetail.getRepresentativeName();
+                    }
+                    String companyName;
+                    if (donateDetail.getCompanyName() == null) {
+                        companyName = "(No Info)";
+                    } else {
+                        companyName = donateDetail.getCompanyName();
+                    }
+                    String officerName;
+                    if (donateDetail.getOfficerName() == null) {
+                        officerName = "(No Info)";
+                    } else {
+                        officerName = donateDetail.getOfficerName();
+                    }
 
-                    System.out.printf("│ %-6S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-11s │\n", index, amount, dateFormat.format(donateDate), precintName, representativeName, companyName, officerName);
+                    System.out.printf("│ %-7S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-11s │\n", index, amount, dateFormat.format(donateDate), precintName, representativeName, companyName, officerName);
                     rowCount++;
                     // Print separator line after each record (except the last one)
-                    if (rowCount < totalRecords) {
-                        System.out.println("├────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
+                    if (rowCount < donateDetailMap.size()) {
+                        System.out.println("├─────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
                     }
                 }
-                System.out.println("└────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────┘");
+                System.out.println("└─────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────┘");
                 System.out.println("============================================================   \u001B[1mLIST ENDED\u001B[0m  ============================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[0m");
@@ -251,16 +270,31 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                         System.out.println("├────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
                         String amount = String.format("%.0f", resultSet.getDouble("amount"));
                         LocalDate donate_date = resultSet.getObject("donate_date", LocalDate.class);
-                        String precint_name = resultSet.getString("precint_name");
-                        String representative_name = resultSet.getString("representative_name");
+                        String precint_name;
+                        if (resultSet.getString("precint_name") == null) {
+                            precint_name = "(No Info)";
+                        } else {
+                            precint_name = resultSet.getString("precint_name");
+                        }
+                        String representative_name;
+                        if (resultSet.getString("representative_name") == null) {
+                            representative_name = "(No Info)";
+                        } else {
+                            representative_name = resultSet.getString("representative_name");
+                        }
                         String company_name;
                         if (resultSet.getString("company_name") == null) {
                             company_name = "(Individual)";
                         } else {
                             company_name = resultSet.getString("company_name");
                         }
-                        String name = resultSet.getString("name");
-                        System.out.printf("│ %-6S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-11s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, name);
+                        String officerName;
+                        if (resultSet.getString("name") == null) {
+                            officerName = "(No Info)";
+                        } else {
+                            officerName = resultSet.getString("name");
+                        }
+                        System.out.printf("│ %-6S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-11s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, officerName);
                         hasNext = resultSet.next();
                     }
                     System.out.println("└────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────┘");
@@ -577,11 +611,21 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                 boolean hasNext = resultSet.next();
                 while (hasNext) {
                     int ID = resultSet.getInt("id");
-                    String companyName = resultSet.getString("name");
-                    String precinctName = resultSet.getString("precint_name");
+                    String officerName;
+                    if (resultSet.getString("name") == null) {
+                        officerName = "(No Info)";
+                    } else {
+                        officerName = resultSet.getString("name");
+                    }
+                    String precintName;
+                    if (resultSet.getString("precint_name") == null) {
+                        precintName = "(No Info)";
+                    } else {
+                        precintName = resultSet.getString("precint_name");
+                    }
                     int Stats = resultSet.getInt("Stats");
 
-                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │%n", ID, companyName, precinctName, Stats);
+                    System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │%n", ID, officerName, precintName, Stats);
 
                     hasNext = resultSet.next();
 
@@ -639,10 +683,20 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                     int rowCount = 1;
                     int totalRecords = countRecords(con, "OfficerDistribution");
                     while (resultSet.next()) {
-                        String companyName = resultSet.getString("name");
-                        String precintName = resultSet.getString("precint_name");
+                        String officerName;
+                        if (resultSet.getString("name") == null) {
+                            officerName = "(No Info)";
+                        } else {
+                            officerName = resultSet.getString("name");
+                        }
+                        String precintName;
+                        if (resultSet.getString("precint_name") == null) {
+                            precintName = "(No Info)";
+                        } else {
+                            precintName = resultSet.getString("precint_name");
+                        }
                         int Stats = resultSet.getInt("Stats");
-                        System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", id, companyName, precintName, Stats);
+                        System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", id, officerName, precintName, Stats);
                         rowCount++;
                         // Print separator line after each record (except the last one)
                         if (rowCount < totalRecords) {
@@ -744,8 +798,18 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                 System.out.println("├───────┼─────────────────────────────────────┼─────────────────────────────────────┼──────────────────────┤");
                 while (hasNext) {
                     int householdId = resultSet.getInt("household_id");
-                    String householdLordName = resultSet.getString("household_lord_name");
-                    String precintName = resultSet.getString("precint_name");
+                    String householdLordName;
+                    if (resultSet.getString("household_lord_name") == null) {
+                        householdLordName = "(No Info)";
+                    } else {
+                        householdLordName = resultSet.getString("household_lord_name");
+                    }
+                    String precintName;
+                    if (resultSet.getString("precint_name") == null) {
+                        precintName = "(No Info)";
+                    } else {
+                        precintName = resultSet.getString("precint_name");
+                    }
                     String allocatedAmount = String.format("%.0f", resultSet.getDouble("allocated_amount"));
                     System.out.printf("│ %-5S │ %-35s │ %-35s │ %-20s │%n", householdId, householdLordName, precintName, allocatedAmount);
                     hasNext = resultSet.next();

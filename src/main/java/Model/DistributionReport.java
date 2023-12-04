@@ -46,9 +46,6 @@ public class DistributionReport {
         } catch (Exception exception) {
             exception.printStackTrace();
 
-        } finally {
-            //JDBCQuery.closeConnection();
-
         }
         return rs;
     }
@@ -64,7 +61,7 @@ public class DistributionReport {
                 }
                 catch(Exception e)
                 {
-                    System.out.printf("Error");
+                    System.out.print("Error");
                 }
 
             }
@@ -93,7 +90,7 @@ public class DistributionReport {
                 int columnCount = metaData.getColumnCount();
 
                 // Print column headers
-                for (int i = 1; i <= columnCount; i++) {
+                for (int i = 2; i <= columnCount; i++) {
                     System.out.printf("\u001B[1m%-25s\u001B[0m", metaData.getColumnLabel(i).toUpperCase());
                 }
                 System.out.println();
@@ -101,7 +98,7 @@ public class DistributionReport {
                 // Print data
                 while (rs.next()) {
                     // Check if the object_type contains the specified substring
-                    for (int i = 1; i <= columnCount; i++) {
+                    for (int i = 2; i <= columnCount; i++) {
                         // Check if the column is a floating-point number and format accordingly
                         if (rs.getMetaData().getColumnType(i) == java.sql.Types.FLOAT ||
                                 rs.getMetaData().getColumnType(i) == java.sql.Types.DOUBLE) {
@@ -115,7 +112,7 @@ public class DistributionReport {
                 }
 
             } else {
-                System.out.printf("Data Empty");
+                System.out.print("Data Empty");
             }
         } catch (SQLException e) {
             e.printStackTrace();

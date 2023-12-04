@@ -9,7 +9,7 @@ public class Representative {
 
     public Representative() {
 
-    };
+    }
 
     public Representative(int id, String representativeName, String representativeAddress, String phoneNumber,
                           int companyId) {

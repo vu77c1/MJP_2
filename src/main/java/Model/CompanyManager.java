@@ -8,10 +8,11 @@ import java.sql.*;
 import java.util.*;
 
 public class CompanyManager {
-    private Connection connection;
+    private final Connection connection;
     public CompanyManager(Connection connection){
         this.connection =connection;
-    };
+    }
+
     public CompanyManager(){
         this.connection= DBConnect.connectDatabase();
     }
@@ -79,7 +80,7 @@ public class CompanyManager {
         Company newCompany = inputCompany(scanner);
         addCompany(newCompany);
         return newCompany.getCompanyName();
-    };
+    }
 
     public void addCompany(Company newCompany) {
         String query = "INSERT INTO Company (company_name, company_address) VALUES (?, ?)";

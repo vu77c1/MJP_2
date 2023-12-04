@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
 import menuCom.Menue;
 
 public class MainManager {
-    private static Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
 
     public static void main(String[] args) {
         int n;
@@ -80,7 +80,7 @@ public class MainManager {
             switch (n) {
                 case 1:
                     HouseManager houseManager = new HouseManager(DBConnect.connectDatabase());
-                    houseManager.handleHouseManagement(houseManager, sc);
+                    HouseManager.handleHouseManagement(houseManager, sc);
                     break;
                 case 2:
 
@@ -245,10 +245,10 @@ public class MainManager {
                     distributionManager.addDistribution();
                     break;
                 case 3:
-                    distributionManager.updateDistribution(con);
+                    updateDistribution(con);
                     break;
                 case 4:
-                    distributionManager.deleteDistribution(con);
+                    deleteDistribution(con);
                     break;
                 default:
                     System.out.println("\t\t\t\u001B[31mInvalid function. Please re-enter.\u001B[0m\n");
@@ -318,7 +318,7 @@ public class MainManager {
                                 System.out.println("Please enter a valid month and year (greater than zero).");
                             } else {
                                 // Input is valid, proceed to call displayTop5HouseholdsByDonation
-                                houseManager.displayTop5HouseholdsByDonation(connection, donationRound);
+                                HouseManager.displayTop5HouseholdsByDonation(connection, donationRound);
                                 break;
                             }
                         }
@@ -330,12 +330,12 @@ public class MainManager {
                     break;
                 case 3:
                     CitizenReport citizenReport = new CitizenReport();
-                    citizenReport.printSearchByCitizenObject();
+                    citizenReport.getListCitizenObj();
                     break;
                 case 4:
-                    System.out.println("\t\t\tist the top 5 households with the most priority beneficiaries");
-                    CitizenReport citizenReport1 = new CitizenReport();
-                    citizenReport1.printCitizenObjectTop5();
+                    CitizenReport citizenReport2 = new CitizenReport();
+                    System.out.println("List the top 5 households with the most priority beneficiaries");
+                    citizenReport2.selectTop5();
                     break;
                 case 5:
                     DonateManage1 donateManage1 = new DonateManage1();

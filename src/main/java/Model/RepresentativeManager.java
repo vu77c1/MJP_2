@@ -10,7 +10,7 @@ import java.util.*;
 
 
 public class RepresentativeManager {
-    private Connection connection;
+    private final Connection connection;
 
     public RepresentativeManager(Connection connection) {
         this.connection = connection;
@@ -93,8 +93,6 @@ public class RepresentativeManager {
         }
         return newRepresentative;
     }
-
-    ;
 
     public void addRepresentativeInput(Scanner scanner) throws SQLException {
         Representative newRepresentative = inputRepresentative(scanner);
@@ -205,7 +203,7 @@ public class RepresentativeManager {
                     representative.setRepresentativeName(resultSet.getString("representative_name"));
                     representative.setRepresentativeAddress(resultSet.getString("representative_address"));
                     representative.setPhoneNumber(resultSet.getString("phone_number"));
-                    representative.setCompanyId(resultSet.getInt("id_company"));
+                    representative.setCompanyId(resultSet.getInt("company_id"));
                     return representative;
                 }
             }
@@ -287,19 +285,21 @@ public class RepresentativeManager {
         try {
             st = connection.createStatement();
             System.out.println();
-            System.out.println("._______.______________________.___________________________________.____________________.____________.");
-            System.out.println("│   No  │    Representative    │                Address            │         Phone      │ ID Company │");
-            System.out.println("│_______│______________________│___________________________________│____________________│____________│");
-            rs = st.executeQuery("SELECT dbo.Representative.id, representative_name, representative_address, phone_number, company_id FROM Representative ORDER BY id desc;");
+            System.out.println("._______.______________________.___________________________________.____________________.____________________________________.");
+            System.out.println("│   No  │    Representative    │                Address            │         Phone      │               Company              │");
+            System.out.println("│_______│______________________│___________________________________│____________________│____________________________________│");
+            rs = st.executeQuery("SELECT Representative.id, representative_name, representative_address, phone_number, company_name\n" +
+                    "FROM Representative\n" +
+                    "LEFT JOIN Company ON Representative.company_id = Company.id ORDER BY Representative.id desc");
             int index = 1; // Index bắt đầu từ 1
             while (rs.next()) {
                 String ID = rs.getString("id");
                 String representativeName = rs.getString("representative_name");
                 String representativeAddress = rs.getString("representative_address");
                 String phoneNumber = rs.getString("phone_number");
-                String companyId = rs.getString("company_id");
-                System.out.printf("│ %-5S │ %-20s │ %-33s │ %-18s │ %-10s │\n", index, representativeName, representativeAddress, phoneNumber, companyId);
-                System.out.println("│_______│______________________│___________________________________│____________________│____________│");
+                String companyName = rs.getString("company_name");
+                System.out.printf("│ %-5S │ %-20s │ %-33s │ %-18s │ %-34s │\n", index, representativeName, representativeAddress, phoneNumber, companyName);
+                System.out.println("│_______│______________________│___________________________________│____________________│____________________________________│");
                 index ++;
             }
 

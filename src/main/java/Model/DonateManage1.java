@@ -20,7 +20,7 @@ public class DonateManage1 {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT);
     public static SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
 
-    private static Scanner sc = new Scanner(System.in);
+    private static final Scanner sc = new Scanner(System.in);
 
     public void topValue(Connection con) {
         try {
@@ -195,7 +195,7 @@ public class DonateManage1 {
                 isValid = true;
             }
         } catch (ParseException e) {
-            System.out.println(e.toString());
+            System.out.println(e);
         }
         return isValid;
     }

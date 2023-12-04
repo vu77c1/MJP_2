@@ -6,7 +6,7 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class InputValidator {
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static Date validateDateInput(String prompt) {
         Date date = null;

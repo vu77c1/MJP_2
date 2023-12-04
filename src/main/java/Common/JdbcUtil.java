@@ -11,7 +11,7 @@ import java.sql.SQLException;
 
 public class JdbcUtil {
 		 private static Connection con = null;
-		 static final String connectionUrl = "jdbc:sqlserver://localhost:1433;database=SQLminiversion2;user=sa;password=123456;TrustServerCertificate=true;";
+		 static final String connectionUrl = "jdbc:sqlserver://STMX\\STM;database=miniproject_english;user=STM;password=C0991ryk;TrustServerCertificate=true;";
 		 static {
 				  
 				  try {

@@ -79,10 +79,9 @@ public class Processing {
             // You may use a whitelist or other validation methods depending on your requirements
 
             // Assuming tableName is a valid identifier
-            String sql = "SELECT COUNT(*) FROM ? WHERE id = ?";
+            String sql = "SELECT COUNT(*) FROM " + tableName + " WHERE id = ?";
             try (PreparedStatement stmt = con.prepareStatement(sql)) {
-                stmt.setString(1, tableName);
-                stmt.setInt(2, id);
+                stmt.setInt(1, id);
                 try (ResultSet rs = stmt.executeQuery()) {
                     if (rs.next()) {
                         // Check if the count is greater than 0

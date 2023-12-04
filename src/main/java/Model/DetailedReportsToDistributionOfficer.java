@@ -72,15 +72,15 @@ public class DetailedReportsToDistributionOfficer {
             }
         } while (!checkDateInput(startDate,endDate) || !isValidDateFormat(endDate));
 
-        String sql = "SELECT o.name, SUM(d.amount_received) AS total_amount, d.date_received, od.address_distribution\n" +
+        String sql = "SELECT o.name, SUM(d.amount_distribution) AS total_amount, d.date_distribution, od.address_distribution\n" +
                 "FROM Officer AS o \n" +
                 "LEFT JOIN OfficerDistribution AS od ON o.id = od.officer_id\n" +
                 "LEFT JOIN Distribution AS d ON d.id = od.distribution_id\n" +
-                "WHERE (od.date_distribution BETWEEN '"+ startDate + "' AND '"+ endDate +"') \n" +
+                "WHERE (d.date_distribution BETWEEN '"+ startDate + "' AND '"+ endDate +"') \n" +
                 "   OR (od.address_distribution IS NULL \n" +
-                "   AND od.date_distribution IS NULL\n" +
-                "   AND d.amount_received IS NULL)\n" +
-                "GROUP BY o.name, d.date_received, od.address_distribution \n" +
+                "   AND d.date_distribution IS NULL\n" +
+                "   AND d.amount_distribution IS NULL)\n" +
+                "GROUP BY o.name, d.date_distribution, od.address_distribution \n" +
                 "ORDER BY total_amount desc;";
 
         ResultSet rs = st.executeQuery(sql);

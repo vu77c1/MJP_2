@@ -1,6 +1,6 @@
 package Model;
 
-import Common.InputValidator;
+//import Common.InputValidator;
 import Common.InputValidator1;
 import Common.JDBCQuery1;
 
@@ -18,10 +18,10 @@ import java.util.Map;
 import java.util.Scanner;
 
 
-import static Model.Processing.countRecords;
-import static Model.Processing.dateFormat;
-import static Model.Processing.waitForEnter;
-import static Model.Processing1.*;
+//import static Model.Processing.countRecords;
+//import static Model.Processing.dateFormat;
+//import static Model.Processing.waitForEnter;
+//import static Model.Processing1.*;
 
 public class DistributionManager {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT);
@@ -481,11 +481,11 @@ public class DistributionManager {
 
         Double amount;
         do {
-            amount = InputValidator1.validateFloatInput("\t\t\tEnter New Amount Received:  ");
+            amount = InputValidator1.validateDoubleInput("\t\t\tEnter New Amount Received:  ");
             isValid = InputValidator1.isIntMoreThan0(amount);
-            if (isValid == false) {
-                System.out.println("Please input > 0");
-            }
+//            if (isValid == false) {
+//                System.out.println("Please input > 0");
+//            }
         } while (isValid == false);
 
 
@@ -581,7 +581,7 @@ public class DistributionManager {
                             choice = -1; // Reset choice to -1 to repeat the loop
                         }
                     } while (choice == -1);
-
+                    boolean isValid=false;
                     switch (choice) {
                         case 3:
                             System.out.println("\t\t\tBack to menu");
@@ -589,38 +589,46 @@ public class DistributionManager {
                             break;
                         //Update Số tiền
                         case 1:
-                            double newAmount = InputValidator1.validateDoubleInput("\t\t\tEnter amount: ");
-                            String sql1 = "UPDATE Distribution SET amount_distribution =? WHERE id =?";
-                            try {
-                                pstmt = con.prepareStatement(sql1);
-                                pstmt.setDouble(1, newAmount);
-                                pstmt.setInt(2, identity);
-                                pstmt.executeUpdate();
-                                System.out.println("\t\t\t\u001B[32mUpdated the amount successfully!!!\u001B[0m");
+                            do {
+                                double newAmount = InputValidator1.validateDoubleInput("\t\t\tEnter amount: ");
+                                isValid = InputValidator1.isIntMoreThan0(newAmount);
+                                if(isValid==true){
+                                    String sql1 = "UPDATE Distribution SET amount_distribution =? WHERE id =?";
+                                    try {
+                                        pstmt = con.prepareStatement(sql1);
+                                        pstmt.setDouble(1, newAmount);
+                                        pstmt.setInt(2, identity);
+                                        pstmt.executeUpdate();
+                                        System.out.println("\t\t\t\u001B[32mUpdated the amount successfully!!!\u001B[0m");
 
-                            } catch (Exception e) {
-                                System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
-                            } finally {
-                                try {
-                                    if (pstmt != null) pstmt.close();
-                                } catch (SQLException se2) {
-                                    System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
-                                }
-                                do {
-                                    System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
-                                    String c = sc.next();
-                                    sc.nextLine(); // Consume the newline character
+                                    } catch (Exception e) {
+                                        System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + e.getMessage() + ".\u001B[0m");
+                                    } finally {
+                                        try {
+                                            if (pstmt != null) pstmt.close();
+                                        } catch (SQLException se2) {
+                                            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + se2.getMessage() + ".\u001B[0m");
+                                        }
+                                        do {
+                                            System.out.print("\t\t\tDo you want to continue editing (Y/N)? ");
+                                            String c = sc.next();
+                                            sc.nextLine(); // Consume the newline character
 
-                                    if ("Y".equalsIgnoreCase(c) || "y".equalsIgnoreCase(c)) {
-                                        updateDistribution(con);
-                                    } else if ("N".equalsIgnoreCase(c) || "n".equalsIgnoreCase(c)) {
-                                        break;
-                                    } else {
-                                        System.out.println("\t\t\t\u001B[31mThe input selection is incorrect, please re-enter!!!\u001B[0m");
+                                            if ("Y".equalsIgnoreCase(c) || "y".equalsIgnoreCase(c)) {
+                                                updateDistribution(con);
+                                            } else if ("N".equalsIgnoreCase(c) || "n".equalsIgnoreCase(c)) {
+                                                break;
+                                            } else {
+                                                System.out.println("\t\t\t\u001B[31mThe input selection is incorrect, please re-enter!!!\u001B[0m");
+                                            }
+                                        } while (true);
+
                                     }
-                                } while (true);
 
-                            }
+                                }
+                            }while (isValid==false);
+
+
                             break;
                         //Update ngày ủng hộ
                         case 2:

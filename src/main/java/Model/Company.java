@@ -7,7 +7,7 @@ public class Company {
 
     public Company() {
 
-    };
+    }
 
     public Company(int id, String companyName, String companyAddrress) {
         this.companyName = companyName;
@@ -36,6 +36,6 @@ public class Company {
 
     public void setCompanyAddrress(String companyAddrress) {
         this.companyAddrress = companyAddrress;
-    };
+    }
 
 }

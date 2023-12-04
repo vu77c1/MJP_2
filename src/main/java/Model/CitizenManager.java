@@ -121,7 +121,12 @@ public class CitizenManager {
 
         return indexCitizenObjectMap;
     }
-
+    public static boolean isValidInteger(String input) {
+        if (input == null || input.isEmpty()) {
+            return false;
+        }
+        return input.matches("\\d+");
+    }
     public Citizen enterCitizenDetailsFromConsole(Scanner scanner) {
         Citizen newCitizen = new Citizen();
 
@@ -136,7 +141,7 @@ public class CitizenManager {
         }
         newCitizen.setName(name);
 
-        System.out.print("IdentityCard Number : ");
+        System.out.print("IdentityCard Number (12 Number) : ");
         String cmnd = scanner.nextLine();
         while (!isValidIdentityCard(cmnd)) {
             if (cmnd.matches("0{12}")) {
@@ -144,7 +149,7 @@ public class CitizenManager {
             } else {
                 System.out.println("ID card number is invalid. Please re-enter your ID card number (12 numbers).");
             }
-            System.out.print("IdentityCard Number: ");
+            System.out.print("Incorrect. Please input again IdentityCard Number (12 Number) : ");
             cmnd = scanner.nextLine();
         }
         newCitizen.setIdentityCard(cmnd);
@@ -170,7 +175,7 @@ public class CitizenManager {
         // Yêu cầu người dùng nhập các thông tin khác cho công dân
         String phoneNumber;
         do {
-            System.out.print("Phone Number: ");
+            System.out.print("Phone Number(10 Number) : ");
             phoneNumber = scanner.nextLine();
         } while (!isValidPhoneNumber(phoneNumber));
         newCitizen.setPhoneNumber(phoneNumber);
@@ -190,11 +195,18 @@ public class CitizenManager {
 
         // Nhập index của House từ người dùng
         int houseIndex = -1;
+        String houseIndexInput;
         do {
             System.out.print("House Index: ");
-            houseIndex = Integer.parseInt(scanner.nextLine());
-        } while (!houseMap.containsKey(houseIndex));
+            houseIndexInput = scanner.nextLine();
 
+            if (!isValidInteger(houseIndexInput)) {
+                System.out.println("Invalid input. Please enter a valid integer for House Index.");
+                continue;
+            }
+
+            houseIndex = Integer.parseInt(houseIndexInput);
+        } while (!houseMap.containsKey(houseIndex));
         // Lấy ID của House từ danh sách ánh xạ
         int houseID = houseIndex; // Đây là ID của House được chọn
 
@@ -222,17 +234,36 @@ public class CitizenManager {
             System.out.println(entry.getKey() + ". " + entry.getValue());
         }
 
-        // Nhập index của Citizen Object từ người dùng
+// Nhập index của Citizen Object từ người dùng
         int citizenObjectIndex = -1;
+        String citizenObjectIndexInput;
         do {
             System.out.print("Citizen Object Index: ");
-            citizenObjectIndex = Integer.parseInt(scanner.nextLine());
-        } while (!citizenObjectMap.containsKey(citizenObjectIndex));
+            citizenObjectIndexInput = scanner.nextLine();
 
-        // Lấy ID của Citizen Object từ danh sách ánh xạ
+            if (!isValidInteger(citizenObjectIndexInput)) {
+                System.out.println("Invalid input. Please enter a valid integer for Citizen Object Index.");
+                continue;
+            }
+
+            citizenObjectIndex = Integer.parseInt(citizenObjectIndexInput);
+
+            if (!citizenObjectMap.containsKey(citizenObjectIndex)) {
+                System.out.println("Invalid input. Please enter a valid Citizen Object Index.");
+                continue;
+            }
+
+            String chosenCitizenObjectType = citizenObjectMap.get(citizenObjectIndex);
+            if (sex && chosenCitizenObjectType.equalsIgnoreCase("phụ nữ mang thai")) {
+                System.out.println("'Phụ nữ mang thai' cannot be selected for male.");
+                citizenObjectIndex = -1; // Đặt lại giá trị -1 để yêu cầu nhập lại
+            }
+        } while (citizenObjectIndex == -1);
+
+// Lấy ID của Citizen Object từ danh sách ánh xạ
         int citizenObjectID = citizenObjectIndex; // Đây là ID của Citizen Object được chọn
 
-        // Lưu ID của Citizen Object cho Citizen
+// Lưu ID của Citizen Object cho Citizen
         newCitizen.setCitizenObjectId(citizenObjectID);
 
 
@@ -374,19 +405,40 @@ public class CitizenManager {
 
             for (Map.Entry<Integer, String> entry : citizenData.entrySet()) {
                 String citizenInfo = entry.getValue();
-                String[] infoParts = citizenInfo.split(", ");
+
+                int startIndex = citizenInfo.indexOf("Name: ");
+                int endIndex = citizenInfo.indexOf(", Identity Card: ");
+                String name = citizenInfo.substring(startIndex + 6, endIndex);
+
+                startIndex = citizenInfo.indexOf("Identity Card: ");
+                endIndex = citizenInfo.indexOf(", Date of Birth: ");
+                String identityCard = citizenInfo.substring(startIndex + 15, endIndex);
+
+                startIndex = citizenInfo.indexOf("Date of Birth: ");
+                endIndex = citizenInfo.indexOf(", Phone Number: ");
+                String dateOfBirth = citizenInfo.substring(startIndex + 15, endIndex);
+
+                startIndex = citizenInfo.indexOf("Phone Number: ");
+                endIndex = citizenInfo.indexOf(", Address: ");
+                String phoneNumber = citizenInfo.substring(startIndex + 14, endIndex);
+
+                startIndex = citizenInfo.indexOf("Address: ");
+                endIndex = citizenInfo.indexOf(", Household Lord: ");
+                String address = citizenInfo.substring(startIndex + 10, endIndex);
+
+                startIndex = citizenInfo.indexOf("Household Lord: ");
+                endIndex = citizenInfo.indexOf(", Sex: ");
+                String householdLord = citizenInfo.substring(startIndex + 16, endIndex);
+
+                startIndex = citizenInfo.indexOf("Sex: ");
+                endIndex = citizenInfo.indexOf(", Type: ");
+                String sex = citizenInfo.substring(startIndex + 5, endIndex);
+
+                startIndex = citizenInfo.indexOf("Type: ");
+                String type = citizenInfo.substring(startIndex + 6);
 
                 System.out.printf("| %-6s| %-22s| %-14s| %-14s| %-13s| %-22s| %-15s| %-7s| %-21s|%n",
-                        infoParts[0].split(": ")[1],
-                        infoParts[1].split(": ")[1],
-                        infoParts[2].split(": ")[1],
-                        infoParts[3].split(": ")[1],
-                        infoParts[4].split(": ")[1],
-                        infoParts[5].split(": ")[1],
-                        infoParts[6].split(": ")[1],
-                        infoParts[7].split(": ")[1],
-                        infoParts[8].split(": ")[1]
-                );
+                        entry.getKey(), name, identityCard, dateOfBirth, phoneNumber, address, householdLord, sex, type);
             }
 
 
@@ -399,7 +451,7 @@ public class CitizenManager {
 
                 // Kiểm tra nếu chuỗi nhập vào không phải là số hoặc số âm
                 if (!input.matches("\\d+") || Integer.parseInt(input) <= 0) {
-                    System.out.println("Vui lòng chỉ nhập số dương. Vui lòng nhập lại.");
+                    System.out.println("Incorrect. Please input again");
                     continue;
                 }
 
@@ -407,7 +459,7 @@ public class CitizenManager {
 
                 // Kiểm tra xem index có trong danh sách index hiển thị không
                 if (!indexToIdMap.containsKey(chosenIndex)) {
-                    System.out.println("Lựa chọn index không tồn tại. Vui lòng nhập lại.");
+                    System.out.println("LIndex option does not exist. Please Input-again.");
                     continue;
                 }
 
@@ -935,19 +987,40 @@ public class CitizenManager {
 
             for (Map.Entry<Integer, String> entry : citizenData.entrySet()) {
                 String citizenInfo = entry.getValue();
-                String[] infoParts = citizenInfo.split(", ");
+
+                int startIndex = citizenInfo.indexOf("Name: ");
+                int endIndex = citizenInfo.indexOf(", Identity Card: ");
+                String name = citizenInfo.substring(startIndex + 6, endIndex);
+
+                startIndex = citizenInfo.indexOf("Identity Card: ");
+                endIndex = citizenInfo.indexOf(", Date of Birth: ");
+                String identityCard = citizenInfo.substring(startIndex + 15, endIndex);
+
+                startIndex = citizenInfo.indexOf("Date of Birth: ");
+                endIndex = citizenInfo.indexOf(", Phone Number: ");
+                String dateOfBirth = citizenInfo.substring(startIndex + 15, endIndex);
+
+                startIndex = citizenInfo.indexOf("Phone Number: ");
+                endIndex = citizenInfo.indexOf(", Address: ");
+                String phoneNumber = citizenInfo.substring(startIndex + 14, endIndex);
+
+                startIndex = citizenInfo.indexOf("Address: ");
+                endIndex = citizenInfo.indexOf(", Household Lord: ");
+                String address = citizenInfo.substring(startIndex + 10, endIndex);
+
+                startIndex = citizenInfo.indexOf("Household Lord: ");
+                endIndex = citizenInfo.indexOf(", Sex: ");
+                String householdLord = citizenInfo.substring(startIndex + 16, endIndex);
+
+                startIndex = citizenInfo.indexOf("Sex: ");
+                endIndex = citizenInfo.indexOf(", Type: ");
+                String sex = citizenInfo.substring(startIndex + 5, endIndex);
+
+                startIndex = citizenInfo.indexOf("Type: ");
+                String type = citizenInfo.substring(startIndex + 6);
 
                 System.out.printf("| %-6s| %-22s| %-14s| %-14s| %-13s| %-22s| %-15s| %-7s| %-21s|%n",
-                        infoParts[0].split(": ")[1],
-                        infoParts[1].split(": ")[1],
-                        infoParts[2].split(": ")[1],
-                        infoParts[3].split(": ")[1],
-                        infoParts[4].split(": ")[1],
-                        infoParts[5].split(": ")[1],
-                        infoParts[6].split(": ")[1],
-                        infoParts[7].split(": ")[1],
-                        infoParts[8].split(": ")[1]
-                );
+                        entry.getKey(), name, identityCard, dateOfBirth, phoneNumber, address, householdLord, sex, type);
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -1162,7 +1235,7 @@ public class CitizenManager {
                     case 3:
                         // Sửa thông tin công dân
 
-                       displayCitizenInfo(connection);
+                        displayCitizenInfo(connection);
                         break;
                     case 4:
                         // Hiển thị thông tin tất cả công dân
@@ -1187,4 +1260,3 @@ public class CitizenManager {
 
 
 }
-
