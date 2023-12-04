@@ -84,7 +84,7 @@ public class ReportLocalDonateInformation {
                 "    JOIN DonateDetail AS dd ON c.id = dd.commission_id\n" +
                 ")\n" +
                 "SELECT TOP 5\n" +
-                "    CommissionID,\n" +
+                "    --CommissionID,\n" +
                 "    Precinct,\n" +
                 "    City,\n" +
                 "    Province,\n" +
@@ -93,15 +93,15 @@ public class ReportLocalDonateInformation {
                 "    CommissionTotalAmount\n" +
                 "ORDER BY TotalAmount DESC;";
         ResultSet rs = st.executeQuery(sql);
-        System.out.println("\u001B[33m=============================== Top 5 wards with the most donate ================================");
-        System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s | %-18s |", "Commission ID", "Precinct", "District/City",
+        System.out.println("\u001B[33m====================== Top 5 wards with the most donate =======================");
+        System.out.println(String.format("| %-15s | %-15s | %-18s | %-18s |", "Precinct", "District/City",
                 "Province", "Total Amount"));
-        System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s | %-18s |\u001B[0m", "---------------", "---------------", "---------------",
+        System.out.println(String.format("| %-15s | %-15s | %-18s | %-18s |\u001B[0m", "---------------", "---------------",
                 "-----------------", "------------------"));
         while (rs.next()) {
-            System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s | %-18s |", rs.getInt(1), rs.getString(2),
-                    rs.getString(3), rs.getString(4), formatFloatingPoint(rs.getFloat(5))));
-            System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s | %-18s |", "---------------", "---------------", "---------------",
+            System.out.println(String.format("| %-15s | %-15s | %-18s | %-18s |", rs.getString(1),
+                    rs.getString(2), rs.getString(3), formatFloatingPoint(rs.getFloat(4))));
+            System.out.println(String.format("| %-15s | %-15s | %-18s | %-18s |", "---------------", "---------------",
                     "-----------------", "------------------"));
         }
         System.out.println();
@@ -116,7 +116,7 @@ public class ReportLocalDonateInformation {
     public static void statisticsOfWards() throws SQLException {
         Statement st = connection.createStatement();
         String sql = "SELECT\n" +
-                "    c.id,\n" +
+                "    --c.id,\n" +
                 "    c.precint_name,\n" +
                 "    c.city_name,\n" +
                 "    c.province_name\n" +
@@ -126,15 +126,15 @@ public class ReportLocalDonateInformation {
                 "WHERE\n" +
                 "    dd.commission_id IS NULL;";
         ResultSet rs = st.executeQuery(sql);
-        System.out.println("\u001B[33m============== Statistics of wards that have not been donated ==============");
-        System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s |", "Commission ID", "Precinct", "District/City",
+        System.out.println("\u001B[33m===== Statistics of wards that have not been donated =====");
+        System.out.println(String.format("| %-15s | %-15s | %-18s |", "Precinct", "District/City",
                 "Province"));
-        System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s |\u001B[0m", "---------------", "---------------", "---------------",
+        System.out.println(String.format("| %-15s | %-15s | %-18s |\u001B[0m", "---------------", "---------------",
                 "-----------------"));
         while (rs.next()) {
-            System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s |", rs.getInt(1), rs.getString(2),
-                    rs.getString(3), rs.getString(4)));
-            System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s |", "---------------", "---------------", "---------------",
+            System.out.println(String.format("| %-15s | %-15s | %-18s |", rs.getString(1),
+                    rs.getString(2), rs.getString(3)));
+            System.out.println(String.format("| %-15s | %-15s | %-18s |", "---------------", "---------------",
                     "-----------------"));
         }
         System.out.println();

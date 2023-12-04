@@ -5,22 +5,18 @@ public class Officer {
     private String name;
     private String phoneNumber;
     private String address;
-    private int commissionId;
+    private String precinct;
+    private String city;
+    private String province;
 
-    public Officer(int id, String name, String phoneNumber, String address, int commissionId) {
+    public Officer(int id, String name, String phoneNumber, String address, String precinct, String city, String province) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.address = address;
-        this.commissionId = commissionId;
-    }
-
-    public int getCommissionId() {
-        return commissionId;
-    }
-
-    public void setCommissionId(int commissionId) {
-        this.commissionId = commissionId;
+        this.precinct = precinct;
+        this.city = city;
+        this.province = province;
     }
 
     public Officer() {
@@ -56,5 +52,29 @@ public class Officer {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getPrecinct() {
+        return precinct;
+    }
+
+    public void setPrecinct(String precinct) {
+        this.precinct = precinct;
+    }
+
+    public String getCity() {
+        return city;
+    }
+
+    public void setCity(String city) {
+        this.city = city;
+    }
+
+    public String getProvince() {
+        return province;
+    }
+
+    public void setProvince(String province) {
+        this.province = province;
     }
 }

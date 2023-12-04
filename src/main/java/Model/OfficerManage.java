@@ -378,7 +378,11 @@ public class OfficerManage {
     public static Map<Integer, Officer> getOfficer() throws SQLException {
         Map<Integer, Officer> indexObjectMap = new LinkedHashMap<>();
         Statement st = connection.createStatement();
-        String sql = "select * from Officer Order by id desc";
+        String sql = "select o.id, o.name, o.phone_number, o.address, c.precint_name, c.city_name, c.province_name\n" +
+                "from Officer as o  \n" +
+                "JOIN Commission as c\n" +
+                "on o.commission_id = c.id\n" +
+                "Order by o.id desc";
         ResultSet rs = st.executeQuery(sql);
         int index = 1;
         while (rs.next()) {
@@ -386,7 +390,9 @@ public class OfficerManage {
                     rs.getString(2),
                     rs.getString(3),
                     rs.getString(4),
-                    rs.getInt(5)
+                    rs.getString(5),
+                    rs.getString(6),
+                    rs.getString(7)
             );
             indexObjectMap.put(index, officer);
             index++;
@@ -398,20 +404,23 @@ public class OfficerManage {
     public static void displayOfficerTable() throws SQLException {
         Map<Integer, Officer> officerMap = getOfficer();
         if (!officerMap.isEmpty()) {
-            System.out.println("\u001B[33m============================================= Officer Table ==============================================");
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", "ID", "Name", "Phone number", "Address","Commission ID"));
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |\u001B[0m", "-----", "--------------------", "---------------",
-                    "-----------------------------------", "---------------"));
+            System.out.println("\u001B[33m======================================================= Officer Table ========================================================");
+            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", "ID", "Name", "Phone number", "Address","Work Place"));
+            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |\u001B[0m", "-----", "--------------------", "---------------",
+                    "-----------------------------------", "-----------------------------------"));
             for (Map.Entry<Integer, Officer> entry : officerMap.entrySet()) {
                 Integer index = entry.getKey();
                 Officer officer = entry.getValue();
                 String name = officer.getName();
                 String phoneNumber = officer.getPhoneNumber();
                 String address = officer.getAddress();
-                int commissionId = officer.getCommissionId();
-                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", index, name, phoneNumber, address, commissionId));
-                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", "-----", "--------------------", "---------------",
-                        "-----------------------------------", "---------------"));
+                String precinct = officer.getPrecinct();
+                String city = officer.getCity();
+                String province = officer.getProvince();
+                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", index, name, phoneNumber, address,
+                        precinct + ", " + city + ", " + province));
+                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", "-----", "--------------------", "---------------",
+                        "-----------------------------------", "-----------------------------------"));
             }
         }
         System.out.println();
@@ -420,14 +429,20 @@ public class OfficerManage {
     public static Map<Integer, Officer> getOfficerById(int id, int targetIndex) throws SQLException {
         Map<Integer, Officer> indexObjectMap = new LinkedHashMap<>();
         Statement st = connection.createStatement();
-        String sql = "select * from Officer Where id = " + id;
+        String sql = "select o.id, o.name, o.phone_number, o.address, c.precint_name, c.city_name, c.province_name\n" +
+                "from Officer as o  \n" +
+                "JOIN Commission as c\n" +
+                "on o.commission_id = c.id\n" +
+                "Where o.id = " + id;
         ResultSet rs = st.executeQuery(sql);
         while (rs.next()) {
             Officer officer = new Officer(rs.getInt(1),
                     rs.getString(2),
                     rs.getString(3),
                     rs.getString(4),
-                    rs.getInt(5)
+                    rs.getString(5),
+                    rs.getString(6),
+                    rs.getString(7)
             );
             indexObjectMap.put(targetIndex, officer);
         }
@@ -438,20 +453,23 @@ public class OfficerManage {
     public static void displayOfficerTableById(int id, int targetIndex) throws SQLException {
         Map<Integer, Officer> officerByIdMap = getOfficerById(id, targetIndex);
         if (!officerByIdMap.isEmpty()) {
-            System.out.println("\u001B[33m============================================= Officer Table ==============================================");
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", "ID", "Name", "Phone number", "Address","Commission ID"));
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |\u001B[0m", "-----", "--------------------", "---------------",
-                    "-----------------------------------", "---------------"));
+            System.out.println("\u001B[33m======================================================= Officer Table ========================================================");
+            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", "ID", "Name", "Phone number", "Address","Work Place"));
+            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |\u001B[0m", "-----", "--------------------", "---------------",
+                    "-----------------------------------", "-----------------------------------"));
             for (Map.Entry<Integer, Officer> entry : officerByIdMap.entrySet()) {
                 Integer index = targetIndex;
                 Officer officer = entry.getValue();
                 String name = officer.getName();
                 String phoneNumber = officer.getPhoneNumber();
                 String address = officer.getAddress();
-                int commissionId = officer.getCommissionId();
-                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", index, name, phoneNumber, address, commissionId));
-                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-15s |", "-----", "--------------------", "---------------",
-                        "-----------------------------------", "---------------"));
+                String precinct = officer.getPrecinct();
+                String city = officer.getCity();
+                String province = officer.getProvince();
+                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", index, name, phoneNumber, address,
+                        precinct + ", " + city + ", " + province));
+                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", "-----", "--------------------", "---------------",
+                        "-----------------------------------", "-----------------------------------"));
             }
         }
         System.out.println();
