@@ -12,6 +12,63 @@ public class DonateDetail {
     private LocalDate donateDate;
     private int commissionId;
     private int representativeId;
+    private String precintName;
+    private String representativeName;
+    private String companyName;
+    private String officerName;
+
+    public DonateDetail(int id, double amount, LocalDate donateDate, int commissionId, int representativeId, String precintName, String representativeName, String companyName, String officerName) {
+        this.id = id;
+        this.amount = amount;
+        this.donateDate = donateDate;
+        this.commissionId = commissionId;
+        this.representativeId = representativeId;
+        this.precintName = precintName;
+        this.representativeName = representativeName;
+        this.companyName = companyName;
+        this.officerName = officerName;
+    }
+
+    public Connection getCon() {
+        return con;
+    }
+
+    public void setCon(Connection con) {
+        this.con = con;
+    }
+
+    public String getPrecintName() {
+        return precintName;
+    }
+
+    public void setPrecintName(String precintName) {
+        this.precintName = precintName;
+    }
+
+    public String getRepresentativeName() {
+        return representativeName;
+    }
+
+    public void setRepresentativeName(String representativeName) {
+        this.representativeName = representativeName;
+    }
+
+    public String getCompanyName() {
+        return companyName;
+    }
+
+    public void setCompanyName(String companyName) {
+        this.companyName = companyName;
+    }
+
+    public String getOfficerName() {
+        return officerName;
+    }
+
+    public void setOfficerName(String officerName) {
+        this.officerName = officerName;
+    }
+
     // Constructor
     public DonateDetail(){
     }
@@ -67,14 +124,4 @@ public class DonateDetail {
         this.representativeId = representativeId;
     }
 
-    @Override
-    public String toString() {
-        return "DonateDetail{" +
-                "id=" + id +
-                ", amount=" + amount +
-                ", donateDate=" + donateDate +
-                ", commissionId=" + commissionId +
-                ", representativeId=" + representativeId +
-                '}';
-    }
 }

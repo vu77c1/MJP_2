@@ -2,7 +2,6 @@ package Model;
 
 import Common.DBConnect;
 import Common.InputValidator;
-import org.jetbrains.annotations.NotNull;
 
 import java.sql.*;
 import java.time.LocalDate;
@@ -122,7 +121,7 @@ public class Processing {
     }
 
     // Validate table name to prevent SQL injection
-    private static boolean isValidTableName(@NotNull Connection con, String tableName) {
+    private static boolean isValidTableName (Connection con, String tableName) {
         try {
             DatabaseMetaData metaData = con.getMetaData();
             try (ResultSet tables = metaData.getTables(null, null, tableName, null)) {
