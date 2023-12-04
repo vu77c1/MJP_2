@@ -10,8 +10,8 @@ import java.util.*;
 //import java.util.Date;
 
 public class CitizenManager {
-    private Connection connection;
-    private DateFormat dateFormat;
+    private final Connection connection;
+    private final DateFormat dateFormat;
 
     // Constructor nhận connection từ bên ngoài
     public CitizenManager(Connection connection) {
@@ -424,7 +424,7 @@ public class CitizenManager {
 
                 startIndex = citizenInfo.indexOf("Address: ");
                 endIndex = citizenInfo.indexOf(", Household Lord: ");
-                String address = citizenInfo.substring(startIndex + 10, endIndex);
+                String address = citizenInfo.substring(startIndex + 9, endIndex);
 
                 startIndex = citizenInfo.indexOf("Household Lord: ");
                 endIndex = citizenInfo.indexOf(", Sex: ");
@@ -674,13 +674,13 @@ public class CitizenManager {
             rs = st.executeQuery(sql);
 
             System.out.println("=================================== House Table ====================================");
-            System.out.println(String.format("| %-5s | %-35s | %-20s |", "ID", "Commission Information", "Priority Object Type"));
-            System.out.println(String.format("| %-5s | %-35s | %-20s |", "-----", "-----------------------------------", "---------------------"));
+            System.out.printf("| %-5s | %-35s | %-20s |%n", "ID", "Commission Information", "Priority Object Type");
+            System.out.printf("| %-5s | %-35s | %-20s |%n", "-----", "-----------------------------------", "---------------------");
             int index = 1; // Index bắt đầu từ 1
             while (rs.next()) {
-                System.out.println(String.format("| %-5s | %-35s | %-20s |",
-                        index, rs.getString("commission_info"), rs.getString("object_type")));
-                System.out.println(String.format("| %-5s | %-35s | %-20s |", "-----", "-----------------------------------", "---------------------"));
+                System.out.printf("| %-5s | %-35s | %-20s |%n",
+                        index, rs.getString("commission_info"), rs.getString("object_type"));
+                System.out.printf("| %-5s | %-35s | %-20s |%n", "-----", "-----------------------------------", "---------------------");
                 index++;
             }
             System.out.println();
@@ -696,46 +696,23 @@ public class CitizenManager {
     }
 
     public void processPriorityDecision(Scanner scanner, Connection connection) {
-        int rowCount = 0;
-        try {
-            // Hiển thị bảng House trước khi người dùng nhập lựa chọn
-            displayHouseTable();
+        System.out.println("Do you want to prioritize approval within a specific house_id? (yes/no)");
+        String decision = scanner.nextLine().toLowerCase();
 
-            System.out.println("Do you want to prioritize approval? (yes/no)");
-            String decision = scanner.nextLine().toLowerCase();
+        if (decision.equals("yes")) {
+            System.out.println("Input house to approval:");
+            int houseId = scanner.nextInt();
+            scanner.nextLine(); // Đọc bỏ dòng trống sau khi nhập số
 
-            if (decision.equals("yes")) {
-                int selectedIndex;
-
-                do {
-                    System.out.println("Input the index of the house to approve:");
-                    while (!scanner.hasNextInt()) {
-                        System.out.println("Please enter a valid index number.");
-                        scanner.next(); // Đọc và loại bỏ dữ liệu không hợp lệ
-                    }
-                    selectedIndex = scanner.nextInt();
-                    scanner.nextLine(); // Đọc bỏ dòng trống sau khi nhập số
-
-                    if (selectedIndex <= 0 || selectedIndex > rowCount) {
-                        System.out.println("Please enter a valid index within the displayed range.");
-                    }
-                } while (selectedIndex <= 0 || selectedIndex > rowCount);
-
-                int houseId = mapSelectedIndexToHouseId(selectedIndex, connection);
-                if (houseId != -1) {
-                    processPregnantWomanDecision(scanner, connection, houseId);
-                    checkHouseBefore(connection, houseId);
-                    checkHouseAfter(connection, houseId);
-                } else {
-                    System.out.println("Invalid house index selected. Please select a valid index.");
-                }
-            } else {
-                System.out.println("There is no need to perform priority review within a specific house_id.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
+            processPregnantWomanDecision(scanner, connection, houseId);
+            checkHouseBefore(connection, houseId);
+            checkHouseAfter(connection,houseId);
+        } else {
+            // Xử lý logic khi không muốn xét duyệt theo house_id cụ thể
+            System.out.println("There is no need to perform priority review within a specific house_id.");
         }
     }
+
     public int mapSelectedIndexToHouseId(int selectedIndex, Connection connection) throws SQLException {
         PreparedStatement statement = null;
         ResultSet rs = null;
@@ -907,7 +884,7 @@ public class CitizenManager {
         }
     }
     public void checkHouseBefore(Connection con, int houseId) {
-        System.out.println("\t\t\tAfter ");
+        System.out.println("\t\t\tBefore");
         Integer id=houseId;
         try {
             System.out.println("\t\t\t.___________________________________________________________________");
@@ -929,7 +906,7 @@ public class CitizenManager {
         }
     }
     public void checkHouseAfter(Connection con, int houseId) {
-        System.out.println("\t\t\t ");
+        System.out.println("\t\t\tAfter");
         Integer id=houseId;
         try {
             System.out.println("\t\t\t.___________________________________________________________________");
@@ -1006,7 +983,7 @@ public class CitizenManager {
 
                 startIndex = citizenInfo.indexOf("Address: ");
                 endIndex = citizenInfo.indexOf(", Household Lord: ");
-                String address = citizenInfo.substring(startIndex + 10, endIndex);
+                String address = citizenInfo.substring(startIndex + 9, endIndex);
 
                 startIndex = citizenInfo.indexOf("Household Lord: ");
                 endIndex = citizenInfo.indexOf(", Sex: ");
@@ -1060,29 +1037,40 @@ public class CitizenManager {
         }
 
         if (chosenId != -1) {
-            System.out.println("Select update method (1 - phoneNumber, 2 - typeNameObject , 3- IdentityCard):");
-            int choice;
-
             while (true) {
-                String input = scanner.nextLine();
+                System.out.println("Select update method (0 - Back to Citizen Menu, 1 - Update Phone Number, 2 - Update Type Name Object, 3 - Update Identity Card):");
+                int choice;
 
-                // Kiểm tra xem chuỗi nhập vào có phải là số không và không âm
-                if (!input.matches("\\d+") || Integer.parseInt(input) <= 0) {
-                    System.out.println("Incorrect input. Please re-enter.");
-                    continue;
+                while (true) {
+                    String input = scanner.nextLine();
+
+                    // Kiểm tra xem chuỗi nhập vào có phải là số không và không âm
+                    if (!input.matches("\\d+") || Integer.parseInt(input) < 0 || Integer.parseInt(input) > 3) {
+                        System.out.println("Incorrect input. Please re-enter.");
+                        continue;
+                    }
+
+                    choice = Integer.parseInt(input);
+                    break;
                 }
 
-                choice = Integer.parseInt(input);
-                break;
-            }
-            if (choice == 1) {
-                updatePhoneNumber(chosenId, connection);
-            } else if (choice == 2) {
-                updateTypeNameObject(chosenId, connection);
-            } else if (choice == 3) {
-                updateIdentityCard(chosenId, connection);
-            } else {
-                System.out.println("Invalid selection.");
+                switch (choice) {
+                    case 0:
+                        // Quay về menu Citizen
+                        return;
+                    case 1:
+                        updatePhoneNumber(chosenId, connection);
+                        break;
+                    case 2:
+                        updateTypeNameObject(chosenId, connection);
+                        break;
+                    case 3:
+                        updateIdentityCard(chosenId, connection);
+                        break;
+                    default:
+                        System.out.println("Invalid selection.");
+                        break;
+                }
             }
         }
     }

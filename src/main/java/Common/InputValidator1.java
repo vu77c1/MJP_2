@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class InputValidator1 {
-    private static Scanner scanner = new Scanner(System.in);
+    private static final Scanner scanner = new Scanner(System.in);
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("dd/MM/uuuu").withResolverStyle(ResolverStyle.STRICT);
     public static Date validateDateInput(String prompt) {
         Date date = null;

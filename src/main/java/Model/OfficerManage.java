@@ -8,8 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class OfficerManage {
-    private static Scanner sc = new Scanner(System.in);
-    private static Connection connection = DBConnect.connectDatabase();
+    private static final Scanner sc = new Scanner(System.in);
+    private static final Connection connection = DBConnect.connectDatabase();
     public static void main(String[] args) throws SQLException {
         OfficerManage.getOfficerManage();
     }
@@ -51,24 +51,24 @@ public class OfficerManage {
 
     // create method display menu of Officer table
     public static void displayMenu() {
-        System.out.println(String.format("| %-25s |", "= Officer Manage Menu ="));
-        System.out.println(String.format("| %-25s |", "-------------------------"));
-        System.out.println(String.format("| %-25s |", "0. Exit program"));
-        System.out.println(String.format("| %-25s |", "1. Add new Officer"));
-        System.out.println(String.format("| %-25s |", "2. Update Officer table"));
-        System.out.println(String.format("| %-25s |", "3. Delete Officer by ID"));
-        System.out.println(String.format("| %-25s |", "4. Display Officer table"));
-        System.out.println(String.format("| %-25s |", "========================="));
+        System.out.printf("| %-25s |%n", "= Officer Manage Menu =");
+        System.out.printf("| %-25s |%n", "-------------------------");
+        System.out.printf("| %-25s |%n", "0. Exit program");
+        System.out.printf("| %-25s |%n", "1. Add new Officer");
+        System.out.printf("| %-25s |%n", "2. Update Officer table");
+        System.out.printf("| %-25s |%n", "3. Delete Officer by ID");
+        System.out.printf("| %-25s |%n", "4. Display Officer table");
+        System.out.printf("| %-25s |%n", "=========================");
     }
 
     public static void displayUpdateMenu() {
-        System.out.println(String.format("| %-30s |", "======== Update Menu ========="));
-        System.out.println(String.format("| %-30s |", "------------------------------"));
-        System.out.println(String.format("| %-30s |", "0. Exit program"));
-        System.out.println(String.format("| %-30s |", "1. Update Officer name"));
-        System.out.println(String.format("| %-30s |", "2. Update Officer phone number"));
-        System.out.println(String.format("| %-30s |", "3. Update Officer address"));
-        System.out.println(String.format("| %-30s |", "=============================="));
+        System.out.printf("| %-30s |%n", "======== Update Menu =========");
+        System.out.printf("| %-30s |%n", "------------------------------");
+        System.out.printf("| %-30s |%n", "0. Exit program");
+        System.out.printf("| %-30s |%n", "1. Update Officer name");
+        System.out.printf("| %-30s |%n", "2. Update Officer phone number");
+        System.out.printf("| %-30s |%n", "3. Update Officer address");
+        System.out.printf("| %-30s |%n", "==============================");
     }
 
     // create method 1: Add new Officer
@@ -275,7 +275,7 @@ public class OfficerManage {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
             }
         } while (!checkOfficerIdExistence(targetIndex));
-        int id = targetIndex;
+        int id = getIdFromIndexOfficerTable(targetIndex);
         System.out.println("\u001B[32mThis is the table you are accessing whose id is " + targetIndex +"\u001B[0m");
         displayOfficerTableById(id, targetIndex);
 
@@ -405,9 +405,9 @@ public class OfficerManage {
         Map<Integer, Officer> officerMap = getOfficer();
         if (!officerMap.isEmpty()) {
             System.out.println("\u001B[33m======================================================= Officer Table ========================================================");
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", "ID", "Name", "Phone number", "Address","Work Place"));
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |\u001B[0m", "-----", "--------------------", "---------------",
-                    "-----------------------------------", "-----------------------------------"));
+            System.out.printf("| %-5s | %-20s | %-15s | %-35s | %-35s |%n", "ID", "Name", "Phone number", "Address","Work Place");
+            System.out.printf("| %-5s | %-20s | %-15s | %-35s | %-35s |\u001B[0m%n", "-----", "--------------------", "---------------",
+                    "-----------------------------------", "-----------------------------------");
             for (Map.Entry<Integer, Officer> entry : officerMap.entrySet()) {
                 Integer index = entry.getKey();
                 Officer officer = entry.getValue();
@@ -417,10 +417,10 @@ public class OfficerManage {
                 String precinct = officer.getPrecinct();
                 String city = officer.getCity();
                 String province = officer.getProvince();
-                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", index, name, phoneNumber, address,
-                        precinct + ", " + city + ", " + province));
-                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", "-----", "--------------------", "---------------",
-                        "-----------------------------------", "-----------------------------------"));
+                System.out.printf("| %-5s | %-20s | %-15s | %-35s | %-35s |%n", index, name, phoneNumber, address,
+                        precinct + ", " + city + ", " + province);
+                System.out.printf("| %-5s | %-20s | %-15s | %-35s | %-35s |%n", "-----", "--------------------", "---------------",
+                        "-----------------------------------", "-----------------------------------");
             }
         }
         System.out.println();
@@ -454,9 +454,9 @@ public class OfficerManage {
         Map<Integer, Officer> officerByIdMap = getOfficerById(id, targetIndex);
         if (!officerByIdMap.isEmpty()) {
             System.out.println("\u001B[33m======================================================= Officer Table ========================================================");
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", "ID", "Name", "Phone number", "Address","Work Place"));
-            System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |\u001B[0m", "-----", "--------------------", "---------------",
-                    "-----------------------------------", "-----------------------------------"));
+            System.out.printf("| %-5s | %-20s | %-15s | %-35s | %-35s |%n", "ID", "Name", "Phone number", "Address","Work Place");
+            System.out.printf("| %-5s | %-20s | %-15s | %-35s | %-35s |\u001B[0m%n", "-----", "--------------------", "---------------",
+                    "-----------------------------------", "-----------------------------------");
             for (Map.Entry<Integer, Officer> entry : officerByIdMap.entrySet()) {
                 Integer index = targetIndex;
                 Officer officer = entry.getValue();
@@ -466,10 +466,10 @@ public class OfficerManage {
                 String precinct = officer.getPrecinct();
                 String city = officer.getCity();
                 String province = officer.getProvince();
-                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", index, name, phoneNumber, address,
-                        precinct + ", " + city + ", " + province));
-                System.out.println(String.format("| %-5s | %-20s | %-15s | %-35s | %-35s |", "-----", "--------------------", "---------------",
-                        "-----------------------------------", "-----------------------------------"));
+                System.out.printf("| %-5s | %-20s | %-15s | %-35s | %-35s |%n", index, name, phoneNumber, address,
+                        precinct + ", " + city + ", " + province);
+                System.out.printf("| %-5s | %-20s | %-15s | %-35s | %-35s |%n", "-----", "--------------------", "---------------",
+                        "-----------------------------------", "-----------------------------------");
             }
         }
         System.out.println();
@@ -496,17 +496,17 @@ public class OfficerManage {
         Map<Integer, Map<Integer, Object>> commissionMap = getCommission();
         if (!commissionMap.isEmpty()) {
             System.out.println("\u001B[33m====================== Commission Table =======================");
-            System.out.println(String.format("| %-5s | %-15s | %-15s | %-15s |", "ID", "Precinct", "City/District", "Province"));
-            System.out.println(String.format("| %-5s | %-15s | %-15s | %-15s |\u001B[0m", "-----", "--------------", "--------------", "--------------"));
+            System.out.printf("| %-5s | %-15s | %-15s | %-15s |%n", "ID", "Precinct", "City/District", "Province");
+            System.out.printf("| %-5s | %-15s | %-15s | %-15s |\u001B[0m%n", "-----", "--------------", "--------------", "--------------");
             for (Map.Entry<Integer, Map<Integer, Object>> entry : commissionMap.entrySet()) {
                 Integer index = entry.getKey();
                 Map<Integer, Object> rowData = entry.getValue();
                 String precinct = (String) rowData.get(2);
                 String city = (String) rowData.get(3);
                 String province = (String) rowData.get(4);
-                System.out.println(String.format("| %-5s | %-15s | %-15s | %-15s |", index, precinct,
-                        city, province));
-                System.out.println(String.format("| %-5s | %-15s | %-15s | %-15s |\u001B[0m", "-----", "--------------", "--------------", "--------------"));
+                System.out.printf("| %-5s | %-15s | %-15s | %-15s |%n", index, precinct,
+                        city, province);
+                System.out.printf("| %-5s | %-15s | %-15s | %-15s |\u001B[0m%n", "-----", "--------------", "--------------", "--------------");
             }
         }
         System.out.println();

@@ -12,10 +12,10 @@ public class HouseManager {
 
     // Constructor
     public HouseManager(Connection connection) {
-        this.connection = connection;
+        HouseManager.connection = connection;
     }
     public HouseManager() {
-        this.connection = DBConnect.connectDatabase();
+        connection = DBConnect.connectDatabase();
     }
     public static boolean isValidIdInTable(Connection connection, String tableName, int id) throws SQLException {
         String query = "SELECT COUNT(*) FROM " + tableName + " WHERE id = ?";
@@ -513,14 +513,14 @@ public class HouseManager {
                     "ORDER BY H.id DESC"; // Sắp xếp theo ID giảm dần
             rs = st.executeQuery(sql);
 
-            System.out.println("=================================== House Table ====================================");
-            System.out.println(String.format("| %-5s | %-35s | %-20s |", "ID", "Commission Information", "Priority Object Type"));
-            System.out.println(String.format("| %-5s | %-35s | %-20s |", "-----", "-----------------------------------", "---------------------"));
+            System.out.println("================= House Table =================");
+            System.out.printf("| %-5s | %-35s | %-20s %n", "ID", "Commission Information", "Priority Object Type");
+            System.out.printf("| %-5s | %-35s | %-20s %n", "-----", "-----------------------------------", "---------------------");
             int index = 1; // Index bắt đầu từ 1
             while (rs.next()) {
-                System.out.println(String.format("| %-5s | %-35s | %-20s |",
-                        index, rs.getString("commission_info"), rs.getString("object_type")));
-                System.out.println(String.format("| %-5s | %-35s | %-20s |", "-----", "-----------------------------------", "---------------------"));
+                System.out.printf("| %-5s | %-35s | %-20s %n",
+                        index, rs.getString("commission_info"), rs.getString("object_type"));
+                System.out.printf("| %-5s | %-35s | %-20s %n", "-----", "-----------------------------------", "---------------------");
                 index++;
             }
             System.out.println();
@@ -589,16 +589,16 @@ public class HouseManager {
         int choice;
 
         do {
-            System.out.println("\t\tHouse Management :");
+            System.out.println("\t\t\tHouse Management :");
             System.out.println("\t\t\t0. Exit");
             System.out.println("\t\t\t1. Add");
             System.out.println("\t\t\t2. Delete");
             System.out.println("\t\t\t3. Update");
             System.out.println("\t\t\t4. Display");
-            System.out.print("\t\t\tPlease choose: ");
+            //System.out.print("\t\t\tPlease choose: ");
 
             try {
-                System.out.print("Please choose: ");
+                System.out.print("\t\t\tPlease choose: ");
                 choice = Integer.parseInt(scanner.nextLine());
 
                 switch (choice) {

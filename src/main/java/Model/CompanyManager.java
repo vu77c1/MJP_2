@@ -23,7 +23,7 @@ public class CompanyManager {
         System.out.println("1. Display");
         System.out.println("2. Add");
         System.out.println("3. Delete");
-        System.out.println("4. Display");
+        System.out.println("4. Update");
         System.out.println("0. Exit");
 
         int choice = -1;
@@ -123,12 +123,10 @@ public class CompanyManager {
                 }
             } while (!checkCompanyId);
 
-        } catch (NumberFormatException e){
-            System.out.println("ID invalid");
+//        } catch (NumberFormatException e){
+//            System.out.println("ID invalid");
         } catch (SQLException e){
             System.out.println("Error update: " +e.getMessage());
-        }finally {
-            JDBCQuery.closeConnection();
         }
     }
 
@@ -148,7 +146,8 @@ public class CompanyManager {
 
     }
 
-    public void updatecompanyidForRepresentative(int id) throws SQLException{
+    public void updatecompanyidForRepresentative(int companyId) throws SQLException{
+        int id = getCompanyObject().get(companyId).getId();
         String query ="UPDATE Representative set company_id = Null WHERE company_id ="+ id;
         try (PreparedStatement statement =connection.prepareStatement(query)){
             statement.executeUpdate();
@@ -197,8 +196,8 @@ public class CompanyManager {
         String query = "DELETE FROM Company WHERE id = ?";
         try (PreparedStatement statement = connection.prepareStatement(query)) {
             statement.setInt(1, id);
-            statement.executeUpdate();
-            if(statement.executeUpdate()>0){
+            int row = statement.executeUpdate();
+            if(row>0){
                 System.out.println("\t\tDelete success!!");
             } else {
                 System.out.println("\t\t\tDelete failed. No company found with the specified ID.");
@@ -261,7 +260,7 @@ public class CompanyManager {
                 String id = rs.getString("id");
                 String companyName = rs.getString("company_name");
                 String companyAddress = rs.getString("company_address");
-                System.out.printf("│ %-5S │ %-23s │ %-28s │\n", id, companyName, companyAddress );
+                System.out.printf("│ %-5S │ %-23s │ %-28s │\n", index, companyName, companyAddress );
                 System.out.println("│_______│_________________________│______________________________│");
                 index ++;
             }

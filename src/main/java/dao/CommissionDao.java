@@ -6,11 +6,7 @@ import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Stack;
+import java.util.*;
 
 import Common.JdbcUtil;
 import Model.Commission;
@@ -27,9 +23,9 @@ public class CommissionDao {
 	// in doi tuong commission
 	public int printlnCommissions(List<Commission> commissions) {
 		int numberRow=0;
-		System.out.println(String.format(" %-18s  %-20s  %-25s  %-25s", "Index", "precint_name",
-				"city_name ", "province_name"));
-		Stack<Commission> comStack = new Stack<>();
+		System.out.printf(" %-18s  %-20s  %-25s  %-25s%n", "Index", "precint_name",
+				"city_name ", "province_name");
+		Queue<Commission> comStack = new LinkedList<>();
 		int i = 1;
 		for (Commission com : commissions) {
 			com.setIndex(com.getIndex() + i);
@@ -39,7 +35,7 @@ public class CommissionDao {
 
 		}
 		while (!comStack.isEmpty()) {
-			System.out.println(comStack.pop());
+			System.out.println(comStack.poll());
 		}
 		return numberRow;
 	}
@@ -73,7 +69,6 @@ public class CommissionDao {
 					+ "join DonateDetail as DD on RP.id=DD.representative_id\r\n"
 					+ "left join Company as CP on CP.id=RP.id\r\n"
 					+ "where DD.donate_date   BETWEEN '" + a + "' AND '" + b + "'";
-			System.out.println("Ban da thuc thi: " + sqlString);
 			ResultSet rs = statement.executeQuery(sqlString);
 //					         // lay tung thuoc tinh cua doi tuong
 			while (rs.next()) {
@@ -104,7 +99,6 @@ public class CommissionDao {
 					+ " and " + phase
 					+ " in ( SELECT MONTH(Distribution.date_distribution)\r\n"
 					+ " from Distribution )";
-//						   System.out.println("Ban da thuc thi: " + sqlString);
 			ResultSet rs = statement.executeQuery(sqlString);
 //					         // lay tung thuoc tinh cua doi tuong
 			while (rs.next()) {
@@ -128,8 +122,7 @@ public class CommissionDao {
 			// b2: tao doi tuong statement
 			Statement statement = connection.createStatement();
 			// b3: thuc hien cau lenh sql
-			String sqlString = "  select * from Commission left join Officer on Commission.id= Officer.commision_id";
-//						   System.out.println("Ban da thuc thi: " + sqlString);
+			String sqlString = "  select * from Commission left join Officer on Commission.id= Officer.commision_id order by Commission.id desc ";
 			ResultSet rs = statement.executeQuery(sqlString);
 //					         // lay tung thuoc tinh cua doi tuong
 			while (rs.next()) {
@@ -161,7 +154,6 @@ public class CommissionDao {
 			String sqlString = "INSERT INTO commission (precint_name, city_name, province_name) VALUES ('"
 					+ com.getPrecintName() + "', '" + com.getCityName() + "', '"
 					+ com.getProvinceName() + "');";
-			System.out.println("Ban da thuc thi: " + sqlString);
 //						   System.out.println("======================\n");
 			rs = statement.executeUpdate(sqlString);
 			System.out.println("Sussese!");
@@ -182,7 +174,6 @@ public class CommissionDao {
 			Statement statement = connection.createStatement();
 			// b3: thuc hien cau lenh sql
 			String sqlString = "delete from Commission where id = " + c;
-//						   System.out.println("Ban da thuc thi: " + sqlString);
 			result = statement.executeUpdate(sqlString);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -203,7 +194,6 @@ public class CommissionDao {
 					+ com.getPrecintName() + "'," + "city_name = '"
 					+ com.getCityName() + "'," + "province_name = '"
 					+ com.getProvinceName() + "' where id=" + com.getId();
-//						   System.out.println("Ban da thuc thi: " + sqlString);
 			result = statement.executeUpdate(sqlString);
 		} catch (SQLException e) {
 			e.printStackTrace();

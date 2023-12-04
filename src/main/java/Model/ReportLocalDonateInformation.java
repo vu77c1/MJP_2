@@ -9,8 +9,8 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 public class ReportLocalDonateInformation {
-    private static Scanner sc = new Scanner(System.in);
-    private static Connection connection = DBConnect.connectDatabase();
+    private static final Scanner sc = new Scanner(System.in);
+    private static final Connection connection = DBConnect.connectDatabase();
 
     public static void main(String[] args) throws SQLException {
         ReportLocalDonateInformation.getTask1002OfDung();
@@ -45,12 +45,12 @@ public class ReportLocalDonateInformation {
 
     // create method display menu
     public static void displayMenu() {
-        System.out.println(String.format("| %-50s |", "============= Tast 1002 Of Dung Menu ============="));
-        System.out.println(String.format("| %-50s |", "--------------------------------------------------"));
-        System.out.println(String.format("| %-50s |", "0. Exit program"));
-        System.out.println(String.format("| %-50s |", "1. Top 5 wards with the most donate"));
-        System.out.println(String.format("| %-50s |", "2. Statistics of wards that have not been donated"));
-        System.out.println(String.format("| %-50s |", "=================================================="));
+        System.out.printf("| %-50s |%n", "============= Tast 1002 Of Dung Menu =============");
+        System.out.printf("| %-50s |%n", "--------------------------------------------------");
+        System.out.printf("| %-50s |%n", "0. Exit program");
+        System.out.printf("| %-50s |%n", "1. Top 5 wards with the most donate");
+        System.out.printf("| %-50s |%n", "2. Statistics of wards that have not been donated");
+        System.out.printf("| %-50s |%n", "==================================================");
     }
 
     // create method check input Int
@@ -94,15 +94,15 @@ public class ReportLocalDonateInformation {
                 "ORDER BY TotalAmount DESC;";
         ResultSet rs = st.executeQuery(sql);
         System.out.println("\u001B[33m====================== Top 5 wards with the most donate =======================");
-        System.out.println(String.format("| %-15s | %-15s | %-18s | %-18s |", "Precinct", "District/City",
-                "Province", "Total Amount"));
-        System.out.println(String.format("| %-15s | %-15s | %-18s | %-18s |\u001B[0m", "---------------", "---------------",
-                "-----------------", "------------------"));
+        System.out.printf("| %-15s | %-15s | %-18s | %-18s |%n", "Precinct", "District/City",
+                "Province", "Total Amount");
+        System.out.printf("| %-15s | %-15s | %-18s | %-18s |\u001B[0m%n", "---------------", "---------------",
+                "-----------------", "------------------");
         while (rs.next()) {
-            System.out.println(String.format("| %-15s | %-15s | %-18s | %-18s |", rs.getString(1),
-                    rs.getString(2), rs.getString(3), formatFloatingPoint(rs.getFloat(4))));
-            System.out.println(String.format("| %-15s | %-15s | %-18s | %-18s |", "---------------", "---------------",
-                    "-----------------", "------------------"));
+            System.out.printf("| %-15s | %-15s | %-18s | %-18s |%n", rs.getString(1),
+                    rs.getString(2), rs.getString(3), formatFloatingPoint(rs.getFloat(4)));
+            System.out.printf("| %-15s | %-15s | %-18s | %-18s |%n", "---------------", "---------------",
+                    "-----------------", "------------------");
         }
         System.out.println();
     }
@@ -127,15 +127,15 @@ public class ReportLocalDonateInformation {
                 "    dd.commission_id IS NULL;";
         ResultSet rs = st.executeQuery(sql);
         System.out.println("\u001B[33m===== Statistics of wards that have not been donated =====");
-        System.out.println(String.format("| %-15s | %-15s | %-18s |", "Precinct", "District/City",
-                "Province"));
-        System.out.println(String.format("| %-15s | %-15s | %-18s |\u001B[0m", "---------------", "---------------",
-                "-----------------"));
+        System.out.printf("| %-15s | %-15s | %-18s |%n", "Precinct", "District/City",
+                "Province");
+        System.out.printf("| %-15s | %-15s | %-18s |\u001B[0m%n", "---------------", "---------------",
+                "-----------------");
         while (rs.next()) {
-            System.out.println(String.format("| %-15s | %-15s | %-18s |", rs.getString(1),
-                    rs.getString(2), rs.getString(3)));
-            System.out.println(String.format("| %-15s | %-15s | %-18s |", "---------------", "---------------",
-                    "-----------------"));
+            System.out.printf("| %-15s | %-15s | %-18s |%n", rs.getString(1),
+                    rs.getString(2), rs.getString(3));
+            System.out.printf("| %-15s | %-15s | %-18s |%n", "---------------", "---------------",
+                    "-----------------");
         }
         System.out.println();
     }

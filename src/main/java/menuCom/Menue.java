@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
+import Common.InputValidator;
 import Model.Commission;
 import Model.Officer;
 import dao.CommissionDao;
@@ -245,7 +246,7 @@ public class Menue {
         System.out.println("3: Delete a commission");
         System.out.println("4: Update a commission");
         System.out.println("0: Exit");
-        int n = Integer.parseInt(input_int());
+        int n = InputValidator.validateIntInput("\t\t\t Input something: ");
         switch (n) {
             case 0:
 //						   CommissionDao commissionDao1 = new CommissionDao();

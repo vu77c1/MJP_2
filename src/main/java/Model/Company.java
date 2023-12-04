@@ -10,6 +10,7 @@ public class Company {
     }
 
     public Company(int id, String companyName, String companyAddrress) {
+        this.id = id;
         this.companyName = companyName;
         this.companyAddrress = companyAddrress;
     }

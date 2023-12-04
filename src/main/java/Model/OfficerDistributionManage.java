@@ -9,8 +9,8 @@ import java.util.*;
 import java.util.Date;
 
 public class OfficerDistributionManage {
-    private static Scanner sc = new Scanner(System.in);
-    private static Connection connection = DBConnect.connectDatabase();
+    private static final Scanner sc = new Scanner(System.in);
+    private static final Connection connection = DBConnect.connectDatabase();
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) throws SQLException {
@@ -54,24 +54,24 @@ public class OfficerDistributionManage {
 
     // create method display menu of Officer Distribution table
     public static void displayMenu() {
-        System.out.println(String.format("| %-40s |", "=== Officer Distribution Manage Menu ==="));
-        System.out.println(String.format("| %-40s |", "----------------------------------------"));
-        System.out.println(String.format("| %-40s |", "0. Exit program"));
-        System.out.println(String.format("| %-40s |", "1. Add new data"));
-        System.out.println(String.format("| %-40s |", "2. Update Officer Distribution table"));
-        System.out.println(String.format("| %-40s |", "3. Delete data by ID"));
-        System.out.println(String.format("| %-40s |", "4. Display Officer Distribution table"));
-        System.out.println(String.format("| %-40s |", "========================================"));
+        System.out.printf("| %-40s |%n", "=== Officer Distribution Manage Menu ===");
+        System.out.printf("| %-40s |%n", "----------------------------------------");
+        System.out.printf("| %-40s |%n", "0. Exit program");
+        System.out.printf("| %-40s |%n", "1. Add new data");
+        System.out.printf("| %-40s |%n", "2. Update Officer Distribution table");
+        System.out.printf("| %-40s |%n", "3. Delete data by ID");
+        System.out.printf("| %-40s |%n", "4. Display Officer Distribution table");
+        System.out.printf("| %-40s |%n", "========================================");
     }
 
     // create method display Update menu
     public static void displayUpdateMenu() {
-        System.out.println(String.format("| %-30s |", "======== Update Menu ========="));
-        System.out.println(String.format("| %-30s |", "------------------------------"));
-        System.out.println(String.format("| %-30s |", "0. Exit program"));
-        System.out.println(String.format("| %-30s |", "1. Update date distribution"));
-        System.out.println(String.format("| %-30s |", "2. Update address distribution"));
-        System.out.println(String.format("| %-30s |", "=============================="));
+        System.out.printf("| %-30s |%n", "======== Update Menu =========");
+        System.out.printf("| %-30s |%n", "------------------------------");
+        System.out.printf("| %-30s |%n", "0. Exit program");
+        System.out.printf("| %-30s |%n", "1. Update date distribution");
+        System.out.printf("| %-30s |%n", "2. Update address distribution");
+        System.out.printf("| %-30s |%n", "==============================");
     }
 
     // create method 1: Add new data
@@ -313,7 +313,7 @@ public class OfficerDistributionManage {
 
     // create method 2.1:
     private static void updateDateDistribution() throws SQLException {
-        String sql = "UPDATE OfficerDistribution SET date_distribution = ? WHERE id = ?";
+        String sql = "UPDATE OfficerDistribution SET date_received = ? WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
 
         int targetIndex = 0;
@@ -417,10 +417,10 @@ public class OfficerDistributionManage {
         Map<Integer, OfficerDistribution> officerDistributionMap = getOfficerDistribution();
         if (!officerDistributionMap.isEmpty()) {
             System.out.println("\u001B[33m========================================== Officer Distribution Table ============================================");
-            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", "ID", "Officer Name","Amount Distribution",
-                    "Date Distribution", "Address Distribution"));
-            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |\u001B[0m", "-----", "--------------------", "--------------------",
-                    "-----------------", "-----------------------------------"));
+            System.out.printf("| %-5s | %-20s | %-20s | %-18s | %-35s |%n", "ID", "Officer Name","Amount Distribution",
+                    "Date Distribution", "Address Distribution");
+            System.out.printf("| %-5s | %-20s | %-20s | %-18s | %-35s |\u001B[0m%n", "-----", "--------------------", "--------------------",
+                    "-----------------", "-----------------------------------");
             for (Map.Entry<Integer, OfficerDistribution> entry : officerDistributionMap.entrySet()) {
                 Integer index = entry.getKey();
                 OfficerDistribution officerDistribution = entry.getValue();
@@ -428,10 +428,10 @@ public class OfficerDistributionManage {
                 float amoutDistribution = officerDistribution.getAmountDistribution();
                 String date = dateFormat.format(officerDistribution.getDateDistribution());
                 String address = officerDistribution.getAddressDistribution();
-                System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", index, officerName, formatFloatingPoint(amoutDistribution),
-                        date, address));
-                System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", "-----", "--------------------", "--------------------",
-                        "-----------------", "-----------------------------------"));
+                System.out.printf("| %-5s | %-20s | %-20s | %-18s | %-35s |%n", index, officerName, formatFloatingPoint(amoutDistribution),
+                        date, address);
+                System.out.printf("| %-5s | %-20s | %-20s | %-18s | %-35s |%n", "-----", "--------------------", "--------------------",
+                        "-----------------", "-----------------------------------");
             }
         }
         System.out.println();
@@ -440,8 +440,8 @@ public class OfficerDistributionManage {
     public static Map<Integer, OfficerDistribution> getOfficerDistribution() throws SQLException {
         Map<Integer, OfficerDistribution> indexObjectMap = new LinkedHashMap<>();
         Statement st = connection.createStatement();
-        String sql = "SELECT od.id, o.name, d.amount_received, \n" +
-                "od.date_distribution, od.address_distribution \n" +
+        String sql = "SELECT od.id, o.name, d.amount_distribution, \n" +
+                "od.date_received, od.address_distribution \n" +
                 "FROM OfficerDistribution as od\n" +
                 "JOIN Officer as o\n" +
                 "on od.officer_id = o.id\n" +
@@ -468,10 +468,10 @@ public class OfficerDistributionManage {
         Map<Integer, OfficerDistribution> officerDistributionMap = getOfficerDistributionById(id, targetIndex);
         if (!officerDistributionMap.isEmpty()) {
             System.out.println("\u001B[33m========================================== Officer Distribution Table ============================================");
-            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", "ID", "Officer Name","Amount Distribution",
-                    "Date Distribution", "Address Distribution"));
-            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |\u001B[0m", "-----", "--------------------", "--------------------",
-                    "-----------------", "-----------------------------------"));
+            System.out.printf("| %-5s | %-20s | %-20s | %-18s | %-35s |%n", "ID", "Officer Name","Amount Distribution",
+                    "Date Distribution", "Address Distribution");
+            System.out.printf("| %-5s | %-20s | %-20s | %-18s | %-35s |\u001B[0m%n", "-----", "--------------------", "--------------------",
+                    "-----------------", "-----------------------------------");
             for (Map.Entry<Integer, OfficerDistribution> entry : officerDistributionMap.entrySet()) {
                 Integer index = entry.getKey();
                 OfficerDistribution officerDistribution = entry.getValue();
@@ -479,10 +479,10 @@ public class OfficerDistributionManage {
                 float amoutDistribution = officerDistribution.getAmountDistribution();
                 String date = dateFormat.format(officerDistribution.getDateDistribution());
                 String address = officerDistribution.getAddressDistribution();
-                System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", index, officerName, formatFloatingPoint(amoutDistribution),
-                        date, address));
-                System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", "-----", "--------------------", "--------------------",
-                        "-----------------", "-----------------------------------"));
+                System.out.printf("| %-5s | %-20s | %-20s | %-18s | %-35s |%n", index, officerName, formatFloatingPoint(amoutDistribution),
+                        date, address);
+                System.out.printf("| %-5s | %-20s | %-20s | %-18s | %-35s |%n", "-----", "--------------------", "--------------------",
+                        "-----------------", "-----------------------------------");
             }
         }
         System.out.println();
@@ -491,8 +491,8 @@ public class OfficerDistributionManage {
     public static Map<Integer, OfficerDistribution> getOfficerDistributionById(int id, int target) throws SQLException {
         Map<Integer, OfficerDistribution> indexObjectMap = new LinkedHashMap<>();
         Statement st = connection.createStatement();
-        String sql = "SELECT od.id, o.name, d.amount_received, \n" +
-                "od.date_distribution, od.address_distribution \n" +
+        String sql = "SELECT od.id, o.name, d.amount_distribution, \n" +
+                "od.date_received, od.address_distribution \n" +
                 "FROM OfficerDistribution as od\n" +
                 "JOIN Officer as o\n" +
                 "on od.officer_id = o.id\n" +
@@ -536,10 +536,10 @@ public class OfficerDistributionManage {
         while (!isValidDate) {
             checkDate = sc.next();
             try {
-                date = (Date) dateFormat.parse(checkDate);
+                date = dateFormat.parse(checkDate);
                 isValidDate = true;
             }  catch (ParseException e) {
-                System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
+                System.out.println("\u001B[31m" + e + "\u001B[0m");
                 System.out.println("\u001B[31m* Warning: Entered is incorrect format. Please try again!\u001B[0m");
             }
         }
@@ -551,10 +551,10 @@ public class OfficerDistributionManage {
         Map<Integer, Map<Integer, Object>> distributionMap = getDistribution();
         if (!distributionMap.isEmpty()) {
             System.out.println("\u001B[33m=============================== Distribution Table ================================");
-            System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", "ID", "Commission ID","Household ID",
-                    "Amount Received", "Date Received"));
-            System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |\u001B[0m", "-----", "--------------", "------------",
-                    "------------------", "------------------"));
+            System.out.printf("| %-5s | %-14s | %-12s | %-18s | %-18s |%n", "ID", "Commission ID","Household ID",
+                    "Amount Received", "Date Received");
+            System.out.printf("| %-5s | %-14s | %-12s | %-18s | %-18s |\u001B[0m%n", "-----", "--------------", "------------",
+                    "------------------", "------------------");
             for (Map.Entry<Integer, Map<Integer, Object>> entry : distributionMap.entrySet()) {
                 Integer index = entry.getKey();
                 Map<Integer, Object> rowData = entry.getValue();
@@ -562,10 +562,10 @@ public class OfficerDistributionManage {
                 int houseId = (int) rowData.get(3);
                 float amount = (float) rowData.get(4);
                 String date = (String) rowData.get(5);
-                System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", index, commissionId,
-                        houseId, formatFloatingPoint(amount), date));
-                System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", "-----", "--------------", "------------",
-                        "------------------", "------------------"));
+                System.out.printf("| %-5s | %-14s | %-12s | %-18s | %-18s |%n", index, commissionId,
+                        houseId, formatFloatingPoint(amount), date);
+                System.out.printf("| %-5s | %-14s | %-12s | %-18s | %-18s |%n", "-----", "--------------", "------------",
+                        "------------------", "------------------");
             }
         }
         System.out.println();

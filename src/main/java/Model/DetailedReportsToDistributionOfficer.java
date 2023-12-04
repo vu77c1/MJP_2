@@ -9,8 +9,8 @@ import java.util.Date;
 import java.util.Scanner;
 
 public class DetailedReportsToDistributionOfficer {
-    private static Scanner sc = new Scanner(System.in);
-    private static Connection connection = DBConnect.connectDatabase();
+    private static final Scanner sc = new Scanner(System.in);
+    private static final Connection connection = DBConnect.connectDatabase();
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) throws SQLException {
@@ -41,11 +41,11 @@ public class DetailedReportsToDistributionOfficer {
     }
 
     public static void displayMenu() {
-        System.out.println(String.format("| %-50s |", "============= Tast 1003 Of Dung Menu ============="));
-        System.out.println(String.format("| %-50s |", "--------------------------------------------------"));
-        System.out.println(String.format("| %-50s |", "0. Exit program"));
-        System.out.println(String.format("| %-50s |", "1. List details of distribution officer"));
-        System.out.println(String.format("| %-50s |", "=================================================="));
+        System.out.printf("| %-50s |%n", "============= Tast 1003 Of Dung Menu =============");
+        System.out.printf("| %-50s |%n", "--------------------------------------------------");
+        System.out.printf("| %-50s |%n", "0. Exit program");
+        System.out.printf("| %-50s |%n", "1. List details of distribution officer");
+        System.out.printf("| %-50s |%n", "==================================================");
     }
 
     public static void listDetailsDistributionOfficer() throws SQLException {
@@ -85,16 +85,16 @@ public class DetailedReportsToDistributionOfficer {
 
         ResultSet rs = st.executeQuery(sql);
         System.out.println("\u001B[33m=================================== List details of distribution officer ===================================");
-        System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |", "Officer name", "Amount distribution", "Date distribution",
-                "Address distribution"));
-        System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |\u001B[0m", "--------------------", "--------------------", "--------------------",
-                "-----------------------------------"));
+        System.out.printf("| %-20s | %-20s | %-20s | %-35s |%n", "Officer name", "Amount distribution", "Date distribution",
+                "Address distribution");
+        System.out.printf("| %-20s | %-20s | %-20s | %-35s |\u001B[0m%n", "--------------------", "--------------------", "--------------------",
+                "-----------------------------------");
         while (rs.next()) {
             String dateDistributionFormatted = (rs.getDate(3) != null) ? dateFormat.format(rs.getDate(3)) : "null";
-            System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |", rs.getString(1),
-                    formatFloatingPoint(rs.getFloat(2)), dateDistributionFormatted, rs.getString(4)));
-            System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |\u001B[0m", "--------------------", "--------------------", "--------------------",
-                    "-----------------------------------"));
+            System.out.printf("| %-20s | %-20s | %-20s | %-35s |%n", rs.getString(1),
+                    formatFloatingPoint(rs.getFloat(2)), dateDistributionFormatted, rs.getString(4));
+            System.out.printf("| %-20s | %-20s | %-20s | %-35s |\u001B[0m%n", "--------------------", "--------------------", "--------------------",
+                    "-----------------------------------");
         }
         System.out.println();
     }
@@ -113,7 +113,7 @@ public class DetailedReportsToDistributionOfficer {
                 isValid = true;
             }
         } catch (ParseException e) {
-            System.out.println(e.toString());
+            System.out.println(e);
         }
         return isValid;
     }
@@ -125,10 +125,10 @@ public class DetailedReportsToDistributionOfficer {
         while (!isValidDate) {
             checkDate = sc.next();
             try {
-                date = (Date) dateFormat.parse(checkDate);
+                date = dateFormat.parse(checkDate);
                 isValidDate = true;
             }  catch (ParseException e) {
-                System.out.println("\u001B[31m" + e.toString() + "\u001B[0m");
+                System.out.println("\u001B[31m" + e + "\u001B[0m");
                 System.out.println("\u001B[31m* Warning: Entered is incorrect format. Please try again!\u001B[0m");
             }
         }

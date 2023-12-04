@@ -33,9 +33,6 @@ public class PriorityObjectManager {
         } catch (Exception ex2) {
             ex2.printStackTrace();
 
-        } finally {
-            // JDBCQuery.closeConnection();
-
         }
         return indexObjectMap;
     }

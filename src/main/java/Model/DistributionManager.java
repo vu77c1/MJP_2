@@ -26,8 +26,8 @@ import java.util.Scanner;
 public class DistributionManager {
     public static DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("uuuu/MM/dd").withResolverStyle(ResolverStyle.STRICT);
     public static SimpleDateFormat formatter = new SimpleDateFormat("dd/MM/yyyy");
-    private static Connection con = JDBCQuery1.connectDatabase();
-    private static Scanner sc = new Scanner(System.in);
+    private static final Connection con = JDBCQuery1.connectDatabase();
+    private static final Scanner sc = new Scanner(System.in);
 
     public static void handleDistributionManager() {
         DistributionManager distributionManager = new DistributionManager();
@@ -442,7 +442,7 @@ public class DistributionManager {
 
                 do {
                     comid = identity;
-                    if (!isCommissionIdExists(comid) == true) {
+                    if (!isCommissionIdExists(comid)) {
                         System.out.println("\t\t\tID does not exist. Please enter ID again!");
                     }
                 } while (!isCommissionIdExists(comid));
@@ -467,7 +467,7 @@ public class DistributionManager {
 
                 do {
                     houseid = identity1;
-                    if (!isHouseIdExists(houseid) == true) {
+                    if (!isHouseIdExists(houseid)) {
                         System.out.println("\t\t\tID does not exist. Please enter ID again!");
                     }
 
@@ -486,7 +486,7 @@ public class DistributionManager {
 //            if (isValid == false) {
 //                System.out.println("Please input > 0");
 //            }
-        } while (isValid == false);
+        } while (!isValid);
 
 
         Date datereceived= InputValidator1.validateDateInputNew("\t\t\tEnter New Date Received with format dd//MM/yyyy:  ");
@@ -592,7 +592,7 @@ public class DistributionManager {
                             do {
                                 double newAmount = InputValidator1.validateDoubleInput("\t\t\tEnter amount: ");
                                 isValid = InputValidator1.isIntMoreThan0(newAmount);
-                                if(isValid==true){
+                                if(isValid){
                                     String sql1 = "UPDATE Distribution SET amount_distribution =? WHERE id =?";
                                     try {
                                         pstmt = con.prepareStatement(sql1);
@@ -626,7 +626,7 @@ public class DistributionManager {
                                     }
 
                                 }
-                            }while (isValid==false);
+                            }while (!isValid);
 
 
                             break;

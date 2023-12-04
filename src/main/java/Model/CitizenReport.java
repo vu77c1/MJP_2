@@ -43,9 +43,6 @@ public class CitizenReport {
         } catch (Exception exception) {
             exception.printStackTrace();
 
-        } finally {
-            //JDBCQuery.closeConnection();
-
         }
         return rs;
     }
@@ -146,7 +143,7 @@ public class CitizenReport {
                     // Print data in a formatted way
                     //  System.out.printf("%-5d%-10d%-20s%-20s%-20s%-20s%-15s%-20s%-10s%n", index++, houseId, name, address, typeNameObject, identityCard, dateOfBirth, householdLord, sex);
                 }
-                if (check == true) {
+                if (check) {
                     System.out.println("LIST HOUSE HOLD LORD ");
                     System.out.printf("\u001B[1m%-5s%-25s%-20s%-20s%-40s%-15s%-5s\u001B[0m%n", "ID",  "NAME", "IDENTITY_CARD", "PHONE_NUMBER", "ADDRESS", "DATE_OF_BIRTH", "SEX");
                     System.out.println();

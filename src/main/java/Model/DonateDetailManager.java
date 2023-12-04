@@ -184,10 +184,10 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
         try {
             Map<Integer, DonateDetail> donateDetailMap = getDonateDetail(con);
             if (!donateDetailMap.isEmpty()) {
-                System.out.println("============================================================= \u001B[1mDONATION LIST\u001B[0m ============================================================");
-                System.out.println("┌─────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────┐");
-                System.out.println("│   \u001B[1mSTT\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │   \u001B[1mOfficer\u001B[0m   │");
-                System.out.println("├─────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
+                System.out.println("=============================================================== \u001B[1mDONATION LIST\u001B[0m ==============================================================");
+                System.out.println("┌─────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────────┐");
+                System.out.println("│   \u001B[1mSTT\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │     \u001B[1mOfficer\u001B[0m     │");
+                System.out.println("├─────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────────┤");
                 int rowCount = 0;
                 for (Map.Entry<Integer, DonateDetail> entry : donateDetailMap.entrySet()) {
                     Integer index = entry.getKey();
@@ -219,15 +219,15 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                         officerName = donateDetail.getOfficerName();
                     }
 
-                    System.out.printf("│ %-7S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-11s │\n", index, amount, dateFormat.format(donateDate), precintName, representativeName, companyName, officerName);
+                    System.out.printf("│ %-7S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-15s │\n", index, amount, dateFormat.format(donateDate), precintName, representativeName, companyName, officerName);
                     rowCount++;
                     // Print separator line after each record (except the last one)
                     if (rowCount < donateDetailMap.size()) {
-                        System.out.println("├─────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
+                        System.out.println("├─────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────────┤");
                     }
                 }
-                System.out.println("└─────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────┘");
-                System.out.println("============================================================   \u001B[1mLIST ENDED\u001B[0m  ============================================================");
+                System.out.println("└─────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────────┘");
+                System.out.println("==============================================================   \u001B[1mLIST ENDED\u001B[0m  ==============================================================");
             } else {
                 System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[0m");
             }
@@ -264,10 +264,10 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                     boolean hasNext = resultSet.next();
                     while (hasNext) {
                         System.out.println();
-                        System.out.println("============================================================ \u001B[1mDONATION LIST\u001B[0m ============================================================");
-                        System.out.println("┌────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────┐");
-                        System.out.println("│   \u001B[1mID\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │   \u001B[1mOfficer\u001B[0m   │");
-                        System.out.println("├────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────┤");
+                        System.out.println("============================================================== \u001B[1mDONATION LIST\u001B[0m ==============================================================");
+                        System.out.println("┌────────┬────────────────────┬────────────────────┬────────────────────┬────────────────────────┬──────────────────────┬─────────────────┐");
+                        System.out.println("│   \u001B[1mID\u001B[0m   │   \u001B[1mAmount of money\u001B[0m  │   \u001B[1mDonation Date\u001B[0m    │    \u001B[1mCommune/Ward\u001B[0m    │     \u001B[1mRepresentative\u001B[0m     │     \u001B[1mCompany name\u001B[0m     │     \u001B[1mOfficer\u001B[0m     │");
+                        System.out.println("├────────┼────────────────────┼────────────────────┼────────────────────┼────────────────────────┼──────────────────────┼─────────────────┤");
                         String amount = String.format("%.0f", resultSet.getDouble("amount"));
                         LocalDate donate_date = resultSet.getObject("donate_date", LocalDate.class);
                         String precint_name;
@@ -294,11 +294,11 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                         } else {
                             officerName = resultSet.getString("name");
                         }
-                        System.out.printf("│ %-6S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-11s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, officerName);
+                        System.out.printf("│ %-6S │ %-18s │ %-18s │ %-18s │ %-22s │ %-20s │ %-15s │\n", ID, amount, dateFormat.format(donate_date), precint_name, representative_name, company_name, officerName);
                         hasNext = resultSet.next();
                     }
-                    System.out.println("└────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────┘");
-                    System.out.println("============================================================   \u001B[1mLIST ENDED\u001B[0m  ============================================================");
+                    System.out.println("└────────┴────────────────────┴────────────────────┴────────────────────┴────────────────────────┴──────────────────────┴─────────────────┘");
+                    System.out.println("==============================================================   \u001B[1mLIST ENDED\u001B[0m  ==============================================================");
                 } else {
                     System.out.println("\t\t\t\u001B[31mThere have been no donations yet.\u001B[0m");
                 }
@@ -678,7 +678,7 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                     System.out.println();
                     System.out.println("=================================== \u001B[1mDONATION LIST\u001B[0m ==================================");
                     System.out.println("┌───────┬────────────────────────┬────────────────────────┬────────────────────────┐");
-                    System.out.println("│   \u001B[1mID\u001B[0m  │         \u001B[1mOfficer\u001B[0m        │       \u001B[1mCommission\u001B[0m       │  \u001B[1mParticipations Times\u001B[0m  │");
+                    System.out.println("│   \u001B[1mID\u001B[0m  │         \u001B[1mOfficer\u001B[0m        │       \u001B[1mCommission\u001B[0m       │  \u001B[1mAmount of Monney\u001B[0m  │");
                     System.out.println("├───────┼────────────────────────┼────────────────────────┼────────────────────────┤");
                     int rowCount = 1;
                     int totalRecords = countRecords(con, "OfficerDistribution");
@@ -699,7 +699,7 @@ public static Map<Integer, DonateDetail> getDonateDetail(Connection con) {
                         System.out.printf("│ %-5S │ %-22s │ %-22s │ %-22s │\n", id, officerName, precintName, Stats);
                         rowCount++;
                         // Print separator line after each record (except the last one)
-                        if (rowCount < totalRecords) {
+                        if (rowCount < totalRecords - 1) {
                             System.out.println("├───────┼────────────────────────┼────────────────────────┼────────────────────────┤");
                         }
 
