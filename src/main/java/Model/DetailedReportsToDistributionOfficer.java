@@ -8,13 +8,13 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Scanner;
 
-public class Task1003OfDung {
+public class DetailedReportsToDistributionOfficer {
     private static Scanner sc = new Scanner(System.in);
     private static Connection connection = DBConnect.connectDatabase();
     public static SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
 
     public static void main(String[] args) throws SQLException {
-        Task1003OfDung.getTask1003OfDung();
+        DetailedReportsToDistributionOfficer.getTask1003OfDung();
     }
 
     public static void getTask1003OfDung() throws SQLException {
@@ -30,7 +30,7 @@ public class Task1003OfDung {
                     System.out.println("\u001B[36m* Notification: Program is closed. Thank you for using our program!\u001B[0m");
                     break;
                 case 1:
-                    Task1003OfDung.listDetailsDistributionOfficer();
+                    DetailedReportsToDistributionOfficer.listDetailsDistributionOfficer();
                     displayMenu();
                     break;
                 default:
@@ -52,11 +52,25 @@ public class Task1003OfDung {
         Statement st = connection.createStatement();
 
         // Each batch of statistics is a month, enter the start date and end date as one batch
-        System.out.println("Enter start date (yyyy/MM/dd):");
-        String startDate = checkValidDate();
+        String startDate = "";
+        do {
+            System.out.println("Enter start date (yyyy/MM/dd):");
+            startDate = checkValidDate();
+            if (!isValidDateFormat(startDate)) {
+                System.out.println("\u001B[31m* Warning: Please enter according to format (yyyy/MM/dd).\u001B[0m ");
+            }
+        } while (!isValidDateFormat(startDate));
 
-        System.out.println("Enter end date (yyyy/MM/dd):");
-        String endDate = checkValidDate();
+        String endDate = "";
+        do {
+            System.out.println("Enter end date (yyyy/MM/dd):");
+            endDate = checkValidDate();
+            if (!checkDateInput(startDate,endDate)) {
+                System.out.println("\u001B[31m* Warning: End date must be after Start date.\u001B[0m");
+            } else if (!isValidDateFormat(endDate)) {
+                System.out.println("\u001B[31m* Warning: Please enter according to format (yyyy/MM/dd).\u001B[0m ");
+            }
+        } while (!checkDateInput(startDate,endDate) || !isValidDateFormat(endDate));
 
         String sql = "SELECT o.name, SUM(d.amount_received) AS total_amount, d.date_received, od.address_distribution\n" +
                 "FROM Officer AS o \n" +
@@ -77,12 +91,31 @@ public class Task1003OfDung {
                 "-----------------------------------"));
         while (rs.next()) {
             String dateDistributionFormatted = (rs.getDate(3) != null) ? dateFormat.format(rs.getDate(3)) : "null";
-            System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |", rs.getString(1), rs.getFloat(2),
-                    dateDistributionFormatted, rs.getString(4)));
+            System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |", rs.getString(1),
+                    formatFloatingPoint(rs.getFloat(2)), dateDistributionFormatted, rs.getString(4)));
             System.out.println(String.format("| %-20s | %-20s | %-20s | %-35s |\u001B[0m", "--------------------", "--------------------", "--------------------",
                     "-----------------------------------"));
         }
         System.out.println();
+    }
+
+    private static String formatFloatingPoint(float value) {
+        // Format the floating-point number with desired precision
+        return String.format("%.0f", value);
+    }
+
+    private static boolean checkDateInput(String startDate, String endDate) {
+        boolean isValid = false;
+        try {
+            Date start = dateFormat.parse(startDate);
+            Date end = dateFormat.parse(endDate);
+            if (start.before(end)) {
+                isValid = true;
+            }
+        } catch (ParseException e) {
+            System.out.println(e.toString());
+        }
+        return isValid;
     }
 
     private static String checkValidDate() {
@@ -100,6 +133,17 @@ public class Task1003OfDung {
             }
         }
         return checkDate;
+    }
+
+    private static boolean isValidDateFormat(String dateStr) {
+        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy/MM/dd");
+        dateFormat1.setLenient(false);
+        try {
+            Date date = dateFormat1.parse(dateStr);
+            return dateStr.equals(dateFormat1.format(date));
+        } catch (ParseException e) {
+            return false;
+        }
     }
 
     // create method check input Int

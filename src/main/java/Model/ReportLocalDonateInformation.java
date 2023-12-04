@@ -8,12 +8,12 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Scanner;
 
-public class Task1002OfDung {
+public class ReportLocalDonateInformation {
     private static Scanner sc = new Scanner(System.in);
     private static Connection connection = DBConnect.connectDatabase();
 
     public static void main(String[] args) throws SQLException {
-        Task1002OfDung.getTask1002OfDung();
+        ReportLocalDonateInformation.getTask1002OfDung();
     }
 
     public static void getTask1002OfDung() throws SQLException {
@@ -29,11 +29,11 @@ public class Task1002OfDung {
                     System.out.println("\u001B[36m* Notification: Program is closed. Thank you for using our program!\u001B[0m");
                     break;
                 case 1:
-                    Task1002OfDung.top5Wards();
+                    ReportLocalDonateInformation.top5Wards();
                     displayMenu();
                     break;
                 case 2:
-                    Task1002OfDung.statisticsOfWards();
+                    ReportLocalDonateInformation.statisticsOfWards();
                     displayMenu();
                     break;
                 default:
@@ -100,11 +100,16 @@ public class Task1002OfDung {
                 "-----------------", "------------------"));
         while (rs.next()) {
             System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s | %-18s |", rs.getInt(1), rs.getString(2),
-                    rs.getString(3), rs.getString(4), rs.getFloat(5)));
+                    rs.getString(3), rs.getString(4), formatFloatingPoint(rs.getFloat(5))));
             System.out.println(String.format("| %-15s | %-15s | %-15s | %-18s | %-18s |", "---------------", "---------------", "---------------",
                     "-----------------", "------------------"));
         }
         System.out.println();
+    }
+
+    private static String formatFloatingPoint(float value) {
+        // Format the floating-point number with desired precision
+        return String.format("%.0f", value);
     }
 
     // create method 2: Statistics of wards that have not been donated

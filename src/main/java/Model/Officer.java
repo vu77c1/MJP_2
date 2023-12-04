@@ -5,12 +5,22 @@ public class Officer {
     private String name;
     private String phoneNumber;
     private String address;
+    private int commissionId;
 
-    public Officer(int id, String name, String phoneNumber, String address) {
+    public Officer(int id, String name, String phoneNumber, String address, int commissionId) {
         this.id = id;
         this.name = name;
         this.phoneNumber = phoneNumber;
         this.address = address;
+        this.commissionId = commissionId;
+    }
+
+    public int getCommissionId() {
+        return commissionId;
+    }
+
+    public void setCommissionId(int commissionId) {
+        this.commissionId = commissionId;
     }
 
     public Officer() {

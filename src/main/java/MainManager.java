@@ -1,23 +1,20 @@
 import Common.DBConnect;
-import Common.JdbcConfig;
 import Model.*;
 
-import static Model.Task1002OfDung.*;
+import static Model.ReportLocalDonateInformation.*;
 import static Model.DonateDetailManager.*;
 import static Model.DistributionManager.*;
 import static Model.Processing.*;
-import static Model.Task1003OfDung.*;
+import static Model.DetailedReportsToDistributionOfficer.*;
 
 import Common.InputValidator;
 
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import dao.CommissionDao;
 import menuCom.Menue;
 
 public class MainManager {

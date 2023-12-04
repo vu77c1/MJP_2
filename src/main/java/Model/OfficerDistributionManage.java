@@ -5,9 +5,8 @@ import Common.DBConnect;
 import java.sql.*;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
+import java.util.*;
 import java.util.Date;
-import java.util.Scanner;
 
 public class OfficerDistributionManage {
     private static Scanner sc = new Scanner(System.in);
@@ -70,58 +69,73 @@ public class OfficerDistributionManage {
         System.out.println(String.format("| %-30s |", "======== Update Menu ========="));
         System.out.println(String.format("| %-30s |", "------------------------------"));
         System.out.println(String.format("| %-30s |", "0. Exit program"));
-        System.out.println(String.format("| %-30s |", "1. Update Officer ID"));
-        System.out.println(String.format("| %-30s |", "2. Update Distribution ID"));
-        System.out.println(String.format("| %-30s |", "3. Update date distribution"));
-        System.out.println(String.format("| %-30s |", "4. Update address distribution"));
+        System.out.println(String.format("| %-30s |", "1. Update date distribution"));
+        System.out.println(String.format("| %-30s |", "2. Update address distribution"));
         System.out.println(String.format("| %-30s |", "=============================="));
     }
 
     // create method 1: Add new data
     public static void addNewData() throws SQLException {
         // add Officer_id into Officer Distribution table
-        boolean isExistOfficerID = false;
-        int officerId = 0;
+        System.out.println("Add Officer ID");
+        System.out.println("If you don't remember Officer ID, press 1 to review the Officer table.");
+        System.out.println("If you don't need it, press any number to continue");
+        int isSelectViewOfficerTable = checkInputInt();
+        if (isSelectViewOfficerTable == 1) {
+            OfficerManage.displayOfficerTable();
+        }
+        int targetIndex = 0;
         do {
             System.out.println("Enter Officer id:");
-            officerId = checkInputInt();
+            targetIndex = checkInputInt();
             // call method checkOfficerIdExistence:
-            isExistOfficerID = checkOfficerIdExistence(officerId);
-            if (isExistOfficerID == false) {
+            if (!checkOfficerIdExistence(targetIndex)) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
             }
-        } while (isExistOfficerID == false);
+        } while (!checkOfficerIdExistence(targetIndex));
+        int officerId = getIdFromIndexOfficerTable(targetIndex);
 
         // add Distribution_id into Officer Distribution table
-        boolean isExistOfficerDistributionID = false;
-        int distributionId = 0;
+        System.out.println("Add Distribution ID");
+        int isSelectViewDistributionTable = 0;
+        System.out.println("If you don't remember Distribution ID, press 1 to review the Distribution table.");
+        System.out.println("If you don't need it, press any number to continue");
+        isSelectViewDistributionTable = checkInputInt();
+        if (isSelectViewDistributionTable == 1) {
+            displayDistributionTable();
+        }
+        int targetIndexDistribution = 0;
         do {
             System.out.println("Enter Distribution id:");
-            distributionId = checkInputInt();
+            targetIndexDistribution = checkInputInt();
             // call method checkDistributionIdExistence
-            isExistOfficerDistributionID = checkDistributionIdExistence(distributionId);
-            if (isExistOfficerDistributionID == false) {
+            if (!checkDistributionIdExistence(targetIndexDistribution)) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
             }
-        } while (isExistOfficerDistributionID == false);
+        } while (!checkDistributionIdExistence(targetIndexDistribution));
+        int distributionId = getIdFromIndexDistributionTable(targetIndexDistribution);
 
         // add date distribution
-        System.out.println("Enter date distribution (yyyy/MM/dd):");
-        String dateDistribution = checkValidDate();
+        String dateDistribution = "";
+        do {
+            System.out.println("Enter date distribution (yyyy/MM/dd):");
+            dateDistribution = checkValidDate();
+            if (!isValidDateFormat(dateDistribution)) {
+                System.out.println("\u001B[31m* Warning: Please enter according to format (yyyy/MM/dd).\u001B[0m ");
+            }
+        } while (!isValidDateFormat(dateDistribution));
 
         // add address distribution
         int maxLengthAddress = 255;
-        boolean isCheckStringLength = false;
         String addressDistribution = "";
         do {
             sc.nextLine();
             System.out.println("Enter address distribution");
             addressDistribution = sc.nextLine();
-            isCheckStringLength = validateStringLength(addressDistribution, maxLengthAddress);
-            if (isCheckStringLength == false) {
+            if (!validateStringLength(addressDistribution, maxLengthAddress)) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 255 characters. Please try again!\u001B[0m");
             }
-        } while (isCheckStringLength == false);
+        } while (!validateStringLength(addressDistribution, maxLengthAddress));
 
         // create sql stament and execute
         Statement st = connection.createStatement();
@@ -141,61 +155,51 @@ public class OfficerDistributionManage {
         return input.length() <= maxLength;
     }
 
-    // check existence of Officer id
-    private static boolean checkOfficerIdExistence(int id) throws SQLException {
-        // get the ID value in the Officer table
-        ArrayList<Integer> s1 = new ArrayList<>();
-        String sql = "SELECT * FROM Officer";
-        PreparedStatement pstm = connection.prepareStatement(sql);
-        ResultSet rs = pstm.executeQuery();
-        while (rs.next()) {
-            s1.add(0, rs.getInt(1));
+    private static boolean isValidDateFormat(String dateStr) {
+        SimpleDateFormat dateFormat1 = new SimpleDateFormat("yyyy/MM/dd");
+        dateFormat1.setLenient(false);
+        try {
+            Date date = dateFormat1.parse(dateStr);
+            return dateStr.equals(dateFormat1.format(date));
+        } catch (ParseException e) {
+            return false;
         }
-        int count = 0;
-        for (int i = 0; i < s1.size(); i++) {
-            if (id == s1.get(i)) {
-                count++;
-            }
-        }
-        return count > 0;
     }
 
-    // check existence of Distribution id
-    private static boolean checkDistributionIdExistence(int id) throws SQLException {
-        // get the ID value int the Distribution table
-        ArrayList<Integer> listDistributionId = new ArrayList<>();
-        String sql2 = "Select * from Distribution";
-        PreparedStatement pstm = connection.prepareStatement(sql2);
-        ResultSet rs = pstm.executeQuery();
-        while (rs.next()) {
-            listDistributionId.add(0, rs.getInt(1));
-        }
-        int count = 0;
-        for (int i = 0; i < listDistributionId.size(); i++) {
-            if (id == listDistributionId.get(i)) {
-                count++;
+    // create method check Officer id existence
+    private static boolean checkOfficerIdExistence(int id) throws SQLException {
+        Map<Integer, Officer> indexOfficerMap = OfficerManage.getOfficer();
+        return indexOfficerMap.containsKey(id);
+    }
+
+    // create method get id from index
+    private static int getIdFromIndexOfficerTable(int targetIndex) throws SQLException {
+        Map<Integer, Officer> indexOfficerMap = OfficerManage.getOfficer();
+        if (indexOfficerMap.containsKey(targetIndex)) {
+            Officer officer = indexOfficerMap.get(targetIndex);
+            if (officer != null) {
+                return officer.getId();
             }
         }
-        return count > 0;
+        return 0;
     }
 
     // check existence of OfficerDistribution id
     private static boolean checkOfficerDistributionIdExistence(int id) throws SQLException {
-        // get the ID value int the Officer Distribution table
-        ArrayList<Integer> listODId = new ArrayList<>();
-        String sql = "Select * from OfficerDistribution";
-        PreparedStatement pstm = connection.prepareStatement(sql);
-        ResultSet rs2 = pstm.executeQuery();
-        while (rs2.next()) {
-            listODId.add(0, rs2.getInt(1));
-        }
-        int count = 0;
-        for (int i = 0; i < listODId.size(); i++) {
-            if (id == listODId.get(i)) {
-                count++;
+        Map<Integer, OfficerDistribution> indexOfficerDistributionMap = getOfficerDistribution();
+        return indexOfficerDistributionMap.containsKey(id);
+    }
+
+    // create method get id from index
+    private static int getIdFromIndexOfOfficerDistributionDTable(int targetIndex) throws SQLException {
+        Map<Integer, OfficerDistribution> indexOfficerDistributionMap = getOfficerDistribution();
+        if (indexOfficerDistributionMap.containsKey(targetIndex)) {
+            OfficerDistribution officerDistribution = indexOfficerDistributionMap.get(targetIndex);
+            if (officerDistribution != null) {
+                return officerDistribution.getId();
             }
         }
-        return count > 0;
+        return 0;
     }
 
     // create method 2: Update Officer Distribution table
@@ -210,18 +214,10 @@ public class OfficerDistributionManage {
                     System.out.println("\u001B[32m* Notification: Update program is closed\u001B[0m");
                     break;
                 case 1:
-                    updateOfficerId();
-                    displayUpdateMenu();
-                    break;
-                case 2:
-                    updateDistributionId();
-                    displayUpdateMenu();
-                    break;
-                case 3:
                     updateDateDistribution();
                     displayUpdateMenu();
                     break;
-                case 4:
+                case 2:
                     updateAddressDistribution();
                     displayUpdateMenu();
                     break;
@@ -233,122 +229,113 @@ public class OfficerDistributionManage {
     }
 
     // create method 2.1:
-    private static void updateOfficerId() throws SQLException {
-        int select = 0;
-        do {
-            System.out.println("If you don't remember Officer ID, press 1 to review the Officer table.");
-            System.out.println("If you don't need it, press any number to continue");
-            select = checkInputInt();
-            if (select == 1) {
-                OfficerManage.displayOfficerTable();
-            }
-        } while (false);
-        String sql = "UPDATE OfficerDistribution SET officer_id = ? WHERE id = ?";
-        PreparedStatement pstm = connection.prepareStatement(sql);
-
-        boolean isCheckExistODId = false;
-        int id = 0;
-        do {
-            System.out.println("Enter the id you want to edit:");
-            id = checkInputInt();
-            isCheckExistODId = checkOfficerDistributionIdExistence(id);
-            if (isCheckExistODId == false) {
-                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
-            }
-        } while (isCheckExistODId == false);
-        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
-        displayOfficerDistributionTableById(id);
-
-        boolean isCheckExistOfficerId = false;
-        int newOfficerId = 0;
-        do {
-            System.out.println("Enter new Officer id:");
-            newOfficerId = checkInputInt();
-            // call method checkOfficerIdExistence:
-            isCheckExistOfficerId = checkOfficerIdExistence(newOfficerId);
-            if (isCheckExistOfficerId == false) {
-                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
-            }
-        } while (isCheckExistOfficerId == false);
-
-        pstm.setInt(1, newOfficerId);
-        pstm.setInt(2, id);
-
-        int isCheckQuery = pstm.executeUpdate();
-        if (isCheckQuery > 0) {
-            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
-        }
-    }
+//    private static void updateOfficerId() throws SQLException {
+//        System.out.println("If you don't remember Officer ID, press 1 to review the Officer table.");
+//        System.out.println("If you don't need it, press any number to continue");
+//        int select = checkInputInt();
+//        if (select == 1) {
+//            OfficerManage.displayOfficerTable();
+//        }
+//        String sql = "UPDATE OfficerDistribution SET officer_id = ? WHERE id = ?";
+//        PreparedStatement pstm = connection.prepareStatement(sql);
+//
+//        int id = 0;
+//        do {
+//            System.out.println("Enter the id you want to edit:");
+//            id = checkInputInt();
+//            if (!checkOfficerDistributionIdExistence(id)) {
+//                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
+//            }
+//        } while (!checkOfficerDistributionIdExistence(id));
+//        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
+//        displayOfficerDistributionTableById(id);
+//
+//        int newOfficerId = 0;
+//        do {
+//            System.out.println("Enter new Officer id:");
+//            newOfficerId = checkInputInt();
+//            // call method checkOfficerIdExistence:
+//            if (!checkOfficerIdExistence(newOfficerId)) {
+//                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer table!\u001B[0m");
+//            }
+//        } while (!checkOfficerIdExistence(newOfficerId));
+//
+//        pstm.setInt(1, newOfficerId);
+//        pstm.setInt(2, id);
+//
+//        int isCheckQuery = pstm.executeUpdate();
+//        if (isCheckQuery > 0) {
+//            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
+//        }
+//    }
 
     // create method 2.2:
-    private static void updateDistributionId() throws SQLException {
-        int select = 0;
-        do {
-            System.out.println("If you don't remember Distribution ID, press 1 to review the Distribution table.");
-            System.out.println("If you don't need it, press any number to continue");
-            select = checkInputInt();
-            if (select == 1) {
-                displayDistributionTable();
-            }
-        } while (false);
+//    private static void updateDistributionId() throws SQLException {
+//        System.out.println("If you don't remember Distribution ID, press 1 to review the Distribution table.");
+//        System.out.println("If you don't need it, press any number to continue");
+//        int select = checkInputInt();
+//        if (select == 1) {
+//            displayDistributionTable();
+//        }
+//
+//        String sql = "UPDATE OfficerDistribution SET distribution_id = ? WHERE id = ?";
+//        PreparedStatement pstm = connection.prepareStatement(sql);
+//
+//        int id = 0;
+//        do {
+//            System.out.println("Enter the id you want to edit:");
+//            id = checkInputInt();
+//            if (!checkOfficerDistributionIdExistence(id)) {
+//                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
+//            }
+//        } while (!checkOfficerDistributionIdExistence(id));
+//        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
+//        displayOfficerDistributionTableById(id);
+//
+//        int newDistributionId = 0;
+//        do {
+//            System.out.println("Enter Distribution id:");
+//            newDistributionId = checkInputInt();
+//            // call method checkDistributionIdExistence
+//            if (!checkDistributionIdExistence(newDistributionId)) {
+//                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
+//            }
+//        } while (!checkDistributionIdExistence(newDistributionId));
+//
+//        pstm.setInt(1, newDistributionId);
+//        pstm.setInt(2, id);
+//
+//        int isCheckQuery = pstm.executeUpdate();
+//        if (isCheckQuery > 0) {
+//            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
+//        }
+//    }
 
-        String sql = "UPDATE OfficerDistribution SET distribution_id = ? WHERE id = ?";
-        PreparedStatement pstm = connection.prepareStatement(sql);
-
-        boolean isCheckExistODId = false;
-        int id = 0;
-        do {
-            System.out.println("Enter the id you want to edit:");
-            id = checkInputInt();
-            isCheckExistODId = checkOfficerDistributionIdExistence(id);
-            if (isCheckExistODId == false) {
-                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
-            }
-        } while (isCheckExistODId == false);
-        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
-        displayOfficerDistributionTableById(id);
-
-        boolean isCheckExistDistributionId = false;
-        int newDistributionId = 0;
-        do {
-            System.out.println("Enter Distribution id:");
-            newDistributionId = checkInputInt();
-            // call method checkDistributionIdExistence
-            isCheckExistDistributionId = checkDistributionIdExistence(newDistributionId);
-            if (isCheckExistDistributionId == false) {
-                System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
-            }
-        } while (isCheckExistDistributionId == false);
-
-        pstm.setInt(1, newDistributionId);
-        pstm.setInt(2, id);
-
-        int isCheckQuery = pstm.executeUpdate();
-        if (isCheckQuery > 0) {
-            System.out.println("\u001B[32m* Notification: Update success\u001B[0m");
-        }
-    }
-
-    // create method 2.3:
+    // create method 2.1:
     private static void updateDateDistribution() throws SQLException {
         String sql = "UPDATE OfficerDistribution SET date_distribution = ? WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
 
-        boolean isCheckExistODId = false;
-        int id = 0;
+        int targetIndex = 0;
         do {
             System.out.println("Enter the id you want to edit:");
-            id = checkInputInt();
-            isCheckExistODId = checkOfficerDistributionIdExistence(id);
-            if (isCheckExistODId == false) {
+            targetIndex = checkInputInt();
+            if (!checkOfficerDistributionIdExistence(targetIndex)) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
             }
-        } while (isCheckExistODId == false);
-        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
-        displayOfficerDistributionTableById(id);
+        } while (!checkOfficerDistributionIdExistence(targetIndex));
+        int id = getIdFromIndexOfOfficerDistributionDTable(targetIndex);
+        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + targetIndex +"\u001B[0m");
+        displayOfficerDistributionTableById(id, targetIndex);
 
-        System.out.println("Enter new date distribution (yyyy/MM/dd):");
-        String newDateDistribution = checkValidDate();
+        String newDateDistribution = "";
+        do {
+            System.out.println("Enter new date distribution (yyyy/MM/dd):");
+            newDateDistribution = checkValidDate();
+            if (!isValidDateFormat(newDateDistribution)) {
+                System.out.println("\u001B[31m* Warning: Please enter according to format (yyyy/MM/dd).\u001B[0m ");
+            }
+        } while (!isValidDateFormat(newDateDistribution));
 
         pstm.setString(1, newDateDistribution);
         pstm.setInt(2, id);
@@ -359,36 +346,33 @@ public class OfficerDistributionManage {
         }
     }
 
-    // create method 2.4:
+    // create method 2.2:
     private static void updateAddressDistribution() throws SQLException {
         String sql = "UPDATE OfficerDistribution SET address_distribution = ? WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
 
-        boolean isCheckExistODId = false;
-        int id = 0;
+        int targetIndex = 0;
         do {
             System.out.println("Enter the id you want to edit:");
-            id = checkInputInt();
-            isCheckExistODId = checkOfficerDistributionIdExistence(id);
-            if (isCheckExistODId == false) {
+            targetIndex = checkInputInt();
+            if (!checkOfficerDistributionIdExistence(targetIndex)) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
             }
-        } while (isCheckExistODId == false);
-        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + id +"\u001B[0m");
-        displayOfficerDistributionTableById(id);
+        } while (!checkOfficerDistributionIdExistence(targetIndex));
+        int id = getIdFromIndexOfOfficerDistributionDTable(targetIndex);
+        System.out.println("\u001B[32mThis is the table you are accessing whose id is " + targetIndex +"\u001B[0m");
+        displayOfficerDistributionTableById(id, targetIndex);
 
         int maxLengthAddress = 255;
-        boolean isCheckStringLength = false;
         String newAddressDistribution = "";
         do {
             sc.nextLine();
             System.out.println("Enter address distribution");
             newAddressDistribution = sc.nextLine();
-            isCheckStringLength = validateStringLength(newAddressDistribution, maxLengthAddress);
-            if (isCheckStringLength == false) {
+            if (!validateStringLength(newAddressDistribution, maxLengthAddress)) {
                 System.out.println("\u001B[31m* Warning: You have entered more than 255 characters. Please try again!\u001B[0m");
             }
-        } while (isCheckStringLength == false);
+        } while (!validateStringLength(newAddressDistribution, maxLengthAddress));
 
         pstm.setString(1, newAddressDistribution);
         pstm.setInt(2, id);
@@ -404,18 +388,17 @@ public class OfficerDistributionManage {
         String sql = "DELETE FROM OfficerDistribution WHERE id = ?";
         PreparedStatement pstm = connection.prepareStatement(sql);
 
-        boolean isCheckExistODId = false;
-        int id = 0;
+        int targetIndex = 0;
         do {
             System.out.println("Enter the id you want to delete:");
-            id = checkInputInt();
-            isCheckExistODId = checkOfficerDistributionIdExistence(id);
-            if (isCheckExistODId == false) {
+            targetIndex = checkInputInt();
+            if (!checkOfficerDistributionIdExistence(targetIndex)) {
                 System.out.println("\u001B[31m* Warning: ID does not exist in the Officer Distribution table!\u001B[0m");
             }
-        } while (isCheckExistODId == false);
-        System.out.println("\u001B[31mThis is the table you want to delete whose id is " + id +"\u001B[0m");
-        displayOfficerDistributionTableById(id);
+        } while (!checkOfficerDistributionIdExistence(targetIndex));
+        int id = getIdFromIndexOfOfficerDistributionDTable(targetIndex);
+        System.out.println("\u001B[31mThis is the table you want to delete whose id is " + targetIndex +"\u001B[0m");
+        displayOfficerDistributionTableById(id, targetIndex);
         System.out.println("If you are sure you want to delete, press number 1. Otherwise, press any number (except number 1) to return to the main menu");
         int select = checkInputInt();
         if (select == 1) {
@@ -431,40 +414,102 @@ public class OfficerDistributionManage {
 
     // create method 4: Display Officer Distribution table
     public static void displayOfficerDistributionTable() throws SQLException {
-        Statement st = connection.createStatement();
-        String sql = "SELECT * FROM OfficerDistribution";
-        ResultSet rs = st.executeQuery(sql);
-        System.out.println("\u001B[33m=================================== Officer Distribution Table ====================================");
-        System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", "ID", "Officer ID","Distribution ID",
-                "Date Distribution", "Address Distribution"));
-        System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |\u001B[0m", "-----", "----------", "---------------",
-                "-----------------", "-----------------------------------"));
-        while (rs.next()) {
-            System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", rs.getInt(1), rs.getInt(2),
-                    rs.getInt(3) , dateFormat.format(rs.getDate(4)), rs.getString(5)));
-            System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", "-----", "----------", "---------------",
+        Map<Integer, OfficerDistribution> officerDistributionMap = getOfficerDistribution();
+        if (!officerDistributionMap.isEmpty()) {
+            System.out.println("\u001B[33m========================================== Officer Distribution Table ============================================");
+            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", "ID", "Officer Name","Amount Distribution",
+                    "Date Distribution", "Address Distribution"));
+            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |\u001B[0m", "-----", "--------------------", "--------------------",
                     "-----------------", "-----------------------------------"));
+            for (Map.Entry<Integer, OfficerDistribution> entry : officerDistributionMap.entrySet()) {
+                Integer index = entry.getKey();
+                OfficerDistribution officerDistribution = entry.getValue();
+                String officerName = officerDistribution.getOfficerName();
+                float amoutDistribution = officerDistribution.getAmountDistribution();
+                String date = dateFormat.format(officerDistribution.getDateDistribution());
+                String address = officerDistribution.getAddressDistribution();
+                System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", index, officerName, formatFloatingPoint(amoutDistribution),
+                        date, address));
+                System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", "-----", "--------------------", "--------------------",
+                        "-----------------", "-----------------------------------"));
+            }
         }
         System.out.println();
     }
 
-    // create method Display Officer Distribution table by ID
-    public static void displayOfficerDistributionTableById(int id) throws SQLException {
+    public static Map<Integer, OfficerDistribution> getOfficerDistribution() throws SQLException {
+        Map<Integer, OfficerDistribution> indexObjectMap = new LinkedHashMap<>();
         Statement st = connection.createStatement();
-        String sql = "SELECT * FROM OfficerDistribution WHERE id = " + id;
+        String sql = "SELECT od.id, o.name, d.amount_received, \n" +
+                "od.date_distribution, od.address_distribution \n" +
+                "FROM OfficerDistribution as od\n" +
+                "JOIN Officer as o\n" +
+                "on od.officer_id = o.id\n" +
+                "JOIN Distribution as d\n" +
+                "on od.distribution_id = d.id\n" +
+                "ORDER BY od.id desc;";
         ResultSet rs = st.executeQuery(sql);
-        System.out.println("\u001B[33m=================================== Officer Distribution Table ====================================");
-        System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", "ID", "Officer ID","Distribution ID",
-                "Date Distribution", "Address Distribution"));
-        System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |\u001B[0m", "-----", "----------", "---------------",
-                "-----------------", "-----------------------------------"));
+        int index = 1;
         while (rs.next()) {
-            System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", rs.getInt(1), rs.getInt(2),
-                    rs.getInt(3) , dateFormat.format(rs.getDate(4)), rs.getString(5)));
-            System.out.println(String.format("| %-5s | %-10s | %-15s | %-18s | %-35s |", "-----", "----------", "---------------",
+            OfficerDistribution officerDistribution = new OfficerDistribution(rs.getInt(1),
+                    rs.getString(2),
+                    rs.getFloat(3) ,
+                    rs.getDate(4),
+                    rs.getString(5)
+            );
+            indexObjectMap.put(index, officerDistribution);
+            index++;
+        }
+        return indexObjectMap;
+    }
+
+    // create method Display Officer Distribution table by ID
+    public static void displayOfficerDistributionTableById(int id, int targetIndex) throws SQLException {
+        Map<Integer, OfficerDistribution> officerDistributionMap = getOfficerDistributionById(id, targetIndex);
+        if (!officerDistributionMap.isEmpty()) {
+            System.out.println("\u001B[33m========================================== Officer Distribution Table ============================================");
+            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", "ID", "Officer Name","Amount Distribution",
+                    "Date Distribution", "Address Distribution"));
+            System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |\u001B[0m", "-----", "--------------------", "--------------------",
                     "-----------------", "-----------------------------------"));
+            for (Map.Entry<Integer, OfficerDistribution> entry : officerDistributionMap.entrySet()) {
+                Integer index = entry.getKey();
+                OfficerDistribution officerDistribution = entry.getValue();
+                String officerName = officerDistribution.getOfficerName();
+                float amoutDistribution = officerDistribution.getAmountDistribution();
+                String date = dateFormat.format(officerDistribution.getDateDistribution());
+                String address = officerDistribution.getAddressDistribution();
+                System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", index, officerName, formatFloatingPoint(amoutDistribution),
+                        date, address));
+                System.out.println(String.format("| %-5s | %-20s | %-20s | %-18s | %-35s |", "-----", "--------------------", "--------------------",
+                        "-----------------", "-----------------------------------"));
+            }
         }
         System.out.println();
+    }
+
+    public static Map<Integer, OfficerDistribution> getOfficerDistributionById(int id, int target) throws SQLException {
+        Map<Integer, OfficerDistribution> indexObjectMap = new LinkedHashMap<>();
+        Statement st = connection.createStatement();
+        String sql = "SELECT od.id, o.name, d.amount_received, \n" +
+                "od.date_distribution, od.address_distribution \n" +
+                "FROM OfficerDistribution as od\n" +
+                "JOIN Officer as o\n" +
+                "on od.officer_id = o.id\n" +
+                "JOIN Distribution as d\n" +
+                "on od.distribution_id = d.id\n" +
+                "Where od.id = " + id;
+        ResultSet rs = st.executeQuery(sql);
+        while (rs.next()) {
+            OfficerDistribution officerDistribution = new OfficerDistribution(rs.getInt(1),
+                    rs.getString(2),
+                    rs.getFloat(3) ,
+                    rs.getDate(4),
+                    rs.getString(5)
+            );
+            indexObjectMap.put(target, officerDistribution);
+        }
+        return indexObjectMap;
     }
 
     // create method check input Int
@@ -503,20 +548,75 @@ public class OfficerDistributionManage {
 
     // create method display Distribution table
     private static void displayDistributionTable() throws SQLException {
-        Statement st = connection.createStatement();
-        String sql = "SELECT * FROM Distribution";
-        ResultSet rs = st.executeQuery(sql);
-        System.out.println("\u001B[33m=============================== Distribution Table ================================");
-        System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", "ID", "Commission ID","Household ID",
-                "Amount Received", "Date Received"));
-        System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |\u001B[0m", "-----", "--------------", "------------",
-                "------------------", "------------------"));
-        while (rs.next()) {
-            System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", rs.getInt(1), rs.getInt(2),
-                    rs.getInt(3), rs.getFloat(4), dateFormat.format(rs.getDate(5))));
-            System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", "-----", "--------------", "------------",
+        Map<Integer, Map<Integer, Object>> distributionMap = getDistribution();
+        if (!distributionMap.isEmpty()) {
+            System.out.println("\u001B[33m=============================== Distribution Table ================================");
+            System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", "ID", "Commission ID","Household ID",
+                    "Amount Received", "Date Received"));
+            System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |\u001B[0m", "-----", "--------------", "------------",
                     "------------------", "------------------"));
+            for (Map.Entry<Integer, Map<Integer, Object>> entry : distributionMap.entrySet()) {
+                Integer index = entry.getKey();
+                Map<Integer, Object> rowData = entry.getValue();
+                int commissionId = (int) rowData.get(2);
+                int houseId = (int) rowData.get(3);
+                float amount = (float) rowData.get(4);
+                String date = (String) rowData.get(5);
+                System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", index, commissionId,
+                        houseId, formatFloatingPoint(amount), date));
+                System.out.println(String.format("| %-5s | %-14s | %-12s | %-18s | %-18s |", "-----", "--------------", "------------",
+                        "------------------", "------------------"));
+            }
         }
         System.out.println();
+    }
+
+    public static Map<Integer, Map<Integer, Object>> getDistribution() throws SQLException {
+        Map<Integer, Map<Integer, Object>> indexDataMap = new HashMap<>();
+        Statement st = connection.createStatement();
+        String sql = "SELECT * FROM Distribution Order by id desc;";
+        ResultSet rs = st.executeQuery(sql);
+        int index = 1;
+        while (rs.next()) {
+            int id = rs.getInt(1);
+            int commissionId = rs.getInt(2);
+            int houseId = rs.getInt(3);
+            float amount = rs.getFloat(4);
+            String date = dateFormat.format(rs.getDate(5));
+
+            Map<Integer, Object> rowData = new HashMap<>();
+            rowData.put(1, id);
+            rowData.put(2, commissionId);
+            rowData.put(3, houseId);
+            rowData.put(4, amount);
+            rowData.put(5, date);
+
+            indexDataMap.put(index, rowData);
+            index++;
+        }
+        return indexDataMap;
+    }
+
+    // check existence of Distribution id
+    private static boolean checkDistributionIdExistence(int id) throws SQLException {
+        Map<Integer, Map<Integer, Object>> indexDistributionMap = getDistribution();
+        return indexDistributionMap.containsKey(id);
+    }
+
+    // create method get id from index of Distribution table
+    private static int getIdFromIndexDistributionTable(int targetIndex) throws SQLException {
+        Map<Integer, Map<Integer, Object>> indexDistributionMap = getDistribution();
+        if (indexDistributionMap.containsKey(targetIndex)) {
+            Map<Integer, Object> rowData = indexDistributionMap.get(targetIndex);
+            if (rowData != null) {
+                return (int) rowData.get(1);
+            }
+        }
+        return 0;
+    }
+
+    private static String formatFloatingPoint(float value) {
+        // Format the floating-point number with desired precision
+        return String.format("%.0f", value);
     }
 }

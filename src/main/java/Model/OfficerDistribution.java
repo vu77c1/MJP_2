@@ -1,18 +1,19 @@
 package Model;
 
+import java.awt.*;
 import java.util.Date;
 
 public class OfficerDistribution {
     private int id;
-    private int officerId;
-    private int distributionId;
+    private String officerName;
+    private float amountDistribution;
     private Date dateDistribution;
     private String addressDistribution;
 
-    public OfficerDistribution(int id, int officerId, int distributionId, Date dateDistribution, String addressDistribution) {
+    public OfficerDistribution(int id, String officerName, float amountDistribution, Date dateDistribution, String addressDistribution) {
         this.id = id;
-        this.officerId = officerId;
-        this.distributionId = distributionId;
+        this.officerName = officerName;
+        this.amountDistribution = amountDistribution;
         this.dateDistribution = dateDistribution;
         this.addressDistribution = addressDistribution;
     }
@@ -28,20 +29,20 @@ public class OfficerDistribution {
         this.id = id;
     }
 
-    public int getOfficerId() {
-        return officerId;
+    public String getOfficerName() {
+        return officerName;
     }
 
-    public void setOfficerId(int officerId) {
-        this.officerId = officerId;
+    public void setOfficerName(String officerName) {
+        this.officerName = officerName;
     }
 
-    public int getDistributionId() {
-        return distributionId;
+    public float getAmountDistribution() {
+        return amountDistribution;
     }
 
-    public void setDistributionId(int distributionId) {
-        this.distributionId = distributionId;
+    public void setAmountDistribution(float amountDistribution) {
+        this.amountDistribution = amountDistribution;
     }
 
     public Date getDateDistribution() {
