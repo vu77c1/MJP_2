@@ -135,7 +135,7 @@ public class InputValidator {
             try {
                 System.out.print(prompt);
                 userInput = Integer.parseInt(scanner.nextLine());
-                if (userInput > 0 ){
+                if (userInput >= 0 ){
                     isValid = true;
                 }else {
                     isValid = false;
