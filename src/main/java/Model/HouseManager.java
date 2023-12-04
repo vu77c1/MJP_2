@@ -1,6 +1,6 @@
 package Model;
 import Common.DBConnect;
-import org.jetbrains.annotations.NotNull;
+
 
 import java.sql.*;
 import java.text.ParseException;
@@ -42,48 +42,7 @@ public class HouseManager {
 //    public static boolean isValidPriorityObjectId(Connection connection, int priorityObjectId) throws SQLException {
 //        return isValidIdInTable(connection, "PriorityObject", priorityObjectId);
 //    }
-    public static @NotNull Map<Integer, House> getHouseDetails(Connection con) {
-        Map<Integer, House> indexObjectMap = new LinkedHashMap<>();
-        try {
-            String selectQuery = """
-                SELECT
-                    H.id,
-                    H.commission_id,
-                    H.priority_object_id,
-                    C.precint_name,
-                    PO.object_type
-                FROM
-                    House H
-                    LEFT JOIN Commission C ON H.commission_id = C.id
-                    LEFT JOIN PriorityObject PO ON H.priority_object_id = PO.id
-                ORDER BY H.id DESC""";
 
-            try (PreparedStatement preparedStatement = con.prepareStatement(selectQuery)) {
-                ResultSet rs = preparedStatement.executeQuery();
-                if (rs != null) {
-                    int index = 1;
-                    try {
-                        while (rs.next()) {
-                            House house = new House(
-                                    rs.getInt("id"),
-                                    rs.getInt("commission_id"),
-                                    rs.getInt("priority_object_id"),
-                                    rs.getString("precint_name"),
-                                    rs.getString("object_type")
-                            );
-                            indexObjectMap.put(index, house);
-                            index++;
-                        }
-                    } catch (SQLException ex) {
-                        System.out.println("\t\t\t\u001B[31mThere was an error processing the result set: " + ex.getMessage() + ".\u001B[0m");
-                    }
-                }
-            }
-        } catch (Exception ex) {
-            System.out.println("\t\t\t\u001B[31mThere was an error connecting to the Database: " + ex.getMessage() + ".\u001B[0m");
-        }
-        return indexObjectMap;
-    }
 //    public static int getCommissionIdByName(Connection con, String commissionName) {
 //        int commissionId = -1; // Default value if not found
 //        try {
